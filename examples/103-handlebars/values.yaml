@@ -1,0 +1,14 @@
+
+# this model has constant values used by the workflow
+# normally, these would come from the atlas-values.yaml file in the current directory
+# these are included in the blueprint as defaults
+
+example:
+  when: Wednesday, August 29, 2018 
+  colors:
+  - name: red
+    code: R
+  - name: green
+    code: G
+  - name: blue
+    code: B

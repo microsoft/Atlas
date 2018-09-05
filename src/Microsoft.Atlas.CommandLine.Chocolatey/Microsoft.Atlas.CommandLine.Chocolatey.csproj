@@ -1,0 +1,50 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>netstandard2.0</TargetFramework>
+    <PackageId>atlas-cli</PackageId>
+    <VersionPrefix>0.1</VersionPrefix>
+    <VersionPrefix Condition=" '$(BUILD_BUILDID)' != '' ">$(VersionPrefix).$(BUILD_BUILDID)</VersionPrefix>
+    <IncludeBuildOutput>false</IncludeBuildOutput>
+    <ContentTargetFolders>tools</ContentTargetFolders>
+      
+      <Title>Atlas CLI</Title>
+      <!--<Owners></Owners>-->
+      <Authors>falconcore@microsoft.com</Authors>
+      <PackageProjectUrl>https://PackageProjectUrl</PackageProjectUrl>
+      <PackageIconUrl>https://PackageIconUrl</PackageIconUrl>
+      <Copyright>Copyright 2018</Copyright>
+      <Company>Microsoft</Company>
+      <PackageLicenseUrl>https://PackageLicenseUrl</PackageLicenseUrl>
+      <PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
+      <!-- projectSourceUrl -->
+      <!-- docsUrl -->
+      <!-- mailingListUrl -->
+      <!-- bugTrackerUrl -->
+      <PackageTags>atlas cli admin azure activedirectory aad visualstudio vsts</PackageTags>
+      
+      <Description>Automated deployment and configuration of engineering systems</Description>
+      <!--<ReleaseNotes>ReleaseNotes</ReleaseNotes>-->
+      
+      <RepositoryUrl>$(BUILD_REPOSITORY_URI)</RepositoryUrl>
+      <RepositoryType>git</RepositoryType>
+      <RepositoryBranch>$(BUILD_SOURCEBRANCHNAME)</RepositoryBranch>
+      <RepositoryCommit>$(BUILD_SOURCEVERSION)</RepositoryCommit>
+      <!--<NuspecProperties></NuspecProperties>-->
+  </PropertyGroup>
+
+  <ItemGroup>
+    <None Remove="LICENSE.txt" />
+    <None Remove="VERIFICATION.txt" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Content Include="LICENSE.txt" />
+    <Content Include="VERIFICATION.txt" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PublishProjectReference Include="..\Microsoft.Atlas.CommandLine\Microsoft.Atlas.CommandLine.csproj" TargetFramework="netcoreapp2.0" RuntimeIdentifier="win10-x64" />
+  </ItemGroup>
+
+</Project>

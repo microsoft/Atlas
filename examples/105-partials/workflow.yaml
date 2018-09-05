@@ -1,0 +1,18 @@
+
+
+operations:
+- message: partial files can be included to organize a workflow into different files 
+- message: they are expanded literally in-place as text
+- message: with yaml care must be taken to indent the partial contents the proper amount
+
+- message: including partial one via \{{> one.yaml }}
+  {{# indent 2 }}
+  {{> one.yaml }}
+  {{/ indent }}
+
+- message: including partial two via \{{> two.yaml alpha=10 beta="twenty" }}
+  {{# indent 2 }}
+  {{> two.yaml alpha=10 beta="twenty" }}
+  {{/ indent }}
+
+- message: this is back in the main template

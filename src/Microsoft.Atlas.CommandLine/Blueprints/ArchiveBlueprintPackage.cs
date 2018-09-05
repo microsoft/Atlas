@@ -1,0 +1,28 @@
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT license.
+
+using System;
+using System.IO;
+
+namespace Microsoft.Atlas.CommandLine.Blueprints
+{
+    public class ArchiveBlueprintPackage : IBlueprintPackage
+    {
+        private readonly string _archivePath;
+
+        public ArchiveBlueprintPackage(string archivePath)
+        {
+            _archivePath = archivePath;
+        }
+
+        public bool Exists(string path)
+        {
+            throw new NotImplementedException();
+        }
+
+        public TextReader OpenText(string path)
+        {
+            throw new NotImplementedException();
+        }
+    }
+}

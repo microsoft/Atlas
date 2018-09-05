@@ -1,0 +1,67 @@
+{
+  "id": "18cf5ac7-6146-4e7e-9855-e285d74afabf",
+  "name": "AtlasDeploy",
+  "friendlyName": "Execute Atlas commands",
+  "description": "Execute Atlas commands",
+  "helpMarkDown": "[More Information](https://www.bing.com/)",
+  "category": "Utility",
+  "visibility": [
+    "Build",
+    "Release"
+  ],
+  "author": "Microsoft Corporation",
+  "version": {
+    "Major": 0,
+    "Minor": 1,
+    "Patch": 25
+  },
+  "instanceNameFormat": "Atlas $(samplestring)",
+  "preview": "true",
+  "groups": [
+    {
+      "name": "commands",
+      "displayName": "Commands",
+      "isExpanded": true
+    },
+    {
+      "name": "advanced",
+      "displayName": "Advanced",
+      "isExpanded": false
+    }
+  ],
+  "inputs": [
+    {
+      "name": "azureSubscriptionEndpoint",
+      "aliases": [
+        "azureSubscription"
+      ],
+      "type": "connectedService:AzureRM",
+      "label": "Azure Connection",
+      "helpMarkDown": "Select an Azure service endpoint.",
+      "defaultValue": "",
+      "required": false,
+      "groupName": "commands"
+    },
+    {
+      "name": "command",
+      "type": "string",
+      "label": "command",
+      "defaultValue": "deploy",
+      "required": true,
+      "helpMarkDown": "Atlas command to execute"
+    },
+    {
+      "name": "arguments",
+      "type": "string",
+      "label": "arguments",
+      "defaultValue": "",
+      "required": false,
+      "helpMarkDown": "Additional command line arguments"
+    }
+  ],
+  "execution": {
+    "Node": {
+      "target": "src/index.js"
+    }
+  }
+}

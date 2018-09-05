@@ -1,0 +1,54 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>netcoreapp2.0</TargetFramework>
+    <RuntimeIdentifiers>win10-x64;linux-x64</RuntimeIdentifiers>
+    <RootNamespace>Microsoft.Atlas.CommandLine</RootNamespace>
+    <AssemblyName>atlas</AssemblyName>    
+    <UseSharedCompilation>false</UseSharedCompilation>
+    <ApplicationIcon>..\..\docs\atlas.ico</ApplicationIcon>
+    <CodeAnalysisRuleSet>..\..\build\analyzers.ruleset</CodeAnalysisRuleSet>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
+    <DocumentationFile>bin\Release\netcoreapp2.0\atlas.xml</DocumentationFile>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
+    <DocumentationFile>bin\Debug\netcoreapp2.0\atlas.xml</DocumentationFile>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Content Include="..\..\docs\atlas.ico" Link="Docs\atlas.ico" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="BouncyCastle" Version="1.8.2" />
+    <PackageReference Include="Handlebars.Net" Version="1.9.5" />
+    <PackageReference Include="JmesPath.Net" Version="1.0.101" />
+    <PackageReference Include="Microsoft.AspNetCore.Http.Abstractions" Version="2.1.1" />
+    <PackageReference Include="Microsoft.Extensions.CommandLineUtils" Version="1.1.1" />
+    <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="2.0.0" />
+    <PackageReference Include="Microsoft.Extensions.Logging" Version="2.0.2" />
+    <PackageReference Include="Microsoft.Extensions.Logging.Console" Version="2.0.2" />
+    <PackageReference Include="Microsoft.IdentityModel.Clients.ActiveDirectory" Version="3.19.8" />
+    <PackageReference Include="StyleCop.Analyzers" Version="1.0.2" />
+    <PackageReference Include="System.Security.Cryptography.ProtectedData" Version="4.5.0" />
+    <PackageReference Include="YamlDotNet" Version="5.0.1" />
+    <PackageReference Include="Packaging.Targets" Version="0.1.1-*" />
+    <DotNetCliToolReference Include="dotnet-tarball" Version="0.1.1-*" />
+    <DotNetCliToolReference Include="dotnet-zip" Version="0.1.1-*" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Update="atlas-values.yaml">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="Docs\" />
+  </ItemGroup>
+
+</Project>

@@ -1,0 +1,11 @@
+<html>
+    <head>
+        <title>Characters</title>
+    </head>
+    <body>
+        {{# each characters }}
+        <h1><a href="{{ url }}">{{ @key }}</a></h1>
+        <p>{{{ description }}}</p>
+        {{/ each }}
+    </body>
+</html>

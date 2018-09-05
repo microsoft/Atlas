@@ -1,0 +1,85 @@
+steps:
+
+# Node Tool Installer
+# Finds or Downloads and caches specified version spec of Node and adds it to the PATH.
+- task: NodeTool@0
+  inputs:
+    #versionSpec: '6.x' 
+    checkLatest: true # Optional
+
+# .NET Core Tool Installer
+# Acquires a specific version of .NET Core from internet or the tools cache and adds it to the PATH. Use this task to change the version of .NET Core used in subsequent tasks.
+- task: DotNetCoreInstaller@0
+  inputs:
+    packageType: 'sdk' # Options: runtime, sdk
+    version: '2.1.201' 
+
+- task: DotNetCoreCLI@2
+  displayName: dotnet restore
+  inputs:
+    command: restore
+    projects: 'src/Microsoft.Atlas.CommandLine/Microsoft.Atlas.CommandLine.csproj'
+
+- task: ms.vss-governance-buildtask.governance-build-task-component-detection.ComponentGovernanceComponentDetection@0
+  displayName: 'Component Detection'
+  inputs:
+    governanceProduct: '70f3e0d8-e9ab-e811-bce7-00155d7fb5a6'
+
+- task: DotNetCoreCLI@2
+  displayName: dotnet build
+  inputs:
+    projects: 'src/Microsoft.Atlas.CommandLine/Microsoft.Atlas.CommandLine.csproj'
+
+- task: DotNetCoreCLI@2
+  displayName: dotnet publish
+  inputs:
+    command: publish
+    publishWebProjects: false
+    projects: 'src/Microsoft.Atlas.CommandLine/Microsoft.Atlas.CommandLine.csproj'
+    arguments: '-o $(Build.ArtifactStagingDirectory)/atlas'
+    zipAfterPublish: false
+    modifyOutputPath: false
+
+- task: DotNetCoreCLI@2
+  displayName: 'dotnet tarball'
+  inputs:
+    command: custom
+    projects: src/Microsoft.Atlas.CommandLine/Microsoft.Atlas.CommandLine.csproj
+    custom: msbuild
+    arguments: '/t:CreateTarball /p:RuntimeIdentifier=linux-x64 /p:TargetFramework=netcoreapp2.0 /p:Configuration=Release /p:ArchiveDir=$(Build.ArtifactStagingDirectory)/downloads'
+
+- task: DotNetCoreCLI@2
+  displayName: 'dotnet zip'
+  inputs:
+    command: custom
+    projects: src/Microsoft.Atlas.CommandLine/Microsoft.Atlas.CommandLine.csproj
+    custom: msbuild
+    arguments: '/t:CreateZip /p:RuntimeIdentifier=win10-x64 /p:TargetFramework=netcoreapp2.0 /p:Configuration=Release /p:ArchiveDir=$(Build.ArtifactStagingDirectory)/downloads'
+
+- task: DotNetCoreCLI@2
+  displayName: dotnet pack chocolatey
+  inputs:
+    command: pack
+    packagesToPack: 'src/Microsoft.Atlas.CommandLine.Chocolatey/Microsoft.Atlas.CommandLine.Chocolatey.csproj'
+    configuration: Release
+    packDirectory: '$(Build.ArtifactStagingDirectory)/chocolatey'
+
+- script: |
+    npm install -g typescript
+    npm install -g tfx-cli
+    
+    cd $(Build.SourcesDirectory)/tasks/AtlasV0/runAtlas/src
+    npm install
+    npm run-script tasks:bump
+    tsc
+
+    cd $(Build.SourcesDirectory)
+    dotnet publish $(Build.SourcesDirectory)/src/Microsoft.Atlas.CommandLine/Microsoft.Atlas.CommandLine.csproj --configuration Release --output "$(Build.SourcesDirectory)\tasks\AtlasV0\runAtlas\bin"
+
+    cd $(Build.SourcesDirectory)/tasks/AtlasV0
+    tfx extension create --manifest-globs vss-extension.json --rev-version --output-path $(Build.ArtifactStagingDirectory)/vsts
+
+- task: PublishBuildArtifacts@1
+  displayName: publish artifacts
+  inputs:
+    PathtoPublish: '$(Build.ArtifactStagingDirectory)'

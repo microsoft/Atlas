@@ -1,0 +1,7 @@
+
+# this model has context values used by the workflow
+
+foo: quux
+bar:
+  name: quad 
+  color: orange

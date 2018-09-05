@@ -1,0 +1,36 @@
+<Project>
+  <PropertyGroup>
+    <MsBuildAllProjects>$(MsBuildAllProjects);$(MsBuildThisFileFullPath)</MsBuildAllProjects>
+  </PropertyGroup>
+
+  <PropertyGroup>
+    <VersionPrefix>0.1</VersionPrefix>
+    <VersionPrefix Condition=" '$(BUILD_BUILDID)' != '' ">$(VersionPrefix).$(BUILD_BUILDID)</VersionPrefix>
+    
+    <!-- workaround because NoWarn doesn't disable CS7034 -->
+    <GenerateAssemblyVersionAttribute>false</GenerateAssemblyVersionAttribute>
+  </PropertyGroup>
+
+  <PropertyGroup>
+    <CodeAnalysisRuleSet>$(MSBuildThisFileDirectory)build\analyzers.ruleset</CodeAnalysisRuleSet>
+    <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
+    <WarningsAsErrors />
+    <NoWarn>1701;1702;1705;NU1701;CS1998;CS1591;SA1600;SA1601;CS7034;CS7035</NoWarn>
+    <!-- CS7034: The specified version string does not conform to the required format - major[.minor[.build[.revision]]] -->
+    <!-- CS7035: The specified version string does not conform to the recommended format - major.minor.build.revision -->
+    <!-- doc related (temporary) nowarns are CS1591;SA1600;SA1601 -->
+  </PropertyGroup>
+
+  <PropertyGroup>
+    <GenerateNuspecDependsOn>$(GenerateNuspecDependsOn);AddPublishProjectReferenceToPackageFiles</GenerateNuspecDependsOn>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <AdditionalFiles Include="$(MSBuildThisFileDirectory)build\stylecop.json" Link="stylecop.json" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Include="$(MSBuildThisFileDirectory)build\analyzers.ruleset" Link="analyzers.ruleset" />
+  </ItemGroup>
+
+</Project>

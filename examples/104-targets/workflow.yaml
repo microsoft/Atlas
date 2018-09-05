@@ -1,0 +1,20 @@
+
+
+operations:
+- message: targets are labels that can be used for narrow down execution
+- message: if you specify targets to run only the operations on the path to that target are run
+- message: this is the parent of targets one and two
+  operations:
+  - target: one
+    message: this is the target 'one'
+    operations: 
+    - message: this is a child of target 'one'
+  - target: two
+    message: this is the target 'two'
+    operations: 
+    - message: this is a child of target 'two'
+      operations: 
+      - target: left
+        message: this is nested target 'two/left'
+      - target: right
+        message: this is nested target 'two/right'
