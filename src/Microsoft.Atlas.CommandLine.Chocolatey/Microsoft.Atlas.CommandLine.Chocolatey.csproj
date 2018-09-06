@@ -11,11 +11,11 @@
       <Title>Atlas CLI</Title>
       <!--<Owners></Owners>-->
       <Authors>falconcore@microsoft.com</Authors>
-      <PackageProjectUrl>https://PackageProjectUrl</PackageProjectUrl>
-      <PackageIconUrl>https://PackageIconUrl</PackageIconUrl>
+      <PackageProjectUrl>https://github.com/Microsoft/Atlas</PackageProjectUrl>
+      <PackageIconUrl>https://github.com/Microsoft/Atlas/raw/master/docs/icon-128.png</PackageIconUrl>
       <Copyright>Copyright 2018</Copyright>
       <Company>Microsoft</Company>
-      <PackageLicenseUrl>https://PackageLicenseUrl</PackageLicenseUrl>
+      <PackageLicenseUrl>https://github.com/Microsoft/Atlas/blob/master/LICENSE</PackageLicenseUrl>
       <PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
       <!-- projectSourceUrl -->
       <!-- docsUrl -->
@@ -34,12 +34,12 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <None Remove="LICENSE.txt" />
     <None Remove="VERIFICATION.txt" />
   </ItemGroup>
 
   <ItemGroup>
-    <Content Include="LICENSE.txt" />
+    <Content Include="..\..\LICENSE" />
+    <Content Include="..\..\ThirdPartyNotice.txt" />
     <Content Include="VERIFICATION.txt" />
   </ItemGroup>
 
