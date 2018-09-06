@@ -12,7 +12,7 @@ steps:
 - task: DotNetCoreInstaller@0
   inputs:
     packageType: 'sdk' # Options: runtime, sdk
-    version: '2.1.201' 
+    version: '2.1.401' 
 
 - task: DotNetCoreCLI@2
   displayName: dotnet restore
@@ -47,7 +47,7 @@ steps:
     command: custom
     projects: src/Microsoft.Atlas.CommandLine/Microsoft.Atlas.CommandLine.csproj
     custom: msbuild
-    arguments: '/t:CreateTarball /p:RuntimeIdentifier=linux-x64 /p:TargetFramework=netcoreapp2.0 /p:Configuration=Release /p:ArchiveDir=$(Build.ArtifactStagingDirectory)/downloads'
+    arguments: '/t:Restore,CreateTarball /p:RuntimeIdentifier=linux-x64 /p:TargetFramework=netcoreapp2.0 /p:Configuration=Release /p:ArchiveDir=$(Build.ArtifactStagingDirectory)/downloads'
 
 - task: DotNetCoreCLI@2
   displayName: 'dotnet zip'
@@ -55,7 +55,7 @@ steps:
     command: custom
     projects: src/Microsoft.Atlas.CommandLine/Microsoft.Atlas.CommandLine.csproj
     custom: msbuild
-    arguments: '/t:CreateZip /p:RuntimeIdentifier=win10-x64 /p:TargetFramework=netcoreapp2.0 /p:Configuration=Release /p:ArchiveDir=$(Build.ArtifactStagingDirectory)/downloads'
+    arguments: '/t:Restore,CreateZip /p:RuntimeIdentifier=win10-x64 /p:TargetFramework=netcoreapp2.0 /p:Configuration=Release /p:ArchiveDir=$(Build.ArtifactStagingDirectory)/downloads'
 
 - task: DotNetCoreCLI@2
   displayName: dotnet pack chocolatey
