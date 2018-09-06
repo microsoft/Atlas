@@ -1,0 +1,52 @@
+
+
+operations:
+- message: REST APIs can be called
+
+- message: Listing Microsoft Azure tenants, see https://docs.microsoft.com/en-us/rest/api/resources/subscriptions/list
+  values:
+    tenant: {{azure.tenant}}
+  request: azure-tenants-list.yaml
+  output:
+    tenants: (value[].{ tenantId:tenantId })
+
+- message: (['Looking at tenant ', current.tenantId])
+  values:
+    results: []
+    current: (tenants[0])
+    remaining: (tenants[1:])
+  output:
+    results: ([results, current][])
+    current: (remaining[0])
+    remaining: (remaining[1:])
+  repeat:
+    condition: current != null
+
+  operations:
+  - message: Getting Microsoft Graph user info, see https://docs.microsoft.com/en-us/rest/api/graphrbac/objects/getcurrentuser
+    values:
+      tenant: (current.tenantId)
+    request: graph-me-get.yaml
+    output:
+      current:
+        user: ({ "odata.type":"odata.type", objectId:objectId, displayName:displayName, userPrincipalName:userPrincipalName, otherMails:otherMails })
+
+  - message: Listing Active Directory domains, see https://docs.microsoft.com/en-us/rest/api/graphrbac/domains/list
+    values:
+      tenant: (current.tenantId)
+    request: graph-domains-list.yaml
+    output:
+      current:
+        domains: (value[].name)
+
+  - message: Listing Microsoft Azure subscriptions, see https://docs.microsoft.com/en-us/rest/api/resources/subscriptions/list
+    values:
+      tenant: (current.tenantId)
+    request: azure-subscriptions-list.yaml
+    output:
+      current:
+        subscriptions: (value[].{ subscriptionId:subscriptionId, displayName:displayName })
+
+output: 
+  details: (results)
+  subscriptions: (results[].subscriptions[].[displayName, ' (', subscriptionId, ')'].join('',@))

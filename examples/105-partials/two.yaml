@@ -1,0 +1,12 @@
+
+operations:
+- message: this is a nested operation in the two.yaml partial
+- message: alpha and beta properties were passed in by name
+- operations:
+  - message: alpha is {{alpha}}
+  - message: beta is {{beta}}
+  - message: foo is {{foo}}
+  - message: bar.name is {{bar.name}}
+  - message: bar.color is {{bar.color}}
+- message: "the current context is: {{json}}"
+- message: "the parent context is: {{json ..}}"

@@ -1,0 +1,31 @@
+
+azure:
+  # Your Azure Active Directory ID from https://ms.portal.azure.com/#blade/Microsoft_AAD_IAM/ActiveDirectoryMenuBlade/Properties
+  # tenant: TENANT_ID             
+  # Your Azure Subscription ID from https://ms.portal.azure.com/#blade/Microsoft_Azure_Billing/SubscriptionsBlade
+  # subscription: SUBSCRIPTION_ID 
+  resourceGroupName: atlas-examples-401
+  location: westus2
+
+storage:
+  sku: Standard_LRS
+  container: atlas-example-401
+
+keyvault:
+  name: atlas-example-401-kv
+
+parameters:
+  vmName: buildagent
+  vmCount: 2
+  vmSize: Standard_D4s_v3
+
+vsts:
+  # The unique name portion of your https://ACCOUNT_NAME.visualstudio.com/ url
+  # account: ACCOUNT_NAME   
+  # Create a personal access token with the selected scopes of "Agent Pools (read, manage)" at https://ACCOUNT_NAME.visualstudio.com/_usersSettings/tokens?action=edit
+  # token: VSTS_PAT
+
+pool:
+  name: atlas-example-401
+  agentDownloadUrl: https://vstsagentpackage.azureedge.net/agent/2.134.2/vsts-agent-linux-x64-2.134.2.tar.gz
+  agentCount: 4

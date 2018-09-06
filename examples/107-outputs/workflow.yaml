@@ -1,0 +1,52 @@
+
+operations:
+- message: An operation may also add output to working memory
+  
+- message: The flow of that information is the opposite of values
+
+- message: in that they apply to the following operations in a series
+
+- message: and are apply to the parent sequence
+
+- message: This is a parent operation
+
+  operations: 
+  - message: This nested operation writes a file and adds output *in that order*
+    output:
+      characters:
+        cheshireCat:
+          url: https://en.wikipedia.org/wiki/Cheshire_Cat
+          description: >-
+            The Cheshire Cat (/ˈtʃɛʃər/ or /ˈtʃɛʃɪər/) is a fictional cat
+            popularised by Lewis Carroll in Alice's Adventures in Wonderland
+            and known for its distinctive mischievous grin.
+    template: characters.html
+    write: output-1.html
+        
+  - message: This operation writes a file and adds more output *in that order*
+    output:
+      characters:
+        billTheLizard:
+          url: https://en.wikipedia.org/wiki/Bill_the_Lizard
+          description: >-
+            Introduced in chapter four, Bill is perceived by Alice to be
+            someone who does all of the hard work for The White Rabbit and
+            the denizens of the community.
+    template: characters.html
+    write: output-2.html
+  
+- message: This operation is back at the top level and picks up the other output
+  output:
+    characters:
+      hatter:
+        url: https://en.wikipedia.org/wiki/Hatter_(Alice%27s_Adventures_in_Wonderland)
+        description: >-
+          The Hatter is a fictional character in Lewis Carroll's Alice's
+          Adventures in Wonderland and its sequel Through the Looking-Glass.
+  template: characters.html
+  write: output-3.html
+
+
+- message: Finally, writing out a file that should have all characters
+  template: characters.html
+  write: output-4.html

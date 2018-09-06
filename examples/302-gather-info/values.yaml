@@ -1,0 +1,3 @@
+
+azure:
+  tenant: common # Specify a tenant with --set azure.tenant=YOUR-TENANT-GUID or --set azure.tenant=YOUR-DOMAIN.onmicrosoft.com

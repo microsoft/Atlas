@@ -1,0 +1,18 @@
+
+operations:
+- message: This operation will repeat 5 times...
+  
+  values: # starts at zero
+    counter: 0 
+
+  operations: # runs the nested operations
+  - message: (['Task one, counter is ', counter])
+  - message: (['Task two, counter is ', counter])
+  
+  output: # increments counter before testing repeat.condition 
+    counter: (sum( [counter, `1`] ))
+  
+  repeat: # while repeat.condition is true, operations and output will run again
+    condition: counter < `5`
+    delay: PT.2S
+    timeout: PT3S

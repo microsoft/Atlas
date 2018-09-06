@@ -1,0 +1,11 @@
+
+
+operations:
+- message: template files are processed with Handlebars
+- message: double-braces can substitute values, like example.when={{ example.when }} 
+- message: you can also loop, like this loop over the example.colors array
+{{# example.colors }}
+- message: the example.colors array contains name={{ name }} with code={{ code }}
+{{/ example.colors }}
+- message: the default values come from values.yaml
+- message: "which contains {{ json . }}"

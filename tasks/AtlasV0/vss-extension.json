@@ -1,0 +1,36 @@
+{
+    "manifestVersion": 1,
+    "id": "atlas-task",
+    "name": "Atlas Build and Release Tools",
+    "version": "0.1.24",
+    "publisher": "lodejard",
+    "targets": [
+        {
+            "id": "Microsoft.VisualStudio.Services"
+        }
+    ],    
+    "description": "Tools for building/releasing with Atlas.",
+    "categories": [
+        "Build and release"
+    ],
+    "icons": {
+        "default": "images/atlas.ico"        
+    },
+    "files": [
+        {
+            "path": "runAtlas"
+        }
+    ],
+    "contributions": [
+        {
+            "id": "custom-build-release-task",
+            "type": "ms.vss-distributed-task.task",
+            "targets": [
+                "ms.vss-distributed-task.tasks"
+            ],
+            "properties": {
+                "name": "runAtlas"
+            }
+        }
+    ]
+}

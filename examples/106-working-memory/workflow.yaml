@@ -1,0 +1,47 @@
+
+operations:
+- message: Each operation can add values to the working memory
+  
+- message: That happens operation-by-operation as they execute
+
+- message: Values which are in effect for the current operation
+  values: 
+    characters:
+      cheshireCat:
+        url: https://en.wikipedia.org/wiki/Cheshire_Cat
+        description: >-
+          The Cheshire Cat (/ˈtʃɛʃər/ or /ˈtʃɛʃɪər/) is a fictional cat 
+          popularised by Lewis Carroll in Alice's Adventures in Wonderland 
+          and known for its distinctive mischievous grin. 
+  template: characters.html
+  write: cheshireCat.html
+
+- message: They are also in effect for nested operations
+  values: 
+    characters:
+      billTheLizard:
+        url: https://en.wikipedia.org/wiki/Bill_the_Lizard
+        description: >-
+          Introduced in chapter four, Bill is perceived by Alice to be 
+          someone who does all of the hard work for The White Rabbit and 
+          the denizens of the community.
+  operations:
+  - message: This operation has values from parent, which declared billTheLizard
+    template: characters.html
+    write: billTheLizard-1.html
+
+  - message: This operation adds values which are merged with the parent's
+    values:
+      characters:
+        hatter:
+          url: https://en.wikipedia.org/wiki/Hatter_(Alice%27s_Adventures_in_Wonderland)
+          description: >-
+            The Hatter is a fictional character in Lewis Carroll's Alice's 
+            Adventures in Wonderland and its sequel Through the Looking-Glass.
+    template: characters.html
+    write: twoCharacters.html
+
+  - message: This operation has only values from parent again, which declared billTheLizard
+    template: characters.html
+    write: billTheLizard-2.html
+

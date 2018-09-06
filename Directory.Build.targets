@@ -1,0 +1,34 @@
+<Project>
+  <PropertyGroup>
+    <MsBuildAllProjects>$(MsBuildAllProjects);$(MsBuildThisFileFullPath)</MsBuildAllProjects>
+  </PropertyGroup>
+
+  <Target Name="FixPackageProperties" AfterTargets="CreatePackageProperties">
+    <PropertyGroup>
+      <PackageName>$(PackagePrefix)-$(PackageVersion)-$(RuntimeIdentifier)</PackageName>
+      <_ArchiveDir>$(ArchiveDir)</_ArchiveDir>
+      <_ArchiveDir Condition=" '$(_ArchiveDir)' == '' ">$(TargetDir)</_ArchiveDir>
+      <_ArchiveDir Condition=" '$(_ArchiveDir)' != '' AND !HasTrailingSlash('$(_ArchiveDir)') ">$(_ArchiveDir)\</_ArchiveDir>
+      <PackagePath Condition=" '$(_ArchiveDir)' != '' ">$(_ArchiveDir)$(PackageName)</PackagePath>
+    </PropertyGroup>
+    <MakeDir Directories="$(_ArchiveDir)" Condition=" '$(_ArchiveDir)' != '' " />
+  </Target>
+
+  <Target Name="AddPublishProjectReferenceToPackageFiles" Condition=" '@(PublishProjectReference)' != '' ">
+    <MSBuild Projects="@(PublishProjectReference)" Targets="GetResolvedFileToPublish" BuildInParallel="$(BuildInParallel)" Properties="Configuration=$(Configuration); Platform=$(Platform); TargetFramework=%(PublishProjectReference.TargetFramework); RuntimeIdentifier=%(PublishProjectReference.RuntimeIdentifier);" ContinueOnError="$(ContinueOnError)">
+      <Output TaskParameter="TargetOutputs" ItemName="_AddPublishProjectReferenceToPackageFiles" />
+    </MSBuild>
+    <ItemGroup>
+      <_PackageFiles Include="%(_AddPublishProjectReferenceToPackageFiles.AbsolutePath)" BuildAction="Content" />
+    </ItemGroup>
+  </Target>
+
+  <Target Name="GetResolvedFileToPublish" DependsOnTargets="Build;PrepareForPublish;ComputeFilesToPublish;GeneratePublishDependencyFile;GeneratePublishRuntimeConfigurationFile" Returns="@(ResolvedFileToPublish)">
+    <ItemGroup>
+      <ResolvedFileToPublish Include="$(PublishDepsFilePath)" Condition="Exists('$(PublishDepsFilePath)')" />
+      <ResolvedFileToPublish Include="$(PublishRuntimeConfigFilePath)" Condition="Exists('$(PublishRuntimeConfigFilePath)')" />
+      <ResolvedFileToPublish Update="@(ResolvedFileToPublish)" AbsolutePath="%(FullPath)" />
+    </ItemGroup>
+  </Target>
+
+</Project>

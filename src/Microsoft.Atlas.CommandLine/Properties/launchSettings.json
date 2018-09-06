@@ -1,0 +1,32 @@
+{
+  "profiles": {
+    "account clear": {
+      "commandName": "Project",
+      "commandLineArgs": "account clear"
+    },
+    "account show": {
+      "commandName": "Project",
+      "commandLineArgs": "account show"
+    },
+    "deploy atlas/workflow vsts --dry-run": {
+      "commandName": "Project",
+      "commandLineArgs": "deploy atlas/workflow vsts --dry-run",
+      "workingDirectory": "..\\..\\..\\AtlasSandbox"
+    },
+    "deploy sandbox --dry-run": {
+      "commandName": "Project",
+      "commandLineArgs": "deploy sandbox --dry-run",
+      "workingDirectory": "..\\..\\..\\AtlasSandbox"
+    },
+    "deploy sandbox k8s/lodejard-atlas-dev01": {
+      "commandName": "Project",
+      "commandLineArgs": "deploy sandbox k8s/lodejard-atlas-dev01",
+      "workingDirectory": "..\\..\\..\\AtlasSandbox"
+    },
+    "deploy 106-looping": {
+      "commandName": "Project",
+      "commandLineArgs": "deploy 106-looping",
+      "workingDirectory": "..\\..\\examples"
+    }
+  }
+}

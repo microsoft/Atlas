@@ -1,0 +1,174 @@
+
+values: {{{ json }}}
+
+# Declaring secret {{ secret vsts.token }}
+
+operations:
+- message: Validating inputs
+- {condition: (!azure.tenant),       output: { missing: {azure: {tenant: or --set azure.tenant=AAD_TENANT_ID }}}}
+- {condition: (!azure.subscription), output: { missing: {azure: {subscription: or --set azure.subscription=AZURE_SUBSCRIPTION_ID }}}}
+- {condition: (!vsts.account),       output: { missing: {vsts: {account: or --set vsts.account=VSTS_ACCOUNT_PREFIX }}}}
+- {condition: (!vsts.token),         output: { missing: {vsts: {token: or --set vsts.token=PAT_TOKEN}}}}
+
+- message: Input validation failed
+  condition: (missing != null)
+  throw:
+    message: >
+      This workflow is missing information which is
+      needed to run.      
+
+      Please add them to a values.yaml file in the
+      current directory, or provide the missing values
+      as command line options.
+    details: (missing)
+
+- message: Generating ssh key
+  output:
+    ssh:
+      {{# sshkeygen }}
+      publicKey: "{{ publicKey }}"
+      privateKey: "{{ secret privateKey }}"
+      {{/ sshkeygen }}
+
+- message: Writing id_rsa.pub
+  values:
+    content: (ssh.publicKey)
+  template: content.txt
+  write: id_rsa.pub
+
+- message: Writing id_rsa
+  values:
+    content: (ssh.privateKey)
+  template: content.txt
+  write: id_rsa
+
+- message: Preparing resource group
+  request: apis/azure/resourcegroups/apply.yaml
+
+- message: Deploying storage account and key vault
+  values:
+    deployment:
+      name: storage-and-keyvault-{{ guid (datetime add="PT0S") }}
+      properties:
+        mode: Incremental
+        template: {{> templates/step1/azuredeploy.json }}
+        parameters: 
+          location:
+            value: {{ azure.location }}
+          storageAccountType:
+            value: {{ storage.sku }}
+          containerName:
+            value: {{ storage.container }}
+          tenantId:
+            value: {{ azure.tenant }}
+          enabledForTemplateDeployment:
+            value: true
+          secretsObject:
+            value:
+              secrets:
+              - secretName: sshPublicKey
+                secretValue: (ssh.publicKey)
+              - secretName: sshPrivateKey
+                secretValue: (ssh.privateKey)
+  operations:
+  - message: Validating deployment
+    request: apis/azure/deployments/validate.yaml
+
+  - message: Creating deployment
+    request: apis/azure/deployments/apply.yaml
+
+  - message: Waiting for deployment to complete...
+    request: apis/azure/deployments/get.yaml
+    output:
+      deploymentStatus: (@)
+    repeat:
+      condition: deploymentStatus.properties.provisioningState == 'Accepted' || deploymentStatus.properties.provisioningState == 'Running'
+      delay: PT5S
+      timeout: PT4M
+
+  - message: Deployment failed
+    condition: deploymentStatus.properties.provisioningState != 'Succeeded'
+    throw: 
+      message: (['Deployment provisioning state is "', deploymentStatus.properties.provisioningState, '". ', deploymentStatus.properties.error.message])
+      details: (deploymentStatus.properties.error)
+
+
+  output:
+    status:
+      step1: (deploymentStatus.properties.{state:provisioningState, error:error, outputs:outputs})
+    storage:
+      account: (deploymentStatus.properties.outputs.storageAccountName.value)
+    keyvault:
+      name: (deploymentStatus.properties.outputs.keyVaultName.value)
+
+- message: Uploading custom scripts
+
+  operations:
+  - message: Getting storage keys
+    request: apis/azure/storage/listkeys.yaml
+    output:
+      storage:
+        key: (keys[0].value)
+
+  - message: Sending setup.sh
+    values:
+      storage: 
+        blob: scripts/setup.sh
+        body: |
+          {{# indent 10 }}
+          {{> scripts/setup.sh }}
+          {{/ indent }}
+    request: apis/azure/storage/blob-put.yaml
+
+- message: Deploying vsts agent template
+  values:
+    deployment:
+      name: vm-vsts-agent-{{ guid (datetime add="PT0S") }}
+      properties:
+        mode: Incremental
+        template: {{> templates/step2/azuredeploy.json }}
+        parameters: 
+          authenticationType:
+            value: sshPublicKey
+          adminUsername:
+            value: azureuser
+          adminPasswordOrKey:
+            value: (ssh.publicKey)
+          _artifactsLocation:
+            value: (join('', ['https://', storage.account, '.blob.core.windows.net/', storage.container, '/']))
+          storageAccountName:
+            value: (storage.account)
+          personalAccessToken:
+            value: (vsts.token)
+          {{# each parameters }}
+          {{@key}}:
+            value: {{.}}
+          {{/ each }}
+
+  operations:
+  - message: Validating deployment
+    request: apis/azure/deployments/validate.yaml
+
+  - message: Creating deployment
+    request: apis/azure/deployments/apply.yaml
+
+  - message: Waiting for deployment to complete...
+    request: apis/azure/deployments/get.yaml
+    output:
+      deploymentStatus: (@)
+    repeat:
+      condition: deploymentStatus.properties.provisioningState == 'Accepted' || deploymentStatus.properties.provisioningState == 'Running'
+      delay: PT45S
+      timeout: PT90M
+
+  - message: Deployment failed
+    condition: deploymentStatus.properties.provisioningState != 'Succeeded'
+    throw: 
+      message: (['Deployment provisioning state is "', deploymentStatus.properties.provisioningState, '". ', deploymentStatus.properties.error.message])
+      details: (deploymentStatus.properties.error)
+
+  output:
+    status:
+      step2: (deploymentStatus.properties.{state:provisioningState, error:error, outputs:outputs})
+    sshCommand:
+      account: (deploymentStatus.properties.outputs."ssh-command".value)

@@ -1,0 +1,15 @@
+
+"operations": [
+    {
+        "message": "This is a message"
+    },
+    {
+        "message": "Every operation can have a message"
+    },
+    {
+        "message": "They are kind of like a comment about what the operation does"
+    },
+    {
+        "message": "And are written to the console as operations are executed"
+    }
+]
