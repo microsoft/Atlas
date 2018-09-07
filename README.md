@@ -55,7 +55,7 @@ With Atlas you can make the configuration of everything from CI/CD to production
 
 * Establishing a repository for collaboration on common in-progress and stable workflows, and default location for common workflows
 
-* Shared workflows for larger scenarios, e.g. ASP.NET Core services on Kubernetes with VSTS CI/CD, Azure VM clusters, Azure DNS, geo-redundant load balanding and service routing
+* Shared workflows for larger scenarios, e.g. ASP.NET Core services on Kubernetes with VSTS CI/CD, Azure VM clusters, Azure DNS, ATM, and ALB for geo-redundant load balancing and service routing
 
 ----
 
