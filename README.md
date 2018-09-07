@@ -8,7 +8,7 @@
 
 Atlas is a tool for automating the deployment, configuration, and maintenance of DevOps engineering systems. 
 It can be run interactively from the command line, or can be run entirely unattended as part of a VSTS build or release defintion. 
-An Atlas workflow revolves around making the appropriate REST API calls to VSTS, Active Directory, and Azure Resource Manager. 
+An Atlas workflow revolves around making the appropriate REST API calls to [VSTS][VSTS REST API], [Active Directory][Azure AD REST API], and [Azure Resource Manager][Azure RM REST API]. 
 
 There is a REST API for everything. 
 With Atlas you can make the configuration of everything from CI/CD to production servers consistent, reproducable, and reviewable by capturing them as source controlled templates.
@@ -23,7 +23,7 @@ With Atlas you can make the configuration of everything from CI/CD to production
 
 * Works cross-platform as a .NET Core executable
 
-* Invokes any Azure RM, Azure AD, or VSTS REST API 
+* Invokes any [Azure RM][Azure RM REST API], [Azure AD][Azure AD REST API], or [VSTS][VSTS REST API] REST API 
 
 * From the command line, REST API calls are secured via interactive Active Directory login, similar to `az login`
 
@@ -41,19 +41,17 @@ With Atlas you can make the configuration of everything from CI/CD to production
 
 * Does not allow arbetrary code or command-line execution in order to limit what can be done to the machine executing a workflow
 
-* Currently designed for Azure REST API and Active Directory authentication
+* Currently designed for Active Directory authentication for Azure and VSTS resources
 
 * Not yet available as a class library package
 
 # Goals
 
-Additional features being planned include
-
 * Packing workflows into zip or tarball archive files, publishing and executing workflows from feed locations
 
 * Establishing a repository for collaboration on common in-progress and stable workflows, and default location for common workflows
 
-* Example workflows for larger configurations, e.g. ASP.NET Core services on Kubernetes with VSTS CI/CD and Azure hosting, DNS, and routing
+* Shared workflows for larger scenarios, e.g. ASP.NET Core services on Kubernetes with VSTS CI/CD, Azure VM clusters, Azure DNS, geo-redundant load balanding and service routing
 
 # Contributing
 
@@ -86,3 +84,6 @@ the [Security TechCenter](https://technet.microsoft.com/en-us/security/default).
 [JMESPath]: http://jmespath.org/
 [Build Status]: https://msasg.visualstudio.com/Falcon/_apis/build/status/Atlas-CI?branch=master
 [Build Latest]: https://msasg.visualstudio.com/Falcon/_build/latest?definitionId=6598&branch=master
+[Azure RM REST API]: https://docs.microsoft.com/en-us/rest/api/azure/
+[Azure AD REST API]: https://docs.microsoft.com/en-us/rest/api/graphrbac/
+[VSTS REST API]: https://docs.microsoft.com/en-us/rest/api/vsts/?view=vsts-rest-5.0
