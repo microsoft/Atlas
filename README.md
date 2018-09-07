@@ -2,28 +2,58 @@
 
 # Atlas
 
-Atlas is a tool for automating the deployment, configuration, and maintenance of DevOps engineering 
-systems. An Atlas workflow revolves around making the appropriate REST API calls to VSTS, 
-Active Directory, and Azure Resource Manager. It can be run interactively from the command line, 
-or can be run entirely unattended as part of a VSTS build or release defintion.
+[![Build Status]][Build Latest]
 
-There is a REST API for everything. With Atlas you can make the configuration of everything from CI/CD to
-production servers consistent, reproducable, and reviewable by capturing them as source controlled templates.
+![Atlas Logo]
+
+Atlas is a tool for automating the deployment, configuration, and maintenance of DevOps engineering systems. 
+It can be run interactively from the command line, or can be run entirely unattended as part of a VSTS build or release defintion. 
+An Atlas workflow revolves around making the appropriate REST API calls to VSTS, Active Directory, and Azure Resource Manager. 
+
+There is a REST API for everything. 
+With Atlas you can make the configuration of everything from CI/CD to production servers consistent, reproducable, and reviewable by capturing them as source controlled templates.
 
 # Features
 
-* [YAML](http://yaml.org/) or [JSON](http://json.org/) syntax to define workflows and input parameters
+* [YAML] or [JSON] syntax to define workflows and input parameters
 
-* [Handlebars](http://handlebarsjs.com/) template engine enables workflows to be highly flexible
+* [Handlebars] template engine enables workflows to be highly flexible
 
-* [JMESPath](http://jmespath.org/) provides query language for inputs, outputs, and data transformations
+* [JMESPath] provides query language for inputs, outputs, and data transformations
+
+* Works cross-platform as a .NET Core executable
+
+* Invokes any Azure RM, Azure AD, or VSTS REST API 
+
+* From the command line, REST API calls are secured via interactive Active Directory login, similar to `az login`
+
+* From the build or release definitions, REST API calls are secured via [VSTS service connection to Azure](https://docs.microsoft.com/en-us/vsts/pipelines/library/service-endpoints?view=vsts)
+
+* Renders output values and additional templated files to a target folder
+
+* Operations support conditional executions, retries and looping, and can throwing detailed exceptions
 
 * Extensively detailed log output and safe `--dry-run` support simplify troubleshooting
 
-* From the command line, REST API calls are secured via interactive Azure AD OAUTH sign-in
+* Values which are declared secret are redacted (replaced with xxxx) when written to console output and log files
 
-* From the build or release definitions, REST API calls are secured by [VSTS service connection to Azure](https://docs.microsoft.com/en-us/vsts/pipelines/library/service-endpoints?view=vsts)
+# Limitations
 
+* Does not allow arbetrary code or command-line execution in order to limit what can be done to the machine executing a workflow
+
+* Currently designed for Azure REST API and Active Directory authentication
+
+* Not yet available as a class library package
+
+# Goals
+
+Additional features being planned include
+
+* Packing workflows into zip or tarball archive files, publishing and executing workflows from feed locations
+
+* Establishing a repository for collaboration on common in-progress and stable workflows, and default location for common workflows
+
+* Example workflows for larger configurations, e.g. ASP.NET Core services on Kubernetes with VSTS CI/CD and Azure hosting, DNS, and routing
 
 # Contributing
 
@@ -49,3 +79,10 @@ email to ensure we received your original message. Further information, includin
 [MSRC PGP](https://technet.microsoft.com/en-us/security/dn606155) key, can be found in
 the [Security TechCenter](https://technet.microsoft.com/en-us/security/default).
 
+[Atlas Logo]: https://github.com/Microsoft/Atlas/raw/master/docs/icon-128.png
+[Handlebars]: http://handlebarsjs.com/
+[YAML]: http://yaml.org/
+[JSON]: http://json.org/
+[JMESPath]: http://jmespath.org/
+[Build Status]: https://msasg.visualstudio.com/Falcon/_apis/build/status/Atlas-CI?branch=master
+[Build Latest]: https://msasg.visualstudio.com/Falcon/_build/latest?definitionId=6598&branch=master
