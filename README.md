@@ -1,4 +1,15 @@
 
+
+# Atlas
+
+Atlas is a tool for automating the deployment, configuration, and maintenance of DevOps engineering 
+systems. An Atlas workflow revolves around making the appropriate REST API calls to VSTS, 
+Active Directory, and Azure Resource Manager. It can be run interactively from the command line, 
+or can be run entirely unattended as part of a VSTS build or release defintion.
+
+There is a REST API for everything. With Atlas you can make the configuration of everything from CI/CD to
+production consistent, reproducable, and reviewable by capturing them as source controlled templates.
+
 # Contributing
 
 This project welcomes contributions and suggestions. Most contributions require you to
