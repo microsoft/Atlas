@@ -6,6 +6,8 @@
 
 ![Atlas Logo]
 
+----
+
 Atlas is a tool for automating the deployment, configuration, and maintenance of DevOps engineering systems. 
 It can be run interactively from the command line, or can be run entirely unattended as part of a VSTS build or release defintion. 
 An Atlas workflow revolves around making the appropriate REST API calls to [VSTS][VSTS REST API], [Active Directory][Azure AD REST API], and [Azure Resource Manager][Azure RM REST API]. 
@@ -13,7 +15,9 @@ An Atlas workflow revolves around making the appropriate REST API calls to [VSTS
 There is a REST API for everything. 
 With Atlas you can make the configuration of everything from CI/CD to production servers consistent, reproducable, and reviewable by capturing them as source controlled templates.
 
-# Features
+----
+
+## Features
 
 * [YAML] or [JSON] syntax to define workflows and input parameters
 
@@ -37,7 +41,7 @@ With Atlas you can make the configuration of everything from CI/CD to production
 
 * Values which are declared secret are redacted (replaced with xxxx) when written to console output and log files
 
-# Limitations
+## Limitations
 
 * Does not allow arbitrary code or command-line execution in order to limit what can be done to the machine executing a workflow
 
@@ -45,7 +49,7 @@ With Atlas you can make the configuration of everything from CI/CD to production
 
 * Not yet available as a class library package
 
-# Goals
+## Goals
 
 * Packing workflows into zip or tarball archive files, publishing and executing workflows from feed locations
 
@@ -53,7 +57,9 @@ With Atlas you can make the configuration of everything from CI/CD to production
 
 * Shared workflows for larger scenarios, e.g. ASP.NET Core services on Kubernetes with VSTS CI/CD, Azure VM clusters, Azure DNS, geo-redundant load balanding and service routing
 
-# Contributing
+----
+
+## Contributing
 
 This project welcomes contributions and suggestions. Most contributions require you to
 agree to a Contributor License Agreement (CLA) declaring that you have the right to,
