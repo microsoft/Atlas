@@ -27,7 +27,7 @@ With Atlas you can make the configuration of everything from CI/CD to production
 
 * From the command line, REST API calls are secured via interactive Active Directory login, similar to `az login`
 
-* From the build or release definitions, REST API calls are secured via [VSTS service connection to Azure](https://docs.microsoft.com/en-us/vsts/pipelines/library/service-endpoints?view=vsts)
+* From a VSTS build or release definition, REST API calls are secured via [VSTS service connection to Azure](https://docs.microsoft.com/en-us/vsts/pipelines/library/service-endpoints?view=vsts)
 
 * Renders output values and additional templated files to a target folder
 
@@ -39,7 +39,7 @@ With Atlas you can make the configuration of everything from CI/CD to production
 
 # Limitations
 
-* Does not allow arbetrary code or command-line execution in order to limit what can be done to the machine executing a workflow
+* Does not allow arbitrary code or command-line execution in order to limit what can be done to the machine executing a workflow
 
 * Currently designed for Active Directory authentication for Azure and VSTS resources
 
