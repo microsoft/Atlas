@@ -8,7 +8,22 @@ Active Directory, and Azure Resource Manager. It can be run interactively from t
 or can be run entirely unattended as part of a VSTS build or release defintion.
 
 There is a REST API for everything. With Atlas you can make the configuration of everything from CI/CD to
-production consistent, reproducable, and reviewable by capturing them as source controlled templates.
+production servers consistent, reproducable, and reviewable by capturing them as source controlled templates.
+
+# Features
+
+* [YAML](http://yaml.org/) or [JSON](http://json.org/) syntax to define workflows and input parameters
+
+* [Handlebars](http://handlebarsjs.com/) template engine enables workflows to be highly flexible
+
+* [JMESPath](http://jmespath.org/) provides query language for inputs, outputs, and data transformations
+
+* Extensively detailed log output and safe `--dry-run` support simplify troubleshooting
+
+* From the command line, REST API calls are secured via interactive Azure AD OAUTH sign-in
+
+* From the build or release definitions, REST API calls are secured by [VSTS service connection to Azure](https://docs.microsoft.com/en-us/vsts/pipelines/library/service-endpoints?view=vsts)
+
 
 # Contributing
 
