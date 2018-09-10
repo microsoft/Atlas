@@ -82,8 +82,8 @@
     }
   },
   "variables": {
-    "storageAccountName": "[concat(uniquestring(resourceGroup().id), 'sa')]",
-    "keyVaultName": "[concat(uniquestring(resourceGroup().id), 'kv')]",
+    "storageAccountName": "[concat('sa', uniquestring(resourceGroup().id))]",
+    "keyVaultName": "[concat('kv', uniquestring(resourceGroup().id))]",
     "containerName": "[parameters('containerName')]"
   },
   "resources": [
