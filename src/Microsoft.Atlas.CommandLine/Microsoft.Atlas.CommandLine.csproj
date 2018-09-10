@@ -36,9 +36,9 @@
     <PackageReference Include="StyleCop.Analyzers" Version="1.0.2" />
     <PackageReference Include="System.Security.Cryptography.ProtectedData" Version="4.5.0" />
     <PackageReference Include="YamlDotNet" Version="5.0.1" />
-    <PackageReference Include="Packaging.Targets" Version="0.1.1-*" />
-    <DotNetCliToolReference Include="dotnet-tarball" Version="0.1.1-*" />
-    <DotNetCliToolReference Include="dotnet-zip" Version="0.1.1-*" />
+    <PackageReference Include="Packaging.Targets" Version="0.1.45" PrivateAssets="all" />
+    <DotNetCliToolReference Include="dotnet-tarball" Version="0.1.45" />
+    <DotNetCliToolReference Include="dotnet-zip" Version="0.1.45" />
   </ItemGroup>
 
   <ItemGroup>
