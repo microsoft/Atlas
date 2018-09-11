@@ -2,7 +2,10 @@
 
 # Atlas
 
-[![Build Status]][Build Latest] [![Choco Status]](#chocolatey)
+[![Build Status]][Build Latest] 
+[![Choco Status]][Choco Latest]
+[![Zip Status]][Zip Latest]
+[![Tarball Status]][Tarball Latest]
 
 ![Atlas Logo]
 
@@ -18,6 +21,13 @@ With Atlas you can make the configuration of everything from CI/CD to production
 ----
 
 ## Install
+
+Daily builds of the Atlas CLI are available as self-contained downloads.
+
+| Platform | Master branch (0.1) | Latest build |
+|:------:|:------:|:------:|
+| Windows x64 | [Download latest zip][Zip Latest] | [![Zip Status]][Zip Latest] |
+| Linux x64 | [Download latest tar.gz][Zip Latest] | [![Tarball Status]][Tarball Latest] |
 
 If you want to use a package manager:
 
@@ -101,4 +111,8 @@ the [Security TechCenter](https://technet.microsoft.com/en-us/security/default).
 [Build Status]: https://msasg.visualstudio.com/Falcon/_apis/build/status/Atlas-CI?branch=master
 [Build Latest]: https://msasg.visualstudio.com/Falcon/_build/latest?definitionId=6598&branch=master
 [Choco Status]: https://img.shields.io/myget/atlas-ci/vpre/atlas-cli.svg?label=choco
-[Choco Latest]: https://img.shields.io/myget/atlas-ci/vpre/atlas-cli.svg?label=choco
+[Choco Latest]: #chocolatey
+[Zip Status]: https://img.shields.io/badge/dynamic/json.svg?label=win-x64&url=https%3A%2F%2Fepjdcwdl4ufyw54.azureedge.net%2Fdownloads%2Flatest.json&query=%24[%27win10-x64%27].version
+[Zip Latest]: https://epjdcwdl4ufyw54.azureedge.net/downloads/atlas-latest-win10-x64.zip
+[Tarball Status]: https://img.shields.io/badge/dynamic/json.svg?label=linux-x64&url=https%3A%2F%2Fepjdcwdl4ufyw54.azureedge.net%2Fdownloads%2Flatest.json&query=%24[%27linux-x64%27].version
+[Tarball Latest]: https://epjdcwdl4ufyw54.azureedge.net/downloads/atlas-latest-linux-x64.tar.gz
