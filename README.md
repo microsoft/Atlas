@@ -2,7 +2,10 @@
 
 # Atlas
 
-[![Build Status]][Build Latest]
+[![Build Status]][Build Latest] 
+[![Zip Status]][Zip Latest]
+[![Tarball Status]][Tarball Latest]
+[![Choco Status]][Choco Latest]
 
 ![Atlas Logo]
 
@@ -16,6 +19,20 @@ There is a REST API for everything.
 With Atlas you can make the configuration of everything from CI/CD to production servers consistent, reproducable, and reviewable by capturing them as source controlled templates.
 
 ----
+
+## Install
+
+Daily builds of the Atlas CLI are available as self-contained downloads.
+
+| Platform | [Master branch (0.1)][Master Branch] | [Latest build][Latest Json] |
+|:------:|:------:|:------:|
+| **Windows x64** | [Download latest zip][Zip Latest] | [![Zip Status]][Zip Latest] |
+| **Linux x64** | [Download latest tar.gz][Zip Latest] | [![Tarball Status]][Tarball Latest] |
+
+If you want to use a package manager:
+
+#### Chocolatey
+* [Chocolatey](https://chocolatey.org/) users can use `choco install atlas-cli -s https://www.myget.org/F/atlas-ci` 
 
 ## Features
 
@@ -88,8 +105,16 @@ the [Security TechCenter](https://technet.microsoft.com/en-us/security/default).
 [YAML]: http://yaml.org/
 [JSON]: http://json.org/
 [JMESPath]: http://jmespath.org/
-[Build Status]: https://msasg.visualstudio.com/Falcon/_apis/build/status/Atlas-CI?branch=master
-[Build Latest]: https://msasg.visualstudio.com/Falcon/_build/latest?definitionId=6598&branch=master
 [Azure RM REST API]: https://docs.microsoft.com/en-us/rest/api/azure/
 [Azure AD REST API]: https://docs.microsoft.com/en-us/rest/api/graphrbac/
 [VSTS REST API]: https://docs.microsoft.com/en-us/rest/api/vsts/?view=vsts-rest-5.0
+[Build Status]: https://msasg.visualstudio.com/Falcon/_apis/build/status/Atlas-CI?branch=master
+[Build Latest]: https://msasg.visualstudio.com/Falcon/_build/latest?definitionId=6598&branch=master
+[Choco Status]: https://img.shields.io/myget/atlas-ci/vpre/atlas-cli.svg?label=choco
+[Choco Latest]: #chocolatey
+[Zip Status]: https://img.shields.io/badge/dynamic/json.svg?label=win-x64&url=https%3A%2F%2Fepjdcwdl4ufyw54.azureedge.net%2Fdownloads%2Flatest.json&query=%24[%27win10-x64%27].version
+[Zip Latest]: https://epjdcwdl4ufyw54.azureedge.net/downloads/atlas-latest-win10-x64.zip
+[Tarball Status]: https://img.shields.io/badge/dynamic/json.svg?label=linux-x64&url=https%3A%2F%2Fepjdcwdl4ufyw54.azureedge.net%2Fdownloads%2Flatest.json&query=%24[%27linux-x64%27].version
+[Tarball Latest]: https://epjdcwdl4ufyw54.azureedge.net/downloads/atlas-latest-linux-x64.tar.gz
+[Master Branch]: https://github.com/microsoft/atlas/tree/master
+[Latest Json]: https://epjdcwdl4ufyw54.azureedge.net/downloads/latest.json

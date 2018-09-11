@@ -142,7 +142,8 @@ namespace Microsoft.Atlas.CommandLine.Templates
             var options = arguments.Last() as IDictionary<string, object>;
             if (options != null)
             {
-                if (options.TryGetValue("provider", out var provider) && string.Equals(provider?.ToString(), "RNGCryptoServiceProvider", StringComparison.OrdinalIgnoreCase))
+                if (options.TryGetValue("provider", out var provider) &&
+                    string.Equals(provider?.ToString(), "RNGCryptoServiceProvider", StringComparison.OrdinalIgnoreCase))
                 {
                     using (var rng = new RNGCryptoServiceProvider())
                     {
