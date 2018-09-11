@@ -3,9 +3,9 @@
 # Atlas
 
 [![Build Status]][Build Latest] 
-[![Choco Status]][Choco Latest]
 [![Zip Status]][Zip Latest]
 [![Tarball Status]][Tarball Latest]
+[![Choco Status]][Choco Latest]
 
 ![Atlas Logo]
 
@@ -24,10 +24,10 @@ With Atlas you can make the configuration of everything from CI/CD to production
 
 Daily builds of the Atlas CLI are available as self-contained downloads.
 
-| Platform | Master branch (0.1) | Latest build |
+| Platform | [Master branch (0.1)][Master Branch] | [Latest build][Latest Json] |
 |:------:|:------:|:------:|
-| Windows x64 | [Download latest zip][Zip Latest] | [![Zip Status]][Zip Latest] |
-| Linux x64 | [Download latest tar.gz][Zip Latest] | [![Tarball Status]][Tarball Latest] |
+| **Windows x64** | [Download latest zip][Zip Latest] | [![Zip Status]][Zip Latest] |
+| **Linux x64** | [Download latest tar.gz][Zip Latest] | [![Tarball Status]][Tarball Latest] |
 
 If you want to use a package manager:
 
@@ -116,3 +116,5 @@ the [Security TechCenter](https://technet.microsoft.com/en-us/security/default).
 [Zip Latest]: https://epjdcwdl4ufyw54.azureedge.net/downloads/atlas-latest-win10-x64.zip
 [Tarball Status]: https://img.shields.io/badge/dynamic/json.svg?label=linux-x64&url=https%3A%2F%2Fepjdcwdl4ufyw54.azureedge.net%2Fdownloads%2Flatest.json&query=%24[%27linux-x64%27].version
 [Tarball Latest]: https://epjdcwdl4ufyw54.azureedge.net/downloads/atlas-latest-linux-x64.tar.gz
+[Master Branch]: https://github.com/microsoft/atlas/tree/master
+[Latest Json]: https://epjdcwdl4ufyw54.azureedge.net/downloads/latest.json
