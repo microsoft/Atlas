@@ -1,0 +1,12 @@
+
+# https://docs.microsoft.com/en-us/rest/api/storageservices/put-blob
+
+method: PUT
+url: https://{{storage.account}}.blob.core.windows.net/{{storage.container}}/{{blob.path}}
+headers:
+  x-ms-date: {{ datetime add="PT0S" format="r" }}
+  x-ms-version: "2018-03-28"
+  x-ms-blob-type: BlockBlob
+  Authorization: "SharedKey {{storage.account}}:{{storage.key}}"
+
+body: "{{blob.body}}"
