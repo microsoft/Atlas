@@ -85,6 +85,7 @@ namespace Microsoft.Atlas.CommandLine
                 .AddSingleton<ITemplateEngineFactory, TemplateEngineFactory>()
                 .AddSingleton<TemplateEngineServices>()
                 .AddTransient<ITemplateHelperProvider, SshHelpers>()
+                .AddTransient<ITemplateHelperProvider, BinaryHelpers>()
 
                 .AddSingleton<CommandLineApplicationServices>()
 

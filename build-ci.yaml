@@ -71,6 +71,12 @@ steps:
     configuration: Release
     packDirectory: '$(Build.ArtifactStagingDirectory)/chocolatey'
 
+- task: CopyFiles@2
+  displayName: 'copy examples to $(Build.ArtifactStagingDirectory)'
+  inputs:
+    SourceFolder: examples
+    TargetFolder: '$(Build.ArtifactStagingDirectory)/examples'
+
 - script: |
     npm install -g typescript
     npm install -g tfx-cli
