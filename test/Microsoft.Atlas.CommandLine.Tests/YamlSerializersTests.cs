@@ -212,9 +212,9 @@ eta:
 
             var json = serializers.JsonSerializer.Serialize(data);
 
-            Assert.AreEqual("data: !!binary AAECA/7/", yaml.Replace("\r\n", string.Empty));
+            Assert.AreEqual("data: !!binary AAECA/7/", yaml.Replace("\r", string.Empty).Replace("\n", string.Empty));
 
-            Assert.AreEqual(@"{""data"": !!binary AAECA/7/}", json.Replace("\r\n", string.Empty));
+            Assert.AreEqual(@"{""data"": !!binary AAECA/7/}", json.Replace("\r", string.Empty).Replace("\n", string.Empty));
         }
 
         private void AssertAreEqual(object expected, object actual)
