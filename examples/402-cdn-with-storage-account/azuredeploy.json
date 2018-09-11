@@ -92,23 +92,53 @@
                   {
                     "conditions": [
                       {
-                        "name": "LatestJson",
+                        "name": "UrlPath",
                         "parameters": {
                           "@odata.type": "Microsoft.Azure.Cdn.Models.DeliveryRuleUrlPathConditionParameters",
                           "matchType": "Literal",
                           "path": "/downloads/latest.json"
                         }
-                      },
+                      }
+                    ],
+                    "actions": [
                       {
-                        "name": "LatestZip",
+                        "name": "CacheExpiration",
+                        "parameters": {
+                          "@odata.type": "Microsoft.Azure.Cdn.Models.DeliveryRuleCacheExpirationActionParameters",
+                          "cacheBehavior": "BypassCache",
+                          "cacheType": "All"
+                        }
+                      }
+                    ],
+                    "order": 1
+                  },
+                  {
+                    "conditions": [
+                      {
+                        "name": "UrlPath",
                         "parameters": {
                           "@odata.type": "Microsoft.Azure.Cdn.Models.DeliveryRuleUrlPathConditionParameters",
                           "matchType": "Literal",
                           "path": "/downloads/atlas-latest-win10-x64.zip"
                         }
-                      },
+                      }
+                    ],
+                    "actions": [
                       {
-                        "name": "LatestTarball",
+                        "name": "CacheExpiration",
+                        "parameters": {
+                          "@odata.type": "Microsoft.Azure.Cdn.Models.DeliveryRuleCacheExpirationActionParameters",
+                          "cacheBehavior": "BypassCache",
+                          "cacheType": "All"
+                        }
+                      }
+                    ],
+                    "order": 2
+                  },
+                  {
+                    "conditions": [
+                      {
+                        "name": "UrlPath",
                         "parameters": {
                           "@odata.type": "Microsoft.Azure.Cdn.Models.DeliveryRuleUrlPathConditionParameters",
                           "matchType": "Literal",
@@ -126,7 +156,7 @@
                         }
                       }
                     ],
-                    "order": 1
+                    "order": 3
                   }
                 ]
               }
