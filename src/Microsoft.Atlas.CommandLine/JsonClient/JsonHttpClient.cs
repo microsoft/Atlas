@@ -47,6 +47,10 @@ namespace Microsoft.Atlas.CommandLine.JsonClient
                 {
                     request.Content = new StringContent((string)jsonRequest.body);
                 }
+                else if (jsonRequest.body is byte[])
+                {
+                    request.Content = new ByteArrayContent((byte[])jsonRequest.body);
+                }
                 else
                 {
                     var memoryStream = new MemoryStream();

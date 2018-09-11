@@ -196,6 +196,27 @@ eta:
             Assert.AreEqual(expected, actual);
         }
 
+        [TestMethod]
+        public void BinaryCanBeSerialized()
+        {
+            var services = Program.AddServices(new ServiceCollection()).BuildServiceProvider();
+
+            var serializers = services.GetRequiredService<IYamlSerializers>();
+
+            var data = new Dictionary<object, object>
+            {
+                { "data", new byte[] { 0, 1, 2, 3, 254, 255 } },
+            };
+
+            var yaml = serializers.YamlSerializer.Serialize(data);
+
+            var json = serializers.JsonSerializer.Serialize(data);
+
+            Assert.AreEqual("data: !!binary AAECA/7/", yaml.Replace("\r\n", string.Empty));
+
+            Assert.AreEqual(@"{""data"": !!binary AAECA/7/}", json.Replace("\r\n", string.Empty));
+        }
+
         private void AssertAreEqual(object expected, object actual)
         {
             Assert.AreSame(expected?.GetType(), actual?.GetType());

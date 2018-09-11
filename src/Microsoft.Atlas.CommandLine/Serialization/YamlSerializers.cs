@@ -12,10 +12,30 @@ namespace Microsoft.Atlas.CommandLine.Serialization
     {
         public YamlSerializers()
         {
-            YamlDeserializer = new DeserializerBuilder().WithNodeTypeResolver(new NonStringScalarTypeResolver()).Build();
-            YamlSerializer = new SerializerBuilder().DisableAliases().WithEventEmitter(DoubleQuoteAmbiguousStringScalarEmitter.Factory).Build();
-            JsonSerializer = new SerializerBuilder().DisableAliases().JsonCompatible().Build();
-            ValueSerialier = new SerializerBuilder().DisableAliases().JsonCompatible().BuildValueSerializer();
+            YamlDeserializer = new DeserializerBuilder()
+                .WithNodeTypeResolver(new NonStringScalarTypeResolver())
+                .WithTagMapping("tag:yaml.org,2002:binary", typeof(byte[]))
+                .WithTypeConverter(new ByteArrayConverter())
+                .Build();
+
+            YamlSerializer = new SerializerBuilder()
+                .DisableAliases()
+                .WithEventEmitter(DoubleQuoteAmbiguousStringScalarEmitter.Factory)
+                .WithTypeConverter(new ByteArrayConverter())
+                .Build();
+
+            JsonSerializer = new SerializerBuilder()
+                .DisableAliases()
+                .JsonCompatible()
+                .WithTypeConverter(new ByteArrayConverter())
+                .Build();
+
+            ValueSerialier = new SerializerBuilder()
+                .DisableAliases()
+                .JsonCompatible()
+                .WithTypeConverter(new ByteArrayConverter())
+                .BuildValueSerializer();
+
             JTokenTranserializer = JTokenTranserializerImpl;
         }
 

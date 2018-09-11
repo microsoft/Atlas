@@ -2,7 +2,7 @@
 
 # Atlas
 
-[![Build Status]][Build Latest]
+[![Build Status]][Build Latest] [![Choco Status]](#chocolatey)
 
 ![Atlas Logo]
 
@@ -16,6 +16,13 @@ There is a REST API for everything.
 With Atlas you can make the configuration of everything from CI/CD to production servers consistent, reproducable, and reviewable by capturing them as source controlled templates.
 
 ----
+
+## Install
+
+If you want to use a package manager:
+
+#### Chocolatey
+* [Chocolatey](https://chocolatey.org/) users can use `choco install atlas-cli -s https://www.myget.org/F/atlas-ci` 
 
 ## Features
 
@@ -88,8 +95,10 @@ the [Security TechCenter](https://technet.microsoft.com/en-us/security/default).
 [YAML]: http://yaml.org/
 [JSON]: http://json.org/
 [JMESPath]: http://jmespath.org/
-[Build Status]: https://msasg.visualstudio.com/Falcon/_apis/build/status/Atlas-CI?branch=master
-[Build Latest]: https://msasg.visualstudio.com/Falcon/_build/latest?definitionId=6598&branch=master
 [Azure RM REST API]: https://docs.microsoft.com/en-us/rest/api/azure/
 [Azure AD REST API]: https://docs.microsoft.com/en-us/rest/api/graphrbac/
 [VSTS REST API]: https://docs.microsoft.com/en-us/rest/api/vsts/?view=vsts-rest-5.0
+[Build Status]: https://msasg.visualstudio.com/Falcon/_apis/build/status/Atlas-CI?branch=master
+[Build Latest]: https://msasg.visualstudio.com/Falcon/_build/latest?definitionId=6598&branch=master
+[Choco Status]: https://img.shields.io/myget/atlas-ci/vpre/atlas-cli.svg?label=choco
+[Choco Latest]: https://img.shields.io/myget/atlas-ci/vpre/atlas-cli.svg?label=choco
