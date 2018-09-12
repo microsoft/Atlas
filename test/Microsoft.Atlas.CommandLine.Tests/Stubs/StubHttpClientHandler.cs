@@ -43,6 +43,8 @@ namespace Microsoft.Atlas.CommandLine.Tests.Stubs
                     {
                         responseMessage.Content = new StringContent(JsonConvert.SerializeObject(response.body));
                     }
+
+                    return responseMessage;
                 }
 
                 throw new ApplicationException($"Invalid request method {request.Method}");

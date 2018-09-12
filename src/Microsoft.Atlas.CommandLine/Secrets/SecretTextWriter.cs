@@ -76,9 +76,9 @@ namespace Microsoft.Atlas.CommandLine.Secrets
                 }
             }
 
-            var textRedacted = _secretTracker.FilterString(text);
-            if (!string.IsNullOrEmpty(textRedacted))
+            if (!string.IsNullOrEmpty(text))
             {
+                var textRedacted = _secretTracker.FilterString(text);
                 _writer.Write(textRedacted);
             }
         }
