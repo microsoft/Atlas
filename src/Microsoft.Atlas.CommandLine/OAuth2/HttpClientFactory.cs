@@ -11,6 +11,7 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Atlas.CommandLine.Accounts;
+using Microsoft.Atlas.CommandLine.ConsoleOutput;
 using Microsoft.Extensions.Logging;
 
 namespace Microsoft.Atlas.CommandLine.OAuth2
@@ -20,26 +21,34 @@ namespace Microsoft.Atlas.CommandLine.OAuth2
         private readonly ISettingsManager _settingsManager;
 
         private readonly ILogger<HttpClientFactory> _logger;
+        private readonly IConsole _console;
+        private readonly IHttpClientHandlerFactory _httpClientHandlerFactory;
 
-        public HttpClientFactory(ISettingsManager settingsManager, ILogger<HttpClientFactory> logger)
+        public HttpClientFactory(
+            ISettingsManager settingsManager,
+            ILogger<HttpClientFactory> logger,
+            IConsole console,
+            IHttpClientHandlerFactory httpClientHandlerFactory)
         {
             _settingsManager = settingsManager;
             _logger = logger;
+            _console = console;
+            _httpClientHandlerFactory = httpClientHandlerFactory;
         }
 
         public HttpClient Create(HttpAuthentication auth)
         {
             HttpMessageHandler handler;
 
-            handler = new HttpClientHandler();
+            handler = _httpClientHandlerFactory.Create();
 
             var settings = _settingsManager.ReadSettings();
             var tokenCache = _settingsManager.GetTokenCache();
-            var tokenProvider = new TokenProvider(settings, tokenCache);
+            var tokenProvider = new TokenProvider(settings, tokenCache, _console);
 
             if (auth != null)
             {
-                handler = new AuthenticationTokenMessageHandler(() => tokenProvider.AcquireTokenAsync(auth.tenant, auth.resourceId, auth.clientId))
+                handler = new AuthenticationTokenMessageHandler(() => tokenProvider.AcquireTokenAsync(auth))
                 {
                     InnerHandler = handler
                 };
@@ -53,11 +62,11 @@ namespace Microsoft.Atlas.CommandLine.OAuth2
                 try
                 {
                     // _logger.LogInformation("{Method} {Url}", request.Method, request.RequestUri);
-                    Console.WriteLine($"{request.Method.ToString().Color(ConsoleColor.Green)} {request.RequestUri}");
+                    _console.WriteLine($"{request.Method.ToString().Color(ConsoleColor.Green)} {request.RequestUri}");
                     sw.Start();
                     var response = await next(request, cancellationToken);
                     sw.Stop();
-                    Console.WriteLine($"{response.StatusCode.ToString().Color((int)response.StatusCode >= 400 ? ConsoleColor.Red : ConsoleColor.Green).Bold()} {request.RequestUri} {sw.ElapsedMilliseconds}ms");
+                    _console.WriteLine($"{response.StatusCode.ToString().Color((int)response.StatusCode >= 400 ? ConsoleColor.Red : ConsoleColor.Green).Bold()} {request.RequestUri} {sw.ElapsedMilliseconds}ms");
 
                     return response;
                 }

@@ -2,7 +2,9 @@
 // Licensed under the MIT license.
 
 using System;
+using System.Linq;
 using System.Net.Http;
+using Microsoft.Atlas.CommandLine.Tests.Stubs;
 using Microsoft.Atlas.CommandLine.Tests.Utilities;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using YamlDotNet.Core;
@@ -22,9 +24,11 @@ namespace Microsoft.Atlas.CommandLine.Tests
             set => _services = value;
         }
 
+        public StubConsole Console { get; set; } = new StubConsole();
+
         public TServiceContext InitializeServices(params object[] stubServices)
         {
-            Services = ServiceContextBase.Create<TServiceContext>(stubServices);
+            Services = ServiceContextBase.Create<TServiceContext>(new[] { Console }.Concat(stubServices).ToArray());
             return Services;
         }
 

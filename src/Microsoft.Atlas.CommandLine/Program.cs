@@ -36,7 +36,9 @@ namespace Microsoft.Atlas.CommandLine
                 Console.SetError(secretTracker.FilterTextWriter(new AnsiConsoleWriter(ConsoleOutput.AnsiConsole.GetError(true))));
             }
 
-            Console.Out.WriteLine("Atlas".Color(ConsoleColor.Cyan).Bold());
+            var console = services.GetRequiredService<IConsole>();
+
+            console.WriteLine("Atlas".Color(ConsoleColor.Cyan).Bold());
 
             var app = services.GetRequiredService<CommandLineApplicationServices>();
 
@@ -48,13 +50,13 @@ namespace Microsoft.Atlas.CommandLine
             }
             catch (Exception ex)
             {
-                Console.Error.WriteLine(ex);
+                console.Error.WriteLine(ex);
                 return 1;
             }
             finally
             {
-                Console.Out.Flush();
-                Console.Error.Flush();
+                console.Out.Flush();
+                console.Error.Flush();
             }
         }
 
@@ -72,6 +74,7 @@ namespace Microsoft.Atlas.CommandLine
 
                 .AddSingleton<IJsonHttpClientFactory, JsonHttpClientFactory>()
                 .AddSingleton<IHttpClientFactory, HttpClientFactory>()
+                .AddSingleton<IHttpClientHandlerFactory, HttpClientHandlerFactory>()
 
                 .AddSingleton<ISettingsDirectory, SettingsDirectory>()
                 .AddSingleton<ISettingsManager, SettingsManager>()
@@ -88,6 +91,7 @@ namespace Microsoft.Atlas.CommandLine
                 .AddTransient<ITemplateHelperProvider, BinaryHelpers>()
 
                 .AddSingleton<CommandLineApplicationServices>()
+                .AddTransient<IConsole, ConsoleService>()
 
                 .AddTransient<WorkflowCommands>()
                 .AddTransient<AccountCommands>()
@@ -187,6 +191,7 @@ namespace Microsoft.Atlas.CommandLine
                 deploy.Option("-o|--output-directory", "Output folder for generated files", CommandOptionType.SingleValue, inherited: true);
 
                 deploy.Option("--dry-run", "Skip non-GET REST api calls", CommandOptionType.NoValue, inherited: true);
+                deploy.Option("--non-interactive", "Disables all interactive prompting. Some examples of interactive prompting include requests to complete authentication steps.", CommandOptionType.NoValue, inherited: true);
 
                 deploy.OnExecute<WorkflowCommands>();
             });
