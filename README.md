@@ -128,14 +128,14 @@ atlas deploy 101-messages
 
 Atlas runs on Windows and Linux. Windows 10 and Ubuntu 16.04 are the tested environments.
 
-#### Building Atlas source
+#### Building Atlas from source
 
 Prerequisites:
 * Required: Download and [install](https://www.microsoft.com/net/download/dotnet-core/2.1) the .NET Core SDK
 * Optional: [Install](https://docs.microsoft.com/en-us/visualstudio/install/install-visual-studio?view=vs-2017) or [update](https://docs.microsoft.com/en-us/visualstudio/install/install-visual-studio?view=vs-2017) Visual Studio 2017
 * Optional: Download and [install](https://code.visualstudio.com/Download) Visual Studio Code
 
-To clone and build from source:
+To clone and build from source, run the following commands from a console window:
 
 ```
 git clone https://github.com/Microsoft/Atlas.git
