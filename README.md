@@ -76,6 +76,19 @@ If you want to use a package manager:
 
 ----
 
+## System Requirements
+
+#### Running Atlas
+
+Atlas runs on Windows and Linux. Windows 10 and Ubuntu 16.04 are the tested environments.
+
+#### Building from source
+
+Prerequisites:
+* Required: Download and [install](https://www.microsoft.com/net/download/dotnet-core/2.1) the .NET Core SDK
+* Optional: [Install](https://docs.microsoft.com/en-us/visualstudio/install/install-visual-studio?view=vs-2017) or [update](https://docs.microsoft.com/en-us/visualstudio/install/install-visual-studio?view=vs-2017) Visual Studio 2017
+* Optional: Download and [install](https://code.visualstudio.com/Download) Visual Studio Code
+
 ## Contributing
 
 This project welcomes contributions and suggestions. Most contributions require you to
