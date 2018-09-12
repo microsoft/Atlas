@@ -173,8 +173,8 @@ eta:
             var yaml = serializers.YamlSerializer.Serialize(data);
 
             // yaml serializer writes blank value for null
-            var expected = GetYamlRepresentation();
-            var actual = yaml;
+            var expected = GetYamlRepresentation().Replace("\r", string.Empty);
+            var actual = yaml.Replace("\r", string.Empty);
 
             Assert.AreEqual(expected, actual);
         }
