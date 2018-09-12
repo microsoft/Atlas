@@ -253,7 +253,10 @@ namespace Microsoft.Atlas.CommandLine.Commands
                 {
                     GenerateOutput("output.yaml", writer => _serializers.YamlSerializer.Serialize(writer, context.ValuesOut));
 
-                    _serializers.YamlSerializer.Serialize(_console.Out, context.ValuesOut);
+                    using (var writer = _secretTracker.FilterTextWriter(_console.Out))
+                    {
+                        _serializers.YamlSerializer.Serialize(writer, context.ValuesOut);
+                    }
                 }
             }
 

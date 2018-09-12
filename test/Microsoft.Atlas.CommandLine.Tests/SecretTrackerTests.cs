@@ -4,12 +4,14 @@
 using System;
 using System.IO;
 using Microsoft.Atlas.CommandLine.Secrets;
+using Microsoft.Atlas.CommandLine.Tests.Stubs;
+using Microsoft.Atlas.CommandLine.Tests.Utilities;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace Microsoft.Atlas.CommandLine.Tests
 {
     [TestClass]
-    public class SecretTrackerTests
+    public class SecretTrackerTests : ServiceContextTestsBase<SecretTrackerTests.ServiceContext>
     {
         private const string Redacted = "xxxxxxxx";
 
@@ -195,6 +197,56 @@ namespace Microsoft.Atlas.CommandLine.Tests
 
             var output = outputStream.GetStringBuilder().ToString();
             Assert.AreEqual($"DoesNotFail{Environment.NewLine}", output);
+        }
+
+        [TestMethod]
+        public void HttpResponseSecretsAreHidden()
+        {
+            var stubBlueprints = Yaml<StubBlueprintManager>(@"
+                Blueprints:
+                  hide-secrets:
+                    Files:
+                      workflow.yaml: |
+                        operations:
+                        - message: Fetching secrets
+                          request: request.yaml
+                          output:
+                            things:
+                              one: (keys[0].value)
+                              two: (keys[1].value)
+                      request.yaml: |
+                        method: GET
+                        url: https://localhost/
+                        secret: keys[*].value
+            ");
+
+            var stubHttpClients = Yaml<StubHttpClientHandlerFactory>(@"
+                Responses:
+                  https://localhost/:
+                    GET:
+                      status: 200
+                      body:
+                        keys:
+                        - name: key-1
+                          value: alpha
+                        - name: key-2
+                          value: beta
+            ");
+
+            InitializeServices(stubBlueprints, stubHttpClients);
+
+            var result = Services.App.Execute("deploy", "hide-secrets");
+
+            Assert.AreEqual(0, result);
+
+            Console.AssertContainsInOrder("Fetching secrets", "one: xxxxxxxx", "two: xxxxxxxx");
+        }
+
+        public class ServiceContext : ServiceContextBase
+        {
+            public ISecretTracker SecretTracker { get; set; }
+
+            public CommandLineApplicationServices App { get; set; }
         }
     }
 }
