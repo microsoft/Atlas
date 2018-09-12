@@ -11,6 +11,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Xml;
 using Microsoft.Atlas.CommandLine.Blueprints;
+using Microsoft.Atlas.CommandLine.ConsoleOutput;
 using Microsoft.Atlas.CommandLine.Execution;
 using Microsoft.Atlas.CommandLine.JsonClient;
 using Microsoft.Atlas.CommandLine.Models.Workflow;
@@ -34,6 +35,7 @@ namespace Microsoft.Atlas.CommandLine.Commands
         private readonly IPatternMatcherFactory _patternMatcherFactory;
         private readonly ISecretTracker _secretTracker;
         private readonly IBlueprintManager _blueprintManager;
+        private readonly IConsole _console;
         private int _operationCount;
 
         public WorkflowCommands(
@@ -43,7 +45,8 @@ namespace Microsoft.Atlas.CommandLine.Commands
             IJmesPathQuery jmesPathQuery,
             IPatternMatcherFactory patternMatcherFactory,
             ISecretTracker secretTracker,
-            IBlueprintManager blueprintManager)
+            IBlueprintManager blueprintManager,
+            IConsole console)
         {
             _clientFactory = clientFactory;
             _templateEngineFactory = templateEngineFactory;
@@ -52,6 +55,7 @@ namespace Microsoft.Atlas.CommandLine.Commands
             _patternMatcherFactory = patternMatcherFactory;
             _secretTracker = secretTracker;
             _blueprintManager = blueprintManager;
+            _console = console;
         }
 
         public CommandOption Values { get; set; }
@@ -62,6 +66,8 @@ namespace Microsoft.Atlas.CommandLine.Commands
 
         public CommandOption DryRun { get; set; }
 
+        public CommandOption NonInteractive { get; set; }
+
         public CommandOption Set { get; set; }
 
         public CommandArgument Blueprint { get; set; }
@@ -69,6 +75,10 @@ namespace Microsoft.Atlas.CommandLine.Commands
         public CommandArgument Workflow { get; set; }
 
         public bool IsDryRun => DryRun?.HasValue() ?? false;
+
+        public bool IsNonInteractive => NonInteractive?.HasValue() ?? false;
+
+        public bool IsInteractive => !IsNonInteractive;
 
         public void GenerateOutput(string filename, Action<TextWriter> generate)
         {
@@ -243,7 +253,7 @@ namespace Microsoft.Atlas.CommandLine.Commands
                 {
                     GenerateOutput("output.yaml", writer => _serializers.YamlSerializer.Serialize(writer, context.ValuesOut));
 
-                    _serializers.YamlSerializer.Serialize(Console.Out, context.ValuesOut);
+                    _serializers.YamlSerializer.Serialize(_console.Out, context.ValuesOut);
                 }
             }
 
@@ -295,8 +305,8 @@ namespace Microsoft.Atlas.CommandLine.Commands
             {
                 if (!string.IsNullOrEmpty(message))
                 {
-                    Console.WriteLine();
-                    Console.WriteLine($"{new string(' ', context.Indent * 2)}- {message.Color(ConsoleColor.Cyan).Bold()}");
+                    _console.WriteLine();
+                    _console.WriteLine($"{new string(' ', context.Indent * 2)}- {message.Color(ConsoleColor.Cyan).Bold()}");
                 }
 
                 var debugPath = Path.Combine(OutputDirectory.Required(), "logs", $"{++_operationCount:000}-{new string('-', context.Indent * 2)}{new string((message ?? operation.write ?? operation.request ?? operation.template ?? string.Empty).Select(ch => char.IsLetterOrDigit(ch) ? ch : '-').ToArray())}.yaml");
@@ -347,7 +357,8 @@ namespace Microsoft.Atlas.CommandLine.Commands
                                 {
                                     tenant = request?.auth?.tenant ?? "common",
                                     resourceId = request?.auth?.resource ?? "499b84ac-1321-427f-aa17-267ca6975798",
-                                    clientId = request?.auth?.client ?? "e8f3cc86-b3b2-4ebb-867c-9c314925b384"
+                                    clientId = request?.auth?.client ?? "e8f3cc86-b3b2-4ebb-867c-9c314925b384",
+                                    interactive = IsInteractive
                                 };
                             }
 
@@ -356,7 +367,7 @@ namespace Microsoft.Atlas.CommandLine.Commands
                             var method = new HttpMethod(request.method ?? "GET");
                             if (IsDryRun && method.Method != "GET")
                             {
-                                Console.WriteLine($"Skipping {method.Method.ToString().Color(ConsoleColor.Yellow)} {request.url}");
+                                _console.WriteLine($"Skipping {method.Method.ToString().Color(ConsoleColor.Yellow)} {request.url}");
                             }
                             else
                             {
@@ -446,10 +457,10 @@ namespace Microsoft.Atlas.CommandLine.Commands
 
                             var throwDetails = ProcessValues(operation.@throw.details, context.Values);
 
-                            Console.WriteLine(throwMessage.Color(ConsoleColor.Red));
+                            _console.WriteLine(throwMessage.Color(ConsoleColor.Red));
                             if (throwDetails != null)
                             {
-                                Console.WriteLine(_serializers.YamlSerializer.Serialize(throwDetails).Color(ConsoleColor.Red));
+                                _console.WriteLine(_serializers.YamlSerializer.Serialize(throwDetails).Color(ConsoleColor.Red));
                             }
 
                             throw new OperationException(string.IsNullOrEmpty(throwMessage) ? message : throwMessage)

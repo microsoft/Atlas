@@ -135,6 +135,8 @@ Blueprints:
             var result = Services.App.Execute("deploy", "the-test");
 
             Assert.AreEqual(0, result);
+
+            Console.AssertContainsInOrder("returning 42", "x: 42");
         }
 
         [TestMethod]
@@ -242,7 +244,7 @@ Blueprints:
 
             var stubJsonHttpClientFactory = Yaml<StubJsonHttpClientFactory>(@"
 Responses:
- ""https://localhost/"":
+ https://localhost/:
   GET:
    status: 200
    body:
@@ -255,6 +257,44 @@ Responses:
             var result = Services.App.Execute("deploy", "the-test");
 
             Assert.AreEqual(0, result);
+        }
+
+        [TestMethod]
+        public async Task NonInteractiveOptionCausesErrorWhenTokenRequired()
+        {
+            var stubBlueprints = Yaml<StubBlueprintManager>(@"
+Blueprints:
+ the-test:
+  Files:
+   workflow.yaml: |
+    operations:
+    - message: Calling request and not producing output
+      request: request.yaml
+   request.yaml: |
+    method: GET
+    url: https://localhost/
+    auth:
+     tenant: fakename.onmicrosoft.com
+     resource: https://localhost/
+     client: 04b07795-8ddb-461a-bbee-02f9e1bf7b46 # Azure CLI
+");
+
+            var stubRequests = Yaml<StubHttpClientHandlerFactory>(@"
+Responses:
+ https://localhost/:
+  GET:
+   status: 400
+   body: This call shouldn't happen
+");
+
+            InitializeServices(stubBlueprints, stubRequests);
+
+            var error = Assert.ThrowsException<AggregateException>(() =>
+            {
+                Services.App.Execute("deploy", "the-test", "--non-interactive");
+            });
+
+            Assert.IsTrue(error.Message.Contains("interactive"), "Exception message includes 'interactive'");
         }
     }
 }
