@@ -35,6 +35,11 @@ namespace Microsoft.Atlas.CommandLine
                 Console.SetOut(secretTracker.FilterTextWriter(new AnsiConsoleWriter(ConsoleOutput.AnsiConsole.GetOutput(true))));
                 Console.SetError(secretTracker.FilterTextWriter(new AnsiConsoleWriter(ConsoleOutput.AnsiConsole.GetError(true))));
             }
+            else
+            {
+                Console.SetOut(secretTracker.FilterTextWriter(Console.Out));
+                Console.SetError(secretTracker.FilterTextWriter(Console.Error));
+            }
 
             var console = services.GetRequiredService<IConsole>();
 
