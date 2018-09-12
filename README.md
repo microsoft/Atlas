@@ -22,7 +22,9 @@ With Atlas you can make the configuration of everything from CI/CD to production
 
 ## Install
 
-Daily builds of the Atlas CLI are available as self-contained downloads.
+Atlas is currently under active development.
+
+Daily builds of the Atlas CLI are available as self-contained downloads:
 
 | Platform | [Master branch (0.1)][Master Branch] | [Latest build][Latest Json] |
 |:------:|:------:|:------:|
@@ -33,6 +35,50 @@ If you want to use a package manager:
 
 #### Chocolatey
 * [Chocolatey](https://chocolatey.org/) users can use `choco install atlas-cli -s https://www.myget.org/F/atlas-ci` 
+
+## Getting Started
+
+From a console window, `mkdir hello` to create a new subfolder.
+
+Add a `hello/workflow.yaml` file to declare operations:
+
+```
+operations:
+- message: Running my workflow...
+- message: {{ info.greeting }}, {{ info.name }}!
+- message: "All values: {{ json . }}"
+```
+
+Add a `hello/values.yaml` file to declare defaults:
+
+```
+info:
+  greeting: Hello
+  name: World
+```
+
+Run it!
+
+```
+> atlas deploy hello --set info.name=Atlas
+
+Atlas
+
+  - Running my workflow...
+
+  - Hello, Atlas!
+
+  - All values: {"info": {"greeting": "Hello", "name": "Atlas"}}
+```
+
+Clone the [Atlas Examples](https://github.com/Microsoft/Atlas/tree/master/examples) folder to see additional
+kinds of operations Atlas can perform.
+
+```
+git clone https://github.com/Microsoft/Atlas.git
+cd Atlas/examples
+atlas deploy 101-messages
+```
 
 ## Features
 
@@ -82,12 +128,20 @@ If you want to use a package manager:
 
 Atlas runs on Windows and Linux. Windows 10 and Ubuntu 16.04 are the tested environments.
 
-#### Building from source
+#### Building Atlas source
 
 Prerequisites:
 * Required: Download and [install](https://www.microsoft.com/net/download/dotnet-core/2.1) the .NET Core SDK
 * Optional: [Install](https://docs.microsoft.com/en-us/visualstudio/install/install-visual-studio?view=vs-2017) or [update](https://docs.microsoft.com/en-us/visualstudio/install/install-visual-studio?view=vs-2017) Visual Studio 2017
 * Optional: Download and [install](https://code.visualstudio.com/Download) Visual Studio Code
+
+To clone and build from source:
+
+```
+git clone https://github.com/Microsoft/Atlas.git
+cd Atlas
+build.cmd *or* ./build.sh
+```
 
 ## Contributing
 
