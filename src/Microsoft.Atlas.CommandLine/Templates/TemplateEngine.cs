@@ -142,8 +142,7 @@ namespace Microsoft.Atlas.CommandLine.Templates
             var options = arguments.Last() as IDictionary<string, object>;
             if (options != null)
             {
-                if (options.TryGetValue("provider", out var provider) &&
-                    string.Equals(provider?.ToString(), "RNGCryptoServiceProvider", StringComparison.OrdinalIgnoreCase))
+                if (options.TryGetValue("provider", out var provider) && string.Equals(provider?.ToString(), "RNGCryptoServiceProvider", StringComparison.OrdinalIgnoreCase))
                 {
                     using (var rng = new RNGCryptoServiceProvider())
                     {
@@ -283,7 +282,6 @@ namespace Microsoft.Atlas.CommandLine.Templates
             var query = string.Format(formatString, args: formatArguments.ToArray());
             var json = arguments.OfType<HashParameterDictionary>().SingleOrDefault() ?? (object)context;
 
-            // Console.WriteLine($"query: {query}");
             var jmespath = new JmesPath();
             jmespath.FunctionRepository
                 .Register<ItemsFunction>()
