@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.Atlas.CommandLine.Accounts;
+using Microsoft.Atlas.CommandLine.ConsoleOutput;
 using Microsoft.Atlas.CommandLine.Serialization;
 using Microsoft.Extensions.CommandLineUtils;
 
@@ -15,13 +16,16 @@ namespace Microsoft.Atlas.CommandLine.Commands
     {
         private readonly ISettingsManager _settingsManager;
         private readonly IYamlSerializers _yamlSerializers;
+        private readonly IConsole _console;
 
         public AccountCommands(
             ISettingsManager settingsManager,
-            IYamlSerializers yamlSerializers)
+            IYamlSerializers yamlSerializers,
+            IConsole console)
         {
             _settingsManager = settingsManager;
             _yamlSerializers = yamlSerializers;
+            _console = console;
         }
 
         public CommandOption Name { get; set; }
@@ -111,7 +115,7 @@ namespace Microsoft.Atlas.CommandLine.Commands
                 .Select(RedactSecrets)
                 .ToList();
 
-            _yamlSerializers.YamlSerializer.Serialize(Console.Out, accounts);
+            _yamlSerializers.YamlSerializer.Serialize(_console.Out, accounts);
 
             return 0;
         }

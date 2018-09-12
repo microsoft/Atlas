@@ -15,5 +15,7 @@ namespace Microsoft.Atlas.CommandLine.OAuth2
         public string resourceId { get; set; }
 
         public string clientId { get; set; }
+
+        public bool interactive { get; set; } = true;
     }
 }

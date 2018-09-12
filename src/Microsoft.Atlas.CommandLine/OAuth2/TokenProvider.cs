@@ -7,6 +7,7 @@ using System.Net.Http.Headers;
 using System.Text;
 using System.Threading.Tasks;
 using Microsoft.Atlas.CommandLine.Accounts;
+using Microsoft.Atlas.CommandLine.ConsoleOutput;
 using Microsoft.IdentityModel.Clients.ActiveDirectory;
 
 namespace Microsoft.Atlas.CommandLine.OAuth2
@@ -15,15 +16,24 @@ namespace Microsoft.Atlas.CommandLine.OAuth2
     {
         private readonly SettingsModel _settings;
         private readonly TokenCache _tokenCache;
+        private readonly IConsole _console;
 
-        public TokenProvider(SettingsModel settings, TokenCache tokenCache)
+        public TokenProvider(
+            SettingsModel settings,
+            TokenCache tokenCache,
+            IConsole console)
         {
             _settings = settings;
             _tokenCache = tokenCache;
+            _console = console;
         }
 
-        public async Task<AuthenticationHeaderValue> AcquireTokenAsync(string tenant, string resourceId, string clientId)
+        public async Task<AuthenticationHeaderValue> AcquireTokenAsync(HttpAuthentication auth)
         {
+            var tenant = auth.tenant;
+            var resourceId = auth.resourceId;
+            var clientId = auth.clientId;
+
             // https://login.microsoftonline.com
             // https://login.windows.net
             var authority = $"https://login.windows.net/{tenant ?? "common"}";
@@ -71,7 +81,11 @@ namespace Microsoft.Atlas.CommandLine.OAuth2
             }
             else
             {
-                // TODO: don't go down this path if --noninteractive is set?
+                if (auth.interactive == false)
+                {
+                    throw new InvalidOperationException("Matching account credentials have not been stored, and interactive authentication is disallowed.");
+                }
+
                 try
                 {
                     result = await ctx.AcquireTokenSilentAsync(resourceId, clientId);
@@ -79,7 +93,7 @@ namespace Microsoft.Atlas.CommandLine.OAuth2
                 catch
                 {
                     DeviceCodeResult codeResult = await ctx.AcquireDeviceCodeAsync(resourceId, clientId);
-                    Console.Error.WriteLine(codeResult.Message.Color(ConsoleColor.Yellow));
+                    _console.Error.WriteLine(codeResult.Message.Color(ConsoleColor.Yellow));
                     result = await ctx.AcquireTokenByDeviceCodeAsync(codeResult);
                 }
             }

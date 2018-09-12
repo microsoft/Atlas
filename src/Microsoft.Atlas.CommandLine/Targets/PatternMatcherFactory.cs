@@ -48,7 +48,6 @@ namespace Microsoft.Atlas.CommandLine.Targets
                 var globPattern = segments.Take(length).Aggregate(string.Empty, (path, segment) => path + segment + "/");
                 var regexPattern = segments.Take(length).Select(SegmentToRegex).Aggregate("^", (path, segment) => path + segment + "/") + "$";
 
-                // Console.WriteLine($"{pattern} yielded {globPattern} as {regexPattern}");
                 yield return new PatternMatcherExpression(pattern, globPattern, regexPattern);
             }
         }
