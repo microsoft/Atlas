@@ -69,12 +69,8 @@ operations:
     values:
       blob: 
         path: latest.json
-        body:
-          {{# indent 10 }}
-          {{> latest.json }}
-          {{/ indent }}
-        contentType: application/json
-    request: apis/azure/storage/blob-put.yaml
+        body: {{> latest.json }}
+    request: apis/azure/storage/blob-put-json.yaml
 
   - message: Sending atlas-{{ latest.version }}-win10-x64.zip
     values:
