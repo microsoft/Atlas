@@ -1,0 +1,6 @@
+example:
+  key: 7ce39e99-4684-460c-b4bd-276ce0a1cbd1 
+  
+# This is a guid used to demonstrate handling secrets. 
+# In practice, DO NOT staging or production secrets in a source-controlled values.yaml file
+# Sensitive information should instead be provided as a --set example.key=THE-ACTUAL-SECRET

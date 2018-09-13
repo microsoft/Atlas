@@ -12,6 +12,18 @@
                 "test",
                 "test/Microsoft.Atlas.CommandLine.Tests/Microsoft.Atlas.CommandLine.Tests.csproj"
             ]
+        },
+        {
+            "group": {
+                "kind": "build",
+                "isDefault": true
+            },
+            "label": "build",
+            "command": "dotnet",
+            "args": [
+                "build",
+                "src/Microsoft.Atlas.CommandLine/Microsoft.Atlas.CommandLine.csproj"
+            ]
         }
     ]
 }

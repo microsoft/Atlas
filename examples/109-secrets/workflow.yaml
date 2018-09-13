@@ -1,0 +1,30 @@
+
+values: {{{ json }}}
+
+operations:
+- message: If a value is secret, protect it by passing it through the \{{ secret <string> }} Handlebar helper
+
+- message: For example, the message "My example key is \{{ secret example.key }}" will appear like this...
+- message: "My example key is {{ secret example.key}}"
+
+
+- message: Secrets only need to be declared once at render-time
+- message: if that value appears again it is hidden automatically
+
+- output: 
+    another: 
+      variable: (example.key)
+
+- message: "(['Like this {{ example.key }}', ' and this ', another.variable] )"
+
+- message: Secrets are hidden whenever they would have been written to a log file or console output
+- message: "For example, when showing values at render time --- {{ json }}"
+
+- message: "( ['And when showing values at run time --- ', @] )"
+
+- message: or when returning final workflow outout
+
+output:
+  at-render-time: {{ example.key }}
+  at-run-time: ( example.key )
+  with-another-varable-name: ( another.variable )
