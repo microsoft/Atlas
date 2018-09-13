@@ -9,4 +9,4 @@ headers:
   x-ms-blob-type: BlockBlob
   Authorization: "SharedKey {{storage.account}}:{{storage.key}}"
 
-body: "{{blob.body}}"
+body: {{{ json blob.body }}}
