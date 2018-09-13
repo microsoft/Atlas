@@ -8,6 +8,5 @@ headers:
   x-ms-version: "2018-03-28"
   x-ms-blob-type: BlockBlob
   Authorization: "SharedKey {{storage.account}}:{{storage.key}}"
-  Content-Type: {{ blob.contentType }}
 
-body: "{{blob.body}}"
+body: {{{ json blob.body }}}

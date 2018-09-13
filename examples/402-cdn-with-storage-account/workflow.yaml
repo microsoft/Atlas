@@ -69,7 +69,7 @@ operations:
     values:
       blob: 
         path: latest.json
-        body: |
+        body:
           {{# indent 10 }}
           {{> latest.json }}
           {{/ indent }}
