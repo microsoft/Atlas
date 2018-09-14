@@ -54,7 +54,7 @@ namespace Microsoft.Atlas.CommandLine.JsonClient
                 else
                 {
                     var memoryStream = new MemoryStream();
-                    using (var writer = new StreamWriter(memoryStream, Encoding.UTF8, 1024, leaveOpen: true))
+                    using (var writer = new StreamWriter(memoryStream, new UTF8Encoding(encoderShouldEmitUTF8Identifier: false), bufferSize: 1024, leaveOpen: true))
                     {
                         _serializer.Serialize(writer, jsonRequest.body);
                     }
