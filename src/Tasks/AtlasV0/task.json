@@ -3,7 +3,7 @@
   "name": "AtlasDeploy",
   "friendlyName": "Execute Atlas commands",
   "description": "Execute Atlas commands",
-  "helpMarkDown": "[More Information](https://www.bing.com/)",
+  "helpMarkDown": "[More Information](https://github.com/Microsoft/Atlas)",
   "category": "Utility",
   "visibility": [
     "Build",
@@ -13,9 +13,9 @@
   "version": {
     "Major": 0,
     "Minor": 1,
-    "Patch": 25
+    "Patch": 44
   },
-  "instanceNameFormat": "Atlas $(samplestring)",
+  "instanceNameFormat": "Atlas $(command)",
   "preview": "true",
   "groups": [
     {

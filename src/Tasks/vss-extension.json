@@ -2,7 +2,7 @@
     "manifestVersion": 1,
     "id": "atlas-task",
     "name": "Atlas Build and Release Tools",
-    "version": "0.1.24",
+    "version": "0.1.53",
     "publisher": "lodejard",
     "targets": [
         {
@@ -18,18 +18,34 @@
     },
     "files": [
         {
-            "path": "runAtlas"
+            "path": "AtlasV0"
+        },
+        {
+            "path": "AtlasInstallerV0"
+        },
+        {
+            "path": "images"
         }
     ],
     "contributions": [
         {
-            "id": "custom-build-release-task",
+            "id": "custom-atlas-task",
             "type": "ms.vss-distributed-task.task",
             "targets": [
                 "ms.vss-distributed-task.tasks"
             ],
             "properties": {
-                "name": "runAtlas"
+                "name": "AtlasV0"
+            }
+        },
+        {
+            "id": "custom-atlas-installer-task",
+            "type": "ms.vss-distributed-task.task",
+            "targets": [
+                "ms.vss-distributed-task.tasks"
+            ],
+            "properties": {
+                "name": "AtlasInstallerV0"
             }
         }
     ]

@@ -81,7 +81,7 @@ steps:
     npm install -g typescript
     npm install -g tfx-cli
     
-    cd $(Build.SourcesDirectory)/tasks/AtlasV0/runAtlas/src
+    cd $(Build.SourcesDirectory)/src/Tasks/AtlasV0
     npm install
     npm run-script tasks:bump
     tsc
