@@ -77,20 +77,21 @@ steps:
     SourceFolder: examples
     TargetFolder: '$(Build.ArtifactStagingDirectory)/examples'
 
-- script: |
+- displayName: Creating vsix package
+  script: |
     npm install -g typescript
     npm install -g tfx-cli
-    
-    cd $(Build.SourcesDirectory)/src/Tasks/AtlasV0
+
+    cd $(Build.SourcesDirectory)/src/Tasks/AtlasInstallerV0
     npm install
-    npm run-script tasks:bump
     tsc
 
-    cd $(Build.SourcesDirectory)
-    dotnet publish $(Build.SourcesDirectory)/src/Microsoft.Atlas.CommandLine/Microsoft.Atlas.CommandLine.csproj --configuration Release --output "$(Build.SourcesDirectory)\tasks\AtlasV0\runAtlas\bin"
+    cd $(Build.SourcesDirectory)/src/Tasks/AtlasV0
+    npm install
+    tsc
 
-    cd $(Build.SourcesDirectory)/tasks/AtlasV0
-    tfx extension create --manifest-globs vss-extension.json --rev-version --output-path $(Build.ArtifactStagingDirectory)/vsts
+    cd $(Build.SourcesDirectory)/src/Tasks
+    tfx extension create --manifest-globs vss-extension.json --output-path $(Build.ArtifactStagingDirectory)/vsts
 
 - task: PublishBuildArtifacts@1
   displayName: publish artifacts
