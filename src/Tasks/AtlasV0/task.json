@@ -13,7 +13,7 @@
   "version": {
     "Major": 0,
     "Minor": 1,
-    "Patch": 44
+    "Patch": 3308016
   },
   "instanceNameFormat": "Atlas $(command)",
   "preview": "true",

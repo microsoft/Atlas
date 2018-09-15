@@ -2,7 +2,7 @@
     "manifestVersion": 1,
     "id": "atlas-task",
     "name": "Atlas Build and Release Tools",
-    "version": "0.1.53",
+    "version": "0.1.0",
     "publisher": "lodejard",
     "targets": [
         {

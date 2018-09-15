@@ -29,6 +29,6 @@ popd
 if %errorlevel% neq 0 exit /b %errorlevel%
 
 echo "Building vsix"
-call tfx extension create --manifest-globs vss-extension.json --rev-version --output-path %BinFolder%
+call tfx extension create --manifest-globs vss-extension.json --output-path %BinFolder%
 if %errorlevel% neq 0 exit /b %errorlevel%
 
