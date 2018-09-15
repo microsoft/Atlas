@@ -77,8 +77,7 @@ steps:
     SourceFolder: examples
     TargetFolder: '$(Build.ArtifactStagingDirectory)/examples'
 
-- displayName: Creating vsix package
-  script: |
+- script: |
     npm install -g typescript
     npm install -g tfx-cli
 
