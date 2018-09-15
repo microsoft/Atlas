@@ -65,13 +65,6 @@ operations:
       storage:
         key: (keys[0].value)
 
-  - message: Sending latest.json
-    values:
-      blob: 
-        path: latest.json
-        body: {{> latest.json }}
-    request: apis/azure/storage/blob-put-json.yaml
-
   - message: Sending atlas-{{ latest.version }}-win10-x64.zip
     values:
       blob: 
@@ -103,3 +96,10 @@ operations:
         file: {{ latest.downloads }}/atlas-{{ latest.version }}-linux-x64.tar.gz
         contentType: application/x-gtar
     request: apis/azure/storage/blob-put-binary.yaml
+
+  - message: Sending latest.json
+    values:
+      blob: 
+        path: latest.json
+        body: {{> latest.json }}
+    request: apis/azure/storage/blob-put-json.yaml

@@ -1,0 +1,44 @@
+{
+  "id": "18cf5ac8-6146-4e7e-9855-e285d74afabf",
+  "name": "AtlasInstaller",
+  "friendlyName": "Atlas CLI installer",
+  "description": "Install Atlas CLI on agent machine",
+  "helpMarkDown": "[More Information](https://github.com/Microsoft/Atlas)",
+  "category": "Utility",
+  "visibility": [
+    "Build",
+    "Release"
+  ],
+  "author": "Microsoft Corporation",
+  "version": {
+    "Major": 0,
+    "Minor": 1,
+    "Patch": 0
+  },
+  "instanceNameFormat": "Install Atlas $(atlasVersion)",
+  "preview": "true",
+  "groups": [
+  ],
+  "inputs": [
+    {
+      "name": "atlasVersion",
+      "type": "string",
+      "required": true,
+      "label": "Version",
+      "helpMarkDown": "Specify the version of Atlas to install",
+      "defaultValue": "0.1.3305443"
+    },
+    {
+      "name": "checkLatestVersion",
+      "type": "boolean",
+      "label": "Check for latest version of Atlas",
+      "defaultValue": false,
+      "helpMarkDown": "Check for latest version of Atlas"
+    }
+  ],
+  "execution": {
+    "Node": {
+      "target": "src/index.js"
+    }
+  }
+}

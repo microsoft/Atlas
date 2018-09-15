@@ -80,17 +80,20 @@ steps:
 - script: |
     npm install -g typescript
     npm install -g tfx-cli
-    
-    cd $(Build.SourcesDirectory)/tasks/AtlasV0/runAtlas/src
+
+    cd $(Build.SourcesDirectory)/src/Tasks/AtlasInstallerV0
+    sed -ri 's/"Patch": [0-9]+"/"Patch": $(Build.BuildId)/' task.json
     npm install
-    npm run-script tasks:bump
     tsc
 
-    cd $(Build.SourcesDirectory)
-    dotnet publish $(Build.SourcesDirectory)/src/Microsoft.Atlas.CommandLine/Microsoft.Atlas.CommandLine.csproj --configuration Release --output "$(Build.SourcesDirectory)\tasks\AtlasV0\runAtlas\bin"
+    cd $(Build.SourcesDirectory)/src/Tasks/AtlasV0
+    sed -ri 's/"Patch": [0-9]+"/"Patch": $(Build.BuildId)/' task.json
+    npm install
+    tsc
 
-    cd $(Build.SourcesDirectory)/tasks/AtlasV0
-    tfx extension create --manifest-globs vss-extension.json --rev-version --output-path $(Build.ArtifactStagingDirectory)/vsts
+    cd $(Build.SourcesDirectory)/src/Tasks
+    sed -ri 's/"version": "0.1.[0-9]+"/"version": "0.1.$(Build.BuildId)"/' vss-extension.json
+    tfx extension create --manifest-globs vss-extension.json --output-path $(Build.ArtifactStagingDirectory)/vsts
 
 - task: PublishBuildArtifacts@1
   displayName: publish artifacts
