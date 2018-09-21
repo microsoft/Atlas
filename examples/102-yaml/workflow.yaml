@@ -4,4 +4,4 @@ operations:
 - message: yaml is a super-set of json
 - message: yaml file can be written as json, see 01-messages
 - message: but it can also use this nice syntax
-- message: see http://yaml.org and  https://github.com/Animosity/CraftIRC/wiki/Complete-idiot's-introduction-to-yaml
+- message: see http://yaml.org
