@@ -48,6 +48,14 @@ steps:
     modifyOutputPath: false
 
 - task: DotNetCoreCLI@2
+  displayName: dotnet pack
+  inputs:
+    command: pack
+    packagesToPack: 'src/Microsoft.Atlas.CommandLine/Microsoft.Atlas.CommandLine.csproj'
+    configuration: Release
+    packDirectory: '$(Build.ArtifactStagingDirectory)/tools'
+
+- task: DotNetCoreCLI@2
   displayName: 'dotnet tarball'
   inputs:
     command: custom

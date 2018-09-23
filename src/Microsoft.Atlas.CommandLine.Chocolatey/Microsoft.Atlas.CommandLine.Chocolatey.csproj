@@ -5,30 +5,6 @@
     <PackageId>atlas-cli</PackageId>
     <IncludeBuildOutput>false</IncludeBuildOutput>
     <ContentTargetFolders>tools</ContentTargetFolders>
-      
-      <Title>Atlas CLI</Title>
-      <!--<Owners></Owners>-->
-      <Authors>falconcore@microsoft.com</Authors>
-      <PackageProjectUrl>https://github.com/Microsoft/Atlas</PackageProjectUrl>
-      <PackageIconUrl>https://github.com/Microsoft/Atlas/raw/master/docs/icon-128.png</PackageIconUrl>
-      <Copyright>Copyright 2018</Copyright>
-      <Company>Microsoft</Company>
-      <PackageLicenseUrl>https://github.com/Microsoft/Atlas/blob/master/LICENSE</PackageLicenseUrl>
-      <PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
-      <!-- projectSourceUrl -->
-      <!-- docsUrl -->
-      <!-- mailingListUrl -->
-      <!-- bugTrackerUrl -->
-      <PackageTags>atlas cli admin azure activedirectory aad visualstudio vsts</PackageTags>
-      
-      <Description>Automated deployment and configuration of engineering systems</Description>
-      <!--<ReleaseNotes>ReleaseNotes</ReleaseNotes>-->
-      
-      <RepositoryUrl>$(BUILD_REPOSITORY_URI)</RepositoryUrl>
-      <RepositoryType>git</RepositoryType>
-      <RepositoryBranch>$(BUILD_SOURCEBRANCHNAME)</RepositoryBranch>
-      <RepositoryCommit>$(BUILD_SOURCEVERSION)</RepositoryCommit>
-      <!--<NuspecProperties></NuspecProperties>-->
   </PropertyGroup>
 
   <ItemGroup>
