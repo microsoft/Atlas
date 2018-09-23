@@ -30,11 +30,7 @@ namespace Microsoft.Atlas.CommandLine.Templates.Helpers
                 Delegate possibleDelegate;
                 try
                 {
-#if NETCOREAPP2_0
                     possibleDelegate = method.CreateDelegate(typeof(T), this);
-#else
-                    possibleDelegate = Delegate.CreateDelegate(typeof(T), method, this);
-#endif
                 }
                 catch
                 {
@@ -43,15 +39,9 @@ namespace Microsoft.Atlas.CommandLine.Templates.Helpers
 
                 if (possibleDelegate != null)
                 {
-#if NETCOREAPP2_0
                     yield return new KeyValuePair<string, T>(
                         method.GetCustomAttribute<DescriptionAttribute>().Description,
                         (T)(object)possibleDelegate);
-#else
-                    yield return new KeyValuePair<string, T>(
-                        ((DescriptionAttribute)Attribute.GetCustomAttribute(method, typeof(DescriptionAttribute))).Description,
-                        (T)(object)possibleDelegate);
-#endif
                 }
             }
         }

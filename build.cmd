@@ -17,6 +17,9 @@ if %errorlevel% neq 0 exit /b %errorlevel%
 dotnet publish src/Microsoft.Atlas.CommandLine/Microsoft.Atlas.CommandLine.csproj -c Release -o %BinFolder%\atlas
 if %errorlevel% neq 0 exit /b %errorlevel%
 
+dotnet pack src/Microsoft.Atlas.CommandLine/Microsoft.Atlas.CommandLine.csproj -o %BinFolder%\tool
+if %errorlevel% neq 0 exit /b %errorlevel%
+
 dotnet msbuild src/Microsoft.Atlas.CommandLine/Microsoft.Atlas.CommandLine.csproj /t:Restore,CreateTarball /p:RuntimeIdentifier=linux-x64 /p:TargetFramework=netcoreapp2.0 /p:Configuration=Release /p:ArchiveDir=%BinFolder%\downloads
 if %errorlevel% neq 0 exit /b %errorlevel%
 

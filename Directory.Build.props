@@ -13,12 +13,13 @@
 
   <PropertyGroup>
     <CodeAnalysisRuleSet>$(MSBuildThisFileDirectory)build\analyzers.ruleset</CodeAnalysisRuleSet>
-    <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
+    <TreatWarningsAsErrors Condition=" '$(Configuration)' == 'Debug' ">true</TreatWarningsAsErrors>
     <WarningsAsErrors />
-    <NoWarn>1701;1702;1705;NU1701;CS1998;CS1591;SA1600;SA1601;CS7034;CS7035</NoWarn>
+
     <!-- CS7034: The specified version string does not conform to the required format - major[.minor[.build[.revision]]] -->
     <!-- CS7035: The specified version string does not conform to the recommended format - major.minor.build.revision -->
     <!-- doc related (temporary) nowarns are CS1591;SA1600;SA1601 -->
+    <NoWarn>1701;1702;1705;NU1701;CS1998;CS1591;SA1600;SA1601;CS7034;CS7035</NoWarn>
   </PropertyGroup>
 
   <PropertyGroup>
