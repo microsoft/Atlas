@@ -9,6 +9,7 @@
     <UseSharedCompilation>false</UseSharedCompilation>
     <ApplicationIcon>..\..\docs\atlas.ico</ApplicationIcon>
     <PackAsTool>true</PackAsTool>
+    <PackageId>dotnet-atlas</PackageId>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
