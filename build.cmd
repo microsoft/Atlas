@@ -17,7 +17,7 @@ if %errorlevel% neq 0 exit /b %errorlevel%
 dotnet publish src/Microsoft.Atlas.CommandLine/Microsoft.Atlas.CommandLine.csproj -c Release -o %BinFolder%\atlas
 if %errorlevel% neq 0 exit /b %errorlevel%
 
-dotnet pack src/Microsoft.Atlas.CommandLine/Microsoft.Atlas.CommandLine.csproj -o %BinFolder%\tool
+dotnet pack src/Microsoft.Atlas.CommandLine/Microsoft.Atlas.CommandLine.csproj -c Release -o %BinFolder%\tool
 if %errorlevel% neq 0 exit /b %errorlevel%
 
 dotnet msbuild src/Microsoft.Atlas.CommandLine/Microsoft.Atlas.CommandLine.csproj /t:Restore,CreateTarball /p:RuntimeIdentifier=linux-x64 /p:TargetFramework=netcoreapp2.1 /p:Configuration=Release /p:ArchiveDir=%BinFolder%\downloads
@@ -26,7 +26,7 @@ if %errorlevel% neq 0 exit /b %errorlevel%
 dotnet msbuild src/Microsoft.Atlas.CommandLine/Microsoft.Atlas.CommandLine.csproj /t:Restore,CreateZip /p:RuntimeIdentifier=win10-x64 /p:TargetFramework=netcoreapp2.1 /p:Configuration=Release /p:ArchiveDir=%BinFolder%\downloads
 if %errorlevel% neq 0 exit /b %errorlevel%
 
-dotnet pack src/Microsoft.Atlas.CommandLine.Chocolatey/Microsoft.Atlas.CommandLine.Chocolatey.csproj -o %BinFolder%\chocolatey
+dotnet pack src/Microsoft.Atlas.CommandLine.Chocolatey/Microsoft.Atlas.CommandLine.Chocolatey.csproj -c Release -o %BinFolder%\chocolatey
 if %errorlevel% neq 0 exit /b %errorlevel%
 
 call src/Tasks/build.cmd

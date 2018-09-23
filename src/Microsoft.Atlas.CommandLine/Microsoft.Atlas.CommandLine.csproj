@@ -21,10 +21,6 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Content Include="..\..\docs\atlas.ico" Link="Docs\atlas.ico" />
-  </ItemGroup>
-
-  <ItemGroup>
     <PackageReference Include="BouncyCastle" Version="1.8.2" />
     <PackageReference Include="Handlebars.Net" Version="1.9.5" />
     <PackageReference Include="JmesPath.Net" Version="1.0.101" />
@@ -43,13 +39,9 @@
   </ItemGroup>
 
   <ItemGroup>
-    <None Update="atlas-values.yaml">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-  </ItemGroup>
-
-  <ItemGroup>
-    <Folder Include="Docs\" />
+    <None Include="..\..\docs\atlas.ico" />
+    <None Include="..\..\LICENSE" Pack="true" PackagePath="." />
+    <None Include="..\..\ThirdPartyNotice.txt" Pack="true" PackagePath="." />
   </ItemGroup>
 
 </Project>
