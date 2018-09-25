@@ -1,3 +1,3 @@
-dotnet tool install -g sleet
-sleet init --source packages
-sleet push {{ latest.drop }}/tools --source packages
+dotnet tool install sleet --tool-path ./bin
+./bin/sleet init --source packages
+./bin/sleet push {{ latest.drop }}/tools --source packages
