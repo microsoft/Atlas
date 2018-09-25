@@ -32,7 +32,18 @@
       },
       {
         "type": "Microsoft.Storage/storageAccounts/blobServices/containers",
-        "name": "[concat(variables('storageAccountName'), '/default/', '{{ storage.container }}')]",
+        "name": "[concat(variables('storageAccountName'), '/default/', '{{ storage.container.downloads }}')]",
+        "dependsOn": [
+          "[variables('storageAccountName')]"
+        ],
+        "apiVersion": "2018-03-01-preview",
+        "properties": {
+          "publicAccess": "Container"
+        }
+      },
+      {
+        "type": "Microsoft.Storage/storageAccounts/blobServices/containers",
+        "name": "[concat(variables('storageAccountName'), '/default/', '{{ storage.container.packages }}')]",
         "dependsOn": [
           "[variables('storageAccountName')]"
         ],

@@ -9,4 +9,6 @@ azure:
 
 storage:
   sku: Standard_LRS
-  container: downloads
+  container: 
+    downloads: downloads
+    packages: atlas-ci

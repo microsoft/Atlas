@@ -18,7 +18,7 @@ steps:
   displayName: dotnet restore
   inputs:
     command: restore
-    projects: 'src/Microsoft.Atlas.CommandLine/Microsoft.Atlas.CommandLine.csproj'
+    arguments: --force
 
 - task: ms.vss-governance-buildtask.governance-build-task-component-detection.ComponentGovernanceComponentDetection@0
   displayName: 'Component Detection'
@@ -28,8 +28,6 @@ steps:
 
 - task: DotNetCoreCLI@2
   displayName: dotnet build
-  inputs:
-    projects: 'src/Microsoft.Atlas.CommandLine/Microsoft.Atlas.CommandLine.csproj'
 
 - task: DotNetCoreCLI@2
   displayName: dotnet test
@@ -48,12 +46,20 @@ steps:
     modifyOutputPath: false
 
 - task: DotNetCoreCLI@2
+  displayName: dotnet pack
+  inputs:
+    command: pack
+    packagesToPack: 'src/Microsoft.Atlas.CommandLine/Microsoft.Atlas.CommandLine.csproj'
+    configuration: Release
+    packDirectory: '$(Build.ArtifactStagingDirectory)/tools'
+
+- task: DotNetCoreCLI@2
   displayName: 'dotnet tarball'
   inputs:
     command: custom
     projects: src/Microsoft.Atlas.CommandLine/Microsoft.Atlas.CommandLine.csproj
     custom: msbuild
-    arguments: '/t:Restore,CreateTarball /p:RuntimeIdentifier=linux-x64 /p:TargetFramework=netcoreapp2.0 /p:Configuration=Release /p:ArchiveDir=$(Build.ArtifactStagingDirectory)/downloads'
+    arguments: '/t:Restore,CreateTarball /p:RuntimeIdentifier=linux-x64 /p:TargetFramework=netcoreapp2.1 /p:Configuration=Release /p:ArchiveDir=$(Build.ArtifactStagingDirectory)/downloads'
 
 - task: DotNetCoreCLI@2
   displayName: 'dotnet zip'
@@ -61,7 +67,7 @@ steps:
     command: custom
     projects: src/Microsoft.Atlas.CommandLine/Microsoft.Atlas.CommandLine.csproj
     custom: msbuild
-    arguments: '/t:Restore,CreateZip /p:RuntimeIdentifier=win10-x64 /p:TargetFramework=netcoreapp2.0 /p:Configuration=Release /p:ArchiveDir=$(Build.ArtifactStagingDirectory)/downloads'
+    arguments: '/t:Restore,CreateZip /p:RuntimeIdentifier=win10-x64 /p:TargetFramework=netcoreapp2.1 /p:Configuration=Release /p:ArchiveDir=$(Build.ArtifactStagingDirectory)/downloads'
 
 - task: DotNetCoreCLI@2
   displayName: dotnet pack chocolatey

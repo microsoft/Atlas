@@ -2,26 +2,23 @@
 
   <PropertyGroup>
     <OutputType>Exe</OutputType>
-    <TargetFramework>netcoreapp2.0</TargetFramework>
+    <TargetFramework>netcoreapp2.1</TargetFramework>
     <RuntimeIdentifiers>win10-x64;linux-x64</RuntimeIdentifiers>
     <RootNamespace>Microsoft.Atlas.CommandLine</RootNamespace>
     <AssemblyName>atlas</AssemblyName>    
     <UseSharedCompilation>false</UseSharedCompilation>
     <ApplicationIcon>..\..\docs\atlas.ico</ApplicationIcon>
-    <CodeAnalysisRuleSet>..\..\build\analyzers.ruleset</CodeAnalysisRuleSet>
+    <PackAsTool>true</PackAsTool>
+    <PackageId>dotnet-atlas</PackageId>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
-    <DocumentationFile>bin\Release\netcoreapp2.0\atlas.xml</DocumentationFile>
+    <DocumentationFile>bin\Release\netcoreapp2.1\atlas.xml</DocumentationFile>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
-    <DocumentationFile>bin\Debug\netcoreapp2.0\atlas.xml</DocumentationFile>
+    <DocumentationFile>bin\Debug\netcoreapp2.1\atlas.xml</DocumentationFile>
   </PropertyGroup>
-
-  <ItemGroup>
-    <Content Include="..\..\docs\atlas.ico" Link="Docs\atlas.ico" />
-  </ItemGroup>
 
   <ItemGroup>
     <PackageReference Include="BouncyCastle" Version="1.8.2" />
@@ -42,13 +39,9 @@
   </ItemGroup>
 
   <ItemGroup>
-    <None Update="atlas-values.yaml">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-  </ItemGroup>
-
-  <ItemGroup>
-    <Folder Include="Docs\" />
+    <None Include="..\..\docs\atlas.ico" />
+    <None Include="..\..\LICENSE" Pack="true" PackagePath="." />
+    <None Include="..\..\ThirdPartyNotice.txt" Pack="true" PackagePath="." />
   </ItemGroup>
 
 </Project>
