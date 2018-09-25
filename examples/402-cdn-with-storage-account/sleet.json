@@ -1,0 +1,18 @@
+{
+  "sources": [
+    {
+      "name": "packages",
+      "type": "azure",
+      "path": "https://{{ storage.account }}.blob.core.windows.net/{{ storage.container.packages }}/",
+      "container": "{{ storage.container.packages }}",
+      "connectionString": "DefaultEndpointsProtocol=https;AccountName={{ storage.account }};AccountKey={{ storage.key }}"
+    },
+    {
+      "name": "chocolatey",
+      "type": "azure",
+      "path": "https://{{ storage.account }}.blob.core.windows.net/{{ storage.container.chocolatey }}/",
+      "container": "{{ storage.container.chocolatey }}",
+      "connectionString": "DefaultEndpointsProtocol=https;AccountName={{ storage.account }};AccountKey={{ storage.key }}"
+    }
+  ]
+}

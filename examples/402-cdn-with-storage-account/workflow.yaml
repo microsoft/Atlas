@@ -57,49 +57,59 @@ operations:
     storage:
       account: (deploymentStatus.properties.outputs.storageAccountName.value)
 
-- message: Uploading files to storage
-  operations:
-  - message: Getting storage keys
-    request: apis/azure/storage/listkeys.yaml
-    output: 
-      storage:
-        key: (keys[0].value)
+- message: Getting storage keys
+  request: apis/azure/storage/listkeys.yaml
+  output: 
+    storage:
+      key: (keys[0].value)
 
-  - message: Sending atlas-{{ latest.version }}-win10-x64.zip
-    values:
-      blob: 
-        path: atlas-{{ latest.version }}-win10-x64.zip
-        file: {{ latest.downloads }}/atlas-{{ latest.version }}-win10-x64.zip
-        contentType: application/zip
-    request: apis/azure/storage/blob-put-binary.yaml
+- message: Writing sleet.json
+  template: sleet.json
+  write: sleet.json
 
-  - message: Sending atlas-{{ latest.version }}-linux-x64.tar.gz
-    values:
-      blob: 
-        path: atlas-{{ latest.version }}-linux-x64.tar.gz
-        file: {{ latest.downloads }}/atlas-{{ latest.version }}-linux-x64.tar.gz
-        contentType: application/x-gtar
-    request: apis/azure/storage/blob-put-binary.yaml
+- message: Writing sleet-push.cmd
+  template: sleet-push.cmd
+  write: sleet-push.cmd
 
-  - message: Sending atlas-latest-win10-x64.zip
-    values:
-      blob: 
-        path: atlas-latest-win10-x64.zip
-        file: {{ latest.downloads }}/atlas-{{ latest.version }}-win10-x64.zip
-        contentType: application/zip
-    request: apis/azure/storage/blob-put-binary.yaml
+- message: Writing sleet-push.sh
+  template: sleet-push.sh
+  write: sleet-push.sh
 
-  - message: Sending atlas-latest-linux-x64.tar.gz
-    values:
-      blob: 
-        path: atlas-latest-linux-x64.tar.gz
-        file: {{ latest.downloads }}/atlas-{{ latest.version }}-linux-x64.tar.gz
-        contentType: application/x-gtar
-    request: apis/azure/storage/blob-put-binary.yaml
+- message: Sending atlas-{{ latest.version }}-win10-x64.zip
+  values:
+    blob: 
+      path: atlas-{{ latest.version }}-win10-x64.zip
+      file: {{ latest.drop }}/downloads/atlas-{{ latest.version }}-win10-x64.zip
+      contentType: application/zip
+  request: apis/azure/storage/blob-put-binary.yaml
 
-  - message: Sending latest.json
-    values:
-      blob: 
-        path: latest.json
-        body: {{> latest.json }}
-    request: apis/azure/storage/blob-put-json.yaml
+- message: Sending atlas-{{ latest.version }}-linux-x64.tar.gz
+  values:
+    blob: 
+      path: atlas-{{ latest.version }}-linux-x64.tar.gz
+      file: {{ latest.drop }}/downloads/atlas-{{ latest.version }}-linux-x64.tar.gz
+      contentType: application/x-gtar
+  request: apis/azure/storage/blob-put-binary.yaml
+
+- message: Sending atlas-latest-win10-x64.zip
+  values:
+    blob: 
+      path: atlas-latest-win10-x64.zip
+      file: {{ latest.drop }}/downloads/atlas-{{ latest.version }}-win10-x64.zip
+      contentType: application/zip
+  request: apis/azure/storage/blob-put-binary.yaml
+
+- message: Sending atlas-latest-linux-x64.tar.gz
+  values:
+    blob: 
+      path: atlas-latest-linux-x64.tar.gz
+      file: {{ latest.drop }}/downloads/atlas-{{ latest.version }}-linux-x64.tar.gz
+      contentType: application/x-gtar
+  request: apis/azure/storage/blob-put-binary.yaml
+
+- message: Sending latest.json
+  values:
+    blob: 
+      path: latest.json
+      body: {{> latest.json }}
+  request: apis/azure/storage/blob-put-json.yaml
