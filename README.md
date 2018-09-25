@@ -36,7 +36,7 @@ If you want to use a package manager:
 #### Install global tool (Windows or Linux)
 
 1. If `dotnet --version` isn't >= 2.1.300 then [install or upgrade .NET Core](https://www.microsoft.com/net/download/dotnet-core/2.1)
-1. `dotnet tool install -g dotnet-atlas --add-source https://sa2fitssy3mz7ig.blob.core.windows.net/atlas-ci/index.json`
+1. `dotnet tool install -g dotnet-atlas --add-source https://aka.ms/atlas-ci/index.json`
 
 #### Install using Chocolatey (Windows)
 1. If `choco` command is not available then [install Chocolatey](https://chocolatey.org/install#installing-chocolatey)
