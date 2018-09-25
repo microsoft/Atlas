@@ -1,0 +1,10 @@
+
+method: PATCH
+url: https://feeds.dev.azure.com/{{ vsts.account }}/_apis/packaging/feeds/{{  vsts.feed }}/packages/{{ current.packageId }}/versions/{{ vsts.version }}?api-version=5.0-preview.1
+auth:
+  resource: 499b84ac-1321-427f-aa17-267ca6975798 # VSTS app
+  client: e8f3cc86-b3b2-4ebb-867c-9c314925b384 # Azure CLI
+body:
+  op: add
+  path: /views/-
+  view: {{ vsts.quality }}

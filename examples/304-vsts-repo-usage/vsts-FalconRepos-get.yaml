@@ -1,0 +1,7 @@
+
+method: GET 
+# From here -- https://docs.microsoft.com/en-us/rest/api/vsts/release/definitions/list?view=vsts-rest-4.1
+url: https://vsrm.dev.azure.com/{{ vsts.account }}/{{ vsts.project }}/_apis/release/definitions?searchText={{ vsts.searchText }}&$expand={{ vsts.expand }}&api-version=4.1-preview.3
+auth:
+  resource: 499b84ac-1321-427f-aa17-267ca6975798 # VSTS app
+  client: e8f3cc86-b3b2-4ebb-867c-9c314925b384 # Azure CLI

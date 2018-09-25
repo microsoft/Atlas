@@ -1,0 +1,8 @@
+
+values: {{{ json }}}
+
+operations:
+- message: Inventory all Falcon Repos from releases
+  request: vsts-FalconRepos-get.yaml
+  output:
+    releaseDef: (value[].{ ReleaseName:name, CreationDate:createdOn, Environments:environments[*].Name } )

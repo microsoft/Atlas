@@ -1,0 +1,7 @@
+
+vsts:
+  account: msasg
+  project: Falcon
+  feed: FalconSDK
+  quality: Preview
+  version: 2.59.3397226-rc-build3397226

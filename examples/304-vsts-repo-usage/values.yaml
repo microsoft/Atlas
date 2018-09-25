@@ -1,0 +1,6 @@
+
+vsts:
+  account: msasg
+  project: Falcon
+  searchText: ServiceFabric_
+  expand: Artifacts,Environments
