@@ -13,28 +13,9 @@ namespace Microsoft.Atlas.CommandLine
 {
     public static class CommandLineApplicationExtensions
     {
-#pragma warning disable IDE1006 // Naming Styles
-        private static readonly Dictionary<ConsoleColor, string> _colors = new Dictionary<ConsoleColor, string>
-#pragma warning restore IDE1006 // Naming Styles
-        {
-            { ConsoleColor.Black, "30" },
-            { ConsoleColor.Red, "31" },
-            { ConsoleColor.Green, "32" },
-            { ConsoleColor.Yellow, "33" },
-            { ConsoleColor.Blue, "34" },
-            { ConsoleColor.Magenta, "35" },
-            { ConsoleColor.Cyan, "36" },
-            { ConsoleColor.Gray, "37" },
-        };
-
         public static string Color(this string text, ConsoleColor color)
         {
-            return $"\x1b[{_colors[color]}m{text}\x1b[39m";
-        }
-
-        public static string Bold(this string text)
-        {
-            return $"\x1b[1m{text}\x1b[22m";
+            return $"\x1b{{{(int)color}}}{text}\x1b{{-1}}";
         }
 
         public static string Required(this CommandArgument argument)

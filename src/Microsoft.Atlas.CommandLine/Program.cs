@@ -30,20 +30,12 @@ namespace Microsoft.Atlas.CommandLine
 
             var secretTracker = services.GetRequiredService<ISecretTracker>();
 
-            if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
-            {
-                Console.SetOut(secretTracker.FilterTextWriter(new AnsiConsoleWriter(ConsoleOutput.AnsiConsole.GetOutput(true))));
-                Console.SetError(secretTracker.FilterTextWriter(new AnsiConsoleWriter(ConsoleOutput.AnsiConsole.GetError(true))));
-            }
-            else
-            {
-                Console.SetOut(secretTracker.FilterTextWriter(Console.Out));
-                Console.SetError(secretTracker.FilterTextWriter(Console.Error));
-            }
+            Console.SetOut(secretTracker.FilterTextWriter(new ColorConsoleWriter(ColorConsole.GetOutput())));
+            Console.SetError(secretTracker.FilterTextWriter(new ColorConsoleWriter(ColorConsole.GetError())));
 
             var console = services.GetRequiredService<IConsole>();
 
-            console.WriteLine("Atlas".Color(ConsoleColor.Cyan).Bold());
+            console.WriteLine("Atlas".Color(ConsoleColor.Cyan));
 
             var app = services.GetRequiredService<CommandLineApplicationServices>();
 

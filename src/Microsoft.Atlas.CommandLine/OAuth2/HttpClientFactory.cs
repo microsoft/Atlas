@@ -62,17 +62,17 @@ namespace Microsoft.Atlas.CommandLine.OAuth2
                 try
                 {
                     // _logger.LogInformation("{Method} {Url}", request.Method, request.RequestUri);
-                    _console.WriteLine($"{request.Method.ToString().Color(ConsoleColor.Green)} {request.RequestUri}");
+                    _console.WriteLine($"{request.Method.ToString().Color(ConsoleColor.DarkGreen)} {request.RequestUri}");
                     sw.Start();
                     var response = await next(request, cancellationToken);
                     sw.Stop();
-                    _console.WriteLine($"{response.StatusCode.ToString().Color((int)response.StatusCode >= 400 ? ConsoleColor.Red : ConsoleColor.Green).Bold()} {request.RequestUri} {sw.ElapsedMilliseconds}ms");
+                    _console.WriteLine($"{response.StatusCode.ToString().Color((int)response.StatusCode >= 400 ? ConsoleColor.Red : ConsoleColor.Green)} {request.RequestUri} {sw.ElapsedMilliseconds}ms");
 
                     return response;
                 }
                 catch
                 {
-                    Console.WriteLine($"{"FAIL".Color(ConsoleColor.Red)} {request.RequestUri} {sw.ElapsedMilliseconds}ms");
+                    Console.WriteLine($"{"FAIL".Color(ConsoleColor.DarkRed)} {request.RequestUri} {sw.ElapsedMilliseconds}ms");
                     throw;
                 }
             });
