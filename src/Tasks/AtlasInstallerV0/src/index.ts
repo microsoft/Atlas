@@ -13,7 +13,7 @@ async function run() {
 
     let atlasVersion = tl.getInput("atlasVersion", true).trim();
 
-    let checkLatestVersion = tl.getInput("checkLatestVersion", false);
+    let checkLatestVersion = tl.getBoolInput("checkLatestVersion", false);
 
     if (checkLatestVersion) {
         console.log("Determining latest version available");
