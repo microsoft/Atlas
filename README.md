@@ -12,11 +12,11 @@
 ----
 
 Atlas is a tool for automating the deployment, configuration, and maintenance of DevOps engineering systems. 
-It can be run interactively from the command line, or can be run entirely unattended as part of a VSTS build or release defintion. 
+It can be run interactively from the command line, or can be run entirely unattended as part of a VSTS build or release definition. 
 An Atlas workflow revolves around making the appropriate REST API calls to [VSTS][VSTS REST API], [Active Directory][Azure AD REST API], and [Azure Resource Manager][Azure RM REST API]. 
 
 There is a REST API for everything. 
-With Atlas you can make the configuration of everything from CI/CD to production servers consistent, reproducable, and reviewable by capturing them as source controlled templates.
+With Atlas you can make the configuration of everything from CI/CD to production servers consistent, reproducible, and reviewable by capturing them as source controlled templates.
 
 ----
 
