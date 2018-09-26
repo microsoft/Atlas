@@ -309,7 +309,7 @@ namespace Microsoft.Atlas.CommandLine.Commands
                 if (!string.IsNullOrEmpty(message))
                 {
                     _console.WriteLine();
-                    _console.WriteLine($"{new string(' ', context.Indent * 2)}- {message.Color(ConsoleColor.Cyan).Bold()}");
+                    _console.WriteLine($"{new string(' ', context.Indent * 2)}- {message.Color(ConsoleColor.Cyan)}");
                 }
 
                 var debugPath = Path.Combine(OutputDirectory.Required(), "logs", $"{++_operationCount:000}-{new string('-', context.Indent * 2)}{new string((message ?? operation.write ?? operation.request ?? operation.template ?? string.Empty).Select(ch => char.IsLetterOrDigit(ch) ? ch : '-').ToArray())}.yaml");
@@ -370,7 +370,7 @@ namespace Microsoft.Atlas.CommandLine.Commands
                             var method = new HttpMethod(request.method ?? "GET");
                             if (IsDryRun && method.Method != "GET")
                             {
-                                _console.WriteLine($"Skipping {method.Method.ToString().Color(ConsoleColor.Yellow)} {request.url}");
+                                _console.WriteLine($"Skipping {method.Method.ToString().Color(ConsoleColor.DarkYellow)} {request.url}");
                             }
                             else
                             {
@@ -460,10 +460,10 @@ namespace Microsoft.Atlas.CommandLine.Commands
 
                             var throwDetails = ProcessValues(operation.@throw.details, context.Values);
 
-                            _console.WriteLine(throwMessage.Color(ConsoleColor.Red));
+                            _console.WriteLine(throwMessage.Color(ConsoleColor.DarkRed));
                             if (throwDetails != null)
                             {
-                                _console.WriteLine(_serializers.YamlSerializer.Serialize(throwDetails).Color(ConsoleColor.Red));
+                                _console.WriteLine(_serializers.YamlSerializer.Serialize(throwDetails).Color(ConsoleColor.DarkRed));
                             }
 
                             throw new OperationException(string.IsNullOrEmpty(throwMessage) ? message : throwMessage)

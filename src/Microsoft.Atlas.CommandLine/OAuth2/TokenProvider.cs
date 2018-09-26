@@ -93,7 +93,7 @@ namespace Microsoft.Atlas.CommandLine.OAuth2
                 catch
                 {
                     DeviceCodeResult codeResult = await ctx.AcquireDeviceCodeAsync(resourceId, clientId);
-                    _console.Error.WriteLine(codeResult.Message.Color(ConsoleColor.Yellow));
+                    _console.Error.WriteLine(codeResult.Message.Color(ConsoleColor.DarkYellow));
                     result = await ctx.AcquireTokenByDeviceCodeAsync(codeResult);
                 }
             }

@@ -6,12 +6,12 @@ using System.Text;
 
 namespace Microsoft.Atlas.CommandLine.ConsoleOutput
 {
-    internal class AnsiConsoleWriter : TextWriter
+    internal class ColorConsoleWriter : TextWriter
     {
-        private readonly AnsiConsole _ansiConsole;
+        private readonly ColorConsole _ansiConsole;
         private readonly StringBuilder _buffer = new StringBuilder();
 
-        public AnsiConsoleWriter(AnsiConsole ansiConsole)
+        public ColorConsoleWriter(ColorConsole ansiConsole)
         {
             _ansiConsole = ansiConsole;
         }
