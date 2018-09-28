@@ -35,6 +35,10 @@ body:
       defaultVersionType:
         id: latestType
         name: Latest
+  triggers:
+  - triggerType: artifactSource
+    artifactAlias: _{{ build.name }}
+    triggerConditions: {{{ json release.triggerConditions }}}    
   environments:
 {{# each release.stages }}
   - name: {{ name }}
@@ -47,6 +51,9 @@ body:
       daysToKeep: 30
       releasesToKeep: 3
       retainBuild: true
+    conditions:
+    - conditionType: event
+      name: ReleaseStarted
     preDeployApprovals:
       approvals:
       - rank: 1

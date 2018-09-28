@@ -25,6 +25,8 @@ devops:
       path: \Example
       description: Continuous deployment release
       build: ci
+      triggerConditions:
+      - sourceBranch: master
       queue: Hosted VS2017
       stages:
       - name: Stage 1
