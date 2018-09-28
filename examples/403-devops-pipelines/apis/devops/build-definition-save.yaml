@@ -18,7 +18,7 @@ body:
   name: {{ build.name }}
   path: "{{ build.path }}"
   description: "{{ build.description }}"
-  comment: Saved by Atlas workflow
+  comment: Saved by Atlas workflow 403-devops-pipelines
   process:
     resources:
       queues:
@@ -43,7 +43,7 @@ body:
     defaultBranch: refs/heads/master
     clean: false
     checkoutSubmodules: false
-  {{# if build.continuousIntegration }}    
+{{# if build.continuousIntegration }}    
   triggers:
   - triggerType: continuousIntegration
     branchFilters: {{# if build.continuousIntegration.branchFilters }} {{{ json build.continuousIntegration.branchFilters }}} {{ else }} [] {{/ if }}
@@ -51,7 +51,7 @@ body:
     # settingsSourceType: 2
     batchChanges: true
     maxConcurrentBuildsPerBranch: 1
-  {{/ if }}    
+{{/ if }}    
   queue:
     id: {{ queue.id }}
   queueStatus: enabled

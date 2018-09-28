@@ -55,24 +55,24 @@ operations:
 - message: "Processing release {{ name }} in {{ path }}"
   values:
     repository: (devops.repository.properties)
-    build: ( devops.build.{{ build }} )
+    build: ( devops.build.{{ build }}.properties )
     queue: ( devops.queues[?name=='{{ queue }}'] | [0] )
     release: (devops.release.{{ @key }})  
   operations:
-    - message: Finding existing release definition
-      request: apis/devops/release-definition-query.yaml
-      output: "( value[?name=='{{ name }}' && path=='{{ path }}'] | [0].{release:{id:id, revision:revision}} )"
+  - message: Finding existing release definition
+    request: apis/devops/release-definition-query.yaml
+    output: "( value[?name=='{{ name }}' && path=='{{ path }}'] | [0].{release:{id:id, revision:revision}} )"
 
-    - message: Getting release definition details
-      condition: (release.id != null)
-      request: apis/devops/release-definition-get.yaml
-      output:
-        existing: "@"
+  - message: Getting release definition details
+    condition: (release.id != null)
+    request: apis/devops/release-definition-get.yaml
+    output:
+      existing: (@)
 
-    - message: Create or update release definition
-      request: apis/devops/release-definition-save.yaml
-      output:
-        properties: (@)
+  - message: Create or update release definition
+    request: apis/devops/release-definition-save.yaml
+    output:
+      properties: (@)
   output:
     devops:
       release:
@@ -84,4 +84,4 @@ output:
   repository: (devops.repository.properties)
   pr: (devops.build.pr.properties)
   ci: (devops.build.ci.properties)
-  cd: (devops.release.properties)
+  cd: (devops.release.cd.properties)

@@ -11,37 +11,68 @@ auth:
   resource: 499b84ac-1321-427f-aa17-267ca6975798
   client: e8f3cc86-b3b2-4ebb-867c-9c314925b384
 body:
-  {{# if release.id }}
+{{# if release.id }}
   id: {{ release.id }}
   revision: {{ release.revision }}
-  {{/ if }}
+{{/ if }}
   name: "{{ release.name }}"
   path: "{{ release.path }}"
   description: "{{ release.description }}"
-  comment: Saved by atlas workflow
+  comment: Saved by Atlas workflow 403-devops-pipelines
+  artifacts:
+  - type: build
+    alias: _{{ build.name }}
+    sourceId: {{ build.project.id }}
+    isPrimary: true
+    isRetained: true
+    definitionReference:
+      project:
+        id: {{ build.project.id }}
+        name: {{ build.project.name }}
+      definition:
+        id: {{ build.id }}
+        name: {{ build.name }}
+      defaultVersionType:
+        id: latestType
+        name: Latest
   environments:
-  {{# each release.stages }}
+{{# each release.stages }}
   - name: {{ name }}
+    {{# query "(existing.environments[?name==`$1`])" name existing=../existing }}
+    id: {{ id }}
+    owner:
+      id: {{ owner.id }}
+    {{/query}}
     retentionPolicy:
       daysToKeep: 30
       releasesToKeep: 3
       retainBuild: true
     preDeployApprovals:
-      approvalOptions:
-        # requiredApproverCount: 0
-        # releaseCreatorCanBeApprover: false
-        # autoTriggeredAndPreviousEnvironmentApprovedCanBeSkipped: false
-        # enforceIdentityRevalidation: false
-        # timeoutInMinutes: 0
-        # executionOrder: beforeGates
       approvals:
       - rank: 1
+        {{# query "(existing.environments[?name==`$1`].preDeployApprovals.approvals[?rank==`1`][])" name existing=../existing }}
+        id: {{ id }}
+        {{/ query }}
         isAutomated: true
         isNotificationOn: false
-        # id: 1
     postDeployApprovals:
       approvals:
       - rank: 1
+        {{# query "(existing.environments[?name==`$1`].postDeployApprovals.approvals[?rank==`1`][])" name existing=../existing }}
+        id: {{ id }}
+        {{/ query }}
         isAutomated: true
         isNotificationOn: false
-  {{/ each }}
+    {{# query "(existing.environments[?name==`$1`].deployStep)" name existing=../existing }}
+    deployStep:
+      id: {{ id }}
+    {{/ query }}
+    deployPhases:
+    - rank: 1
+      phaseType: agentBasedDeployment
+      name: Agent job
+      deploymentInput:
+        queueId: {{ ../queue.id }}
+      workflowTasks: {{{ json steps }}}
+
+{{/ each }}

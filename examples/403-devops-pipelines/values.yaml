@@ -28,3 +28,10 @@ devops:
       queue: Hosted VS2017
       stages:
       - name: Stage 1
+        steps:
+        - taskId: 6c731c3c-3c68-459a-a5c9-bde6e6595b5b # Bash script
+          version: 3.*
+          enabled: true
+          inputs: 
+            targetType: inline
+            script: echo Hello World
