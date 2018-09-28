@@ -1,0 +1,87 @@
+
+values: {{{ json }}}
+
+operations:
+
+- message: Listing build queues
+  request: apis/devops/distributedtask-queue-list.yaml
+  output:
+    devops:
+      queues: (value)
+
+- message: Processing repository {{ devops.repository.name }}
+  values:
+    repository: ( devops.repository )
+  operations:
+  - message: Finding existing git repository
+    request: apis/devops/git-repository-get.yaml
+    output:
+      properties: (@)
+  output:
+    devops:
+      repository:
+        properties: (properties)
+
+{{# each devops.build }}
+- message: "Processing {{ name }} in {{ path }}"
+  values:
+    repository: (devops.repository.properties)
+    queue: ( devops.queues[?name=='{{ queue }}'] | [0] )
+    build: (devops.build.{{ @key }})
+  operations:
+  - message: Finding existing build definition
+    request: apis/devops/build-definition-query.yaml
+    output:
+      build: "( value[?name=='{{ name }}' && path=='{{ path }}'] | [0].{id:id, revision:revision} )"
+
+  - message: Getting build definition details
+    condition: (build.id != null)
+    request: apis/devops/build-definition-get.yaml
+    output:
+      existing: (@)
+
+  - message: Create or update build definition
+    request: apis/devops/build-definition-save.yaml
+    output:
+      properties: (@)
+  output:
+    devops:
+      build:
+        {{ @key }}:
+          properties: (properties)
+{{/ each }}
+
+{{# each devops.release }}
+- message: "Processing release {{ name }} in {{ path }}"
+  values:
+    repository: (devops.repository.properties)
+    build: ( devops.build.{{ build }} )
+    queue: ( devops.queues[?name=='{{ queue }}'] | [0] )
+    release: (devops.release.{{ @key }})  
+  operations:
+    - message: Finding existing release definition
+      request: apis/devops/release-definition-query.yaml
+      output: "( value[?name=='{{ name }}' && path=='{{ path }}'] | [0].{release:{id:id, revision:revision}} )"
+
+    - message: Getting release definition details
+      condition: (release.id != null)
+      request: apis/devops/release-definition-get.yaml
+      output:
+        existing: "@"
+
+    - message: Create or update release definition
+      request: apis/devops/release-definition-save.yaml
+      output:
+        properties: (@)
+  output:
+    devops:
+      release:
+        {{ @key }}:
+          properties: (properties)
+{{/ each }}
+
+output:
+  repository: (devops.repository.properties)
+  pr: (devops.build.pr.properties)
+  ci: (devops.build.ci.properties)
+  cd: (devops.release.properties)

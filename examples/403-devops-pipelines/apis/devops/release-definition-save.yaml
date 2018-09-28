@@ -1,0 +1,47 @@
+{{# if release.id }}
+# https://docs.microsoft.com/en-us/rest/api/vsts/release/definitions/update?view=vsts-rest-5.0
+method: PUT
+url: https://vsrm.dev.azure.com/{{ devops.organization }}/{{ devops.project }}/_apis/release/definitions/{{ release.id }}?api-version=5.0-preview.3
+{{ else }}
+# https://docs.microsoft.com/en-us/rest/api/vsts/release/definitions/create?view=vsts-rest-5.0
+method: POST
+url: https://vsrm.dev.azure.com/{{ devops.organization }}/{{ devops.project }}/_apis/release/definitions?api-version=5.0-preview.3
+{{/ if }}
+auth:
+  resource: 499b84ac-1321-427f-aa17-267ca6975798
+  client: e8f3cc86-b3b2-4ebb-867c-9c314925b384
+body:
+  {{# if release.id }}
+  id: {{ release.id }}
+  revision: {{ release.revision }}
+  {{/ if }}
+  name: "{{ release.name }}"
+  path: "{{ release.path }}"
+  description: "{{ release.description }}"
+  comment: Saved by atlas workflow
+  environments:
+  {{# each release.stages }}
+  - name: {{ name }}
+    retentionPolicy:
+      daysToKeep: 30
+      releasesToKeep: 3
+      retainBuild: true
+    preDeployApprovals:
+      approvalOptions:
+        # requiredApproverCount: 0
+        # releaseCreatorCanBeApprover: false
+        # autoTriggeredAndPreviousEnvironmentApprovedCanBeSkipped: false
+        # enforceIdentityRevalidation: false
+        # timeoutInMinutes: 0
+        # executionOrder: beforeGates
+      approvals:
+      - rank: 1
+        isAutomated: true
+        isNotificationOn: false
+        # id: 1
+    postDeployApprovals:
+      approvals:
+      - rank: 1
+        isAutomated: true
+        isNotificationOn: false
+  {{/ each }}
