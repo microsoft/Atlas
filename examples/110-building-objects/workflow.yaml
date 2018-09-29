@@ -1,0 +1,36 @@
+
+operations:
+- message: This is an example of changing between hash and array structures
+
+- output:
+    hashes:
+      one: 
+        weight: 5
+        color: "red"
+      two:
+        weight: 6
+        color: "green"
+    lists:
+    - name: three
+      value:
+        weight: 7
+        color: "blue"
+    - name: four
+      value:
+        weight: 8
+        color: "yellow"
+
+- output:
+    list-to-hash: ( to_object( lists[*].[name, value] ) )
+
+- output:
+    hash-to-list: ( items(hashes)[*].{ name:[0], value:[1] } )
+
+- output:
+    list-drill-down: ( lists[*].to_object([[['name', name]], items(value)][])  )
+
+- output:
+    hash-to-flat-list: ( items(hashes)[*].{ name:[0], value:[1] }.to_object([[['name', name]], items(value)][]) )
+
+- output:
+    hash-drill-down: ( to_object( items(hashes)[*].[[0], [1].color] ) )

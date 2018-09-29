@@ -2,19 +2,22 @@ devops:
   organization: atlas-test
   project: example-403
   repository:
-    name: Example
+    code:
+      name: Example
   build:
     pr:
       name: Example-PR
       path: \Example
       description: Pull request verification build
       queue: Hosted VS2017
+      repository: code
       yamlFilename: azure-pipelines.yml
     ci:
       name: Example-CI
       path: \Example
       description: Continuous integration build
       queue: Hosted VS2017
+      repository: code
       yamlFilename: azure-pipelines.yml
       continuousIntegration:
         branchFilters:
@@ -24,10 +27,10 @@ devops:
       name: Example-CD
       path: \Example
       description: Continuous deployment release
+      queue: Hosted VS2017
       build: ci
       triggerConditions:
       - sourceBranch: master
-      queue: Hosted VS2017
       stages:
       - name: Stage 1
         steps:

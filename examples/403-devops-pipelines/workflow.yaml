@@ -9,25 +9,31 @@ operations:
     devops:
       queues: (value)
 
-- message: Processing repository {{ devops.repository.name }}
+{{# each devops.repository }}
+- message: Processing repository {{ name }}
   values:
-    repository: ( devops.repository )
+    repository: ( devops.repository.{{ @key }} )
+
   operations:
   - message: Finding existing git repository
     request: apis/devops/git-repository-get.yaml
     output:
       properties: (@)
+  
   output:
     devops:
       repository:
-        properties: (properties)
+        {{ @key }}:
+          properties: (properties)
+{{/ each }}
 
 {{# each devops.build }}
 - message: "Processing {{ name }} in {{ path }}"
   values:
-    repository: (devops.repository.properties)
+    repository: (devops.repository.{{ repository }}.properties)
     queue: ( devops.queues[?name=='{{ queue }}'] | [0] )
     build: (devops.build.{{ @key }})
+
   operations:
   - message: Finding existing build definition
     request: apis/devops/build-definition-query.yaml
@@ -44,6 +50,7 @@ operations:
     request: apis/devops/build-definition-save.yaml
     output:
       properties: (@)
+
   output:
     devops:
       build:
@@ -54,10 +61,10 @@ operations:
 {{# each devops.release }}
 - message: "Processing release {{ name }} in {{ path }}"
   values:
-    repository: (devops.repository.properties)
     build: ( devops.build.{{ build }}.properties )
     queue: ( devops.queues[?name=='{{ queue }}'] | [0] )
     release: (devops.release.{{ @key }})  
+
   operations:
   - message: Finding existing release definition
     request: apis/devops/release-definition-query.yaml
@@ -73,6 +80,7 @@ operations:
     request: apis/devops/release-definition-save.yaml
     output:
       properties: (@)
+
   output:
     devops:
       release:
@@ -81,7 +89,6 @@ operations:
 {{/ each }}
 
 output:
-  repository: (devops.repository.properties)
-  pr: (devops.build.pr.properties)
-  ci: (devops.build.ci.properties)
-  cd: (devops.release.cd.properties)
+  repository: ( to_object( items(devops.repository)[*].[[0], [1].properties] ) )
+  build: ( to_object( items(devops.build)[*].[[0], [1].properties] ) )
+  release: ( to_object( items(devops.release)[*].[[0], [1].properties] ) )
