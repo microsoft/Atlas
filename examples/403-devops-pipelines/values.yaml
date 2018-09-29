@@ -4,12 +4,12 @@ devops:
   repository:
     name: Example
   build:
-    # pr:
-    #   name: Example-PR
-    #   path: \Example
-    #   description: Pull request verification build
-    #   queue: Hosted VS2017
-    #   yamlFilename: azure-pipelines.yml
+    pr:
+      name: Example-PR
+      path: \Example
+      description: Pull request verification build
+      queue: Hosted VS2017
+      yamlFilename: azure-pipelines.yml
     ci:
       name: Example-CI
       path: \Example
