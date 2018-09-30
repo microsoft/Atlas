@@ -1,8 +1,10 @@
+values: {{{ json }}}
 
 operations:
 - message: This is an example of changing between hash and array structures
 
-- output:
+- message: Adding some data structures to working memory
+  output:
     hashes:
       one: 
         weight: 5
@@ -20,17 +22,35 @@ operations:
         weight: 8
         color: "yellow"
 
-- output:
-    list-to-hash: ( to_object( lists[*].[name, value] ) )
+# Because the values are added at execute-time, rather than render-time
+# they can't be used in Handlebar expressions. However, they can be 
+# used in JMESPath expressions like these.
 
 - output:
-    hash-to-list: ( items(hashes)[*].{ name:[0], value:[1] } )
+    by-jmespath:
+      list-to-hash: ( to_object( lists[*].[name, value] ) )
 
 - output:
-    list-drill-down: ( lists[*].to_object([[['name', name]], items(value)][])  )
+    by-jmespath:
+      hash-to-list: ( items(hashes)[*].{ name:[0], value:[1] } )
 
 - output:
-    hash-to-flat-list: ( items(hashes)[*].{ name:[0], value:[1] }.to_object([[['name', name]], items(value)][]) )
+    by-jmespath:
+      hash-to-flat-list: ( items(hashes)[*].{ name:[0], value:[1] }.to_object([[['name', name]], items(value)][]) )
 
 - output:
-    hash-drill-down: ( to_object( items(hashes)[*].[[0], [1].color] ) )
+    by-jmespath:
+      list-drill-down: ( lists[*].to_object([[['name', name]], items(value)][])  )
+
+- output:
+    by-jmespath:
+      hash-drill-down: ( to_object( items(hashes)[*].[[0], [1].color] ) )
+
+# Alternatively, you can  pass working memory to template for additional Handlebar rendering 
+# at execute-time. This template shows all of the same processes being done without using JMESPath.
+- template: by-template.yaml
+  # optional: write the rendering results to an output file  
+  write: by-template.yaml 
+  # optional: capture the rendering results to working memory using a jmespath query
+  output: 
+    by-template: (@)
