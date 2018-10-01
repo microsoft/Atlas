@@ -4,6 +4,28 @@ devops:
   repository:
     code:
       name: Example
+      branches:
+        "refs/heads/master":
+          "Minimum number of reviewers":
+            settings:
+              minimumApproverCount: 1
+              creatorVoteCounts: false
+              resetOnSourcePush: true
+          "Require a merge strategy":
+            settings:
+              useSquashMerge: true
+          "Build":
+            settings:
+              buildDefinitionId: pr
+              queueOnSourceUpdateOnly: true
+              manualQueueOnly: false
+              displayName: PR Build
+              validDuration: 720
+          "Required reviewers":
+            settings:
+              requiredReviewerIds:
+              - d6e3ffec-98c8-45c1-bec9-2a594d90575c
+              message: Review necessary
   build:
     pr:
       name: Example-PR
@@ -32,11 +54,28 @@ devops:
       triggerConditions:
       - sourceBranch: master
       stages:
-      - name: Stage 1
+      - name: Testing
         steps:
         - taskId: 6c731c3c-3c68-459a-a5c9-bde6e6595b5b # Bash script
           version: 3.*
           enabled: true
           inputs: 
             targetType: inline
-            script: echo Hello World
+            script: echo Hello Testing
+      - name: Staging
+        steps:
+        - taskId: 6c731c3c-3c68-459a-a5c9-bde6e6595b5b # Bash script
+          version: 3.*
+          enabled: true
+          inputs: 
+            targetType: inline
+            script: echo Hello Staging
+      - name: Production
+        steps:
+        - taskId: 6c731c3c-3c68-459a-a5c9-bde6e6595b5b # Bash script
+          version: 3.*
+          enabled: true
+          inputs: 
+            targetType: inline
+            script: echo Hello Production
+

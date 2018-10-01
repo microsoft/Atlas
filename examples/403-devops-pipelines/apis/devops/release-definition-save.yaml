@@ -47,6 +47,7 @@ body:
     owner:
       id: {{ owner.id }}
     {{/query}}
+    rank: {{{ query "sum([`$1`, `1`])" @index }}}
     retentionPolicy:
       daysToKeep: 30
       releasesToKeep: 3
