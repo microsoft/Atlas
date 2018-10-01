@@ -307,6 +307,11 @@ namespace Microsoft.Atlas.CommandLine.Templates
                 return jsonInt.ToString(System.Globalization.CultureInfo.InvariantCulture);
             }
 
+            if (jsonObject is bool jsonBool)
+            {
+                return jsonBool ? "true" : "false";
+            }
+
             return Services.Serializers.JsonSerializer.Serialize(jsonObject)?.TrimEnd('\r', '\n');
         }
 
