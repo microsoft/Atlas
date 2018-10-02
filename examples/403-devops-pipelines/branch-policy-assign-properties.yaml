@@ -14,6 +14,18 @@ repository:
           {{# if settings.buildDefinitionId }}
           buildDefinitionId: {{ query "( devops.build.$1.properties.id )" settings.buildDefinitionId devops=../../devops }}
           {{/ if }}
+          
+          {{# if settings.requiredReviewerIds }}
+          requiredReviewerIds:
+          {{# each settings.requiredReviewerIds }}
+          {{# query "( items[?principalName==`$1`] )" @value items=../../../devops.graph.groups }}
+          - {{ originId }}
+          {{ else }}
+          - {{ @value }} # this is not correct, but it here to cause an error when posted
+          {{/ query }}
+          {{/ each }}
+          {{/ if }}
+
           scope:
           - refName: {{ @../key }}
             matchKind: Exact

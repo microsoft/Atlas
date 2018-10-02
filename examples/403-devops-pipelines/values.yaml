@@ -6,11 +6,6 @@ devops:
       name: Example
       branches:
         "refs/heads/master":
-          "Minimum number of reviewers":
-            settings:
-              minimumApproverCount: 1
-              creatorVoteCounts: false
-              resetOnSourcePush: true
           "Require a merge strategy":
             settings:
               useSquashMerge: true
@@ -21,10 +16,15 @@ devops:
               manualQueueOnly: false
               displayName: PR Build
               validDuration: 720
+          "Minimum number of reviewers":
+            settings:
+              minimumApproverCount: 1
+              creatorVoteCounts: false
+              resetOnSourcePush: true
           "Required reviewers":
             settings:
               requiredReviewerIds:
-              - d6e3ffec-98c8-45c1-bec9-2a594d90575c
+              - '[example-403]\example-403 Team'
               message: Review necessary
   build:
     pr:
