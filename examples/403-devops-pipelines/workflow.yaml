@@ -50,7 +50,6 @@ operations:
 
 {{# each devops.build }}
 - message: "Processing build {{ path }}\\\\{{ name }}"
-  target: x
   values:
     repository: (devops.repository.{{ repository }}.properties)
     queue: ( devops.queues[?name=='{{ queue }}'] | [0] )
@@ -84,7 +83,6 @@ operations:
 
 {{# each devops.release }}
 - message: "Processing release {{ path }}\\\\{{ name }}"
-  target: y
   values:
     build: ( devops.build.{{ build }}.properties )
     queue: ( devops.queues[?name=='{{ queue }}'] | [0] )
@@ -115,7 +113,6 @@ operations:
 
 {{# each devops.repository }}
 - message: Processing policy for repository {{ name }}
-  target: z
   values:
     repository: ( devops.repository.{{ @key }} )
 
