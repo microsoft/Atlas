@@ -12,8 +12,8 @@
 ----
 
 Atlas is a tool for automating the deployment, configuration, and maintenance of DevOps engineering systems. 
-It can be run interactively from the command line, or can be run entirely unattended as part of a VSTS build or release definition. 
-An Atlas workflow revolves around making the appropriate REST API calls to [VSTS][VSTS REST API], [Active Directory][Azure AD REST API], and [Azure Resource Manager][Azure RM REST API]. 
+It can be run interactively from the command line, or can be run entirely unattended as part of an Azure DevOps (formerly known as VSTS) build or release definition.
+An Atlas workflow revolves around making the appropriate REST API calls to [Azure DevOps][Azure DevOps REST API], [Active Directory][Azure AD REST API], and [Azure Resource Manager][Azure RM REST API]. 
 
 There is a REST API for everything. 
 With Atlas you can make the configuration of everything from CI/CD to production servers consistent, reproducible, and reviewable by capturing them as source controlled templates.
@@ -96,11 +96,11 @@ atlas deploy 101-messages
 
 * Works cross-platform as a .NET Core executable
 
-* Invokes any [Azure RM][Azure RM REST API], [Azure AD][Azure AD REST API], or [VSTS][VSTS REST API] REST API 
+* Invokes any [Azure RM][Azure RM REST API], [Azure AD][Azure AD REST API], or [Azure DevOps][Azure DevOps REST API] REST API 
 
 * From the command line, REST API calls are secured via interactive Active Directory login, similar to `az login`
 
-* From a VSTS build or release definition, REST API calls are secured via [VSTS service connection to Azure](https://docs.microsoft.com/en-us/vsts/pipelines/library/service-endpoints?view=vsts)
+* From an Azure DevOps build or release definition, REST API calls are secured via [Azure DevOps service connection to Azure](https://docs.microsoft.com/en-us/Azure DevOps/pipelines/library/service-endpoints?view=Azure DevOps)
 
 * Renders output values and additional templated files to a target folder
 
@@ -114,7 +114,7 @@ atlas deploy 101-messages
 
 * Does not allow arbitrary code or command-line execution in order to limit what can be done to the machine executing a workflow
 
-* Currently designed for Active Directory authentication for Azure and VSTS resources
+* Currently designed for Active Directory authentication for Azure and Azure DevOps resources
 
 * Not yet available as a class library package
 
@@ -124,7 +124,7 @@ atlas deploy 101-messages
 
 * Establishing a repository for collaboration on common in-progress and stable workflows, and default location for common workflows
 
-* Shared workflows for larger scenarios, e.g. ASP.NET Core services on Kubernetes with VSTS CI/CD, Azure VM clusters, Azure DNS, ATM, and ALB for geo-redundant load balancing and service routing
+* Shared workflows for larger scenarios, e.g. ASP.NET Core services on Kubernetes with Azure DevOps CI/CD, Azure VM clusters, Azure DNS, ATM, and ALB for geo-redundant load balancing and service routing
 
 ----
 
@@ -180,7 +180,7 @@ the [Security TechCenter](https://technet.microsoft.com/en-us/security/default).
 [JMESPath]: http://jmespath.org/
 [Azure RM REST API]: https://docs.microsoft.com/en-us/rest/api/azure/
 [Azure AD REST API]: https://docs.microsoft.com/en-us/rest/api/graphrbac/
-[VSTS REST API]: https://docs.microsoft.com/en-us/rest/api/vsts/?view=vsts-rest-5.0
+[Azure DevOps REST API]: https://docs.microsoft.com/en-us/rest/api/vsts/?view=vsts-rest-5.0
 [Build Status]: https://msasg.visualstudio.com/Falcon/_apis/build/status/Atlas-CI?branch=master
 [Build Latest]: https://msasg.visualstudio.com/Falcon/_build/latest?definitionId=6598&branch=master
 [Choco Status]: https://img.shields.io/myget/atlas-ci/vpre/atlas-cli.svg?label=choco
