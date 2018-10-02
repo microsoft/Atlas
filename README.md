@@ -100,7 +100,7 @@ atlas deploy 101-messages
 
 * From the command line, REST API calls are secured via interactive Active Directory login, similar to `az login`
 
-* From an Azure DevOps build or release definition, REST API calls are secured via [Azure DevOps service connection to Azure](https://docs.microsoft.com/en-us/Azure DevOps/pipelines/library/service-endpoints?view=Azure DevOps)
+* From an Azure DevOps build or release definition, REST API calls are secured via [Azure DevOps service connection to Azure](https://docs.microsoft.com/en-us/vsts/pipelines/library/service-endpoints?view=vsts)
 
 * Renders output values and additional templated files to a target folder
 
