@@ -12,7 +12,7 @@
 ----
 
 Atlas is a tool for automating the deployment, configuration, and maintenance of DevOps engineering systems. 
-It can be run interactively from the command line, or can be run entirely unattended as part of an Azure DevOps build or release definition.
+It can be run interactively from the command line, or can be run entirely unattended as part of an Azure DevOps (formerly known as VSTS) build or release definition.
 An Atlas workflow revolves around making the appropriate REST API calls to [Azure DevOps][Azure DevOps REST API], [Active Directory][Azure AD REST API], and [Azure Resource Manager][Azure RM REST API]. 
 
 There is a REST API for everything. 
@@ -180,7 +180,7 @@ the [Security TechCenter](https://technet.microsoft.com/en-us/security/default).
 [JMESPath]: http://jmespath.org/
 [Azure RM REST API]: https://docs.microsoft.com/en-us/rest/api/azure/
 [Azure AD REST API]: https://docs.microsoft.com/en-us/rest/api/graphrbac/
-[Azure DevOps REST API]: https://docs.microsoft.com/en-us/rest/api/Azure DevOps/?view=Azure DevOps-rest-5.0
+[Azure DevOps REST API]: https://docs.microsoft.com/en-us/rest/api/vsts/?view=vsts-rest-5.0
 [Build Status]: https://msasg.visualstudio.com/Falcon/_apis/build/status/Atlas-CI?branch=master
 [Build Latest]: https://msasg.visualstudio.com/Falcon/_build/latest?definitionId=6598&branch=master
 [Choco Status]: https://img.shields.io/myget/atlas-ci/vpre/atlas-cli.svg?label=choco
