@@ -60,7 +60,9 @@ operations:
   - message: Finding existing build definition
     request: apis/devops/build-definition-query.yaml
     output:
-      build: "( value[?name=='{{ name }}' && path=='{{ path }}'] | [0].{id:id, revision:revision} )"
+      build:
+        id: "( value[?name=='{{ name }}' && path=='{{ path }}'] | [0].id )"
+        revision: "( value[?name=='{{ name }}' && path=='{{ path }}'] | [0].revision )"
 
   - message: Getting build definition details
     condition: (build.id != null)
