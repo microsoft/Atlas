@@ -295,7 +295,25 @@ namespace Microsoft.Atlas.CommandLine.Templates
             return transformObject;
         }
 
-        private string ToJsonString(object jsonObject) => jsonObject == null ? "null" : Services.Serializers.JsonSerializer.Serialize(jsonObject)?.TrimEnd('\r', '\n');
+        private string ToJsonString(object jsonObject)
+        {
+            if (jsonObject == null)
+            {
+                return "null";
+            }
+
+            if (jsonObject is int jsonInt)
+            {
+                return jsonInt.ToString(System.Globalization.CultureInfo.InvariantCulture);
+            }
+
+            if (jsonObject is bool jsonBool)
+            {
+                return jsonBool ? "true" : "false";
+            }
+
+            return Services.Serializers.JsonSerializer.Serialize(jsonObject)?.TrimEnd('\r', '\n');
+        }
 
         private class SimpleEncoder : ITextEncoder
         {

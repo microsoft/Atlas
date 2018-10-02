@@ -21,8 +21,10 @@
             "label": "build",
             "command": "dotnet",
             "args": [
-                "build",
-                "src/Microsoft.Atlas.CommandLine/Microsoft.Atlas.CommandLine.csproj"
+                "build"
+            ],
+            "problemMatcher": [
+                "$msCompile"
             ]
         }
     ]

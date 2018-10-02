@@ -1,0 +1,76 @@
+{{# if build.id }}
+# https://docs.microsoft.com/en-us/rest/api/vsts/build/definitions/update?view=vsts-rest-5.0
+method: PUT
+url: https://dev.azure.com/{{ devops.organization }}/{{ devops.project }}/_apis/build/definitions/{{ build.id }}?api-version=5.0-preview.6
+{{ else }} 
+# https://docs.microsoft.com/en-us/rest/api/vsts/build/definitions/create?view=vsts-rest-5.0
+method: POST
+url: https://dev.azure.com/{{ devops.organization }}/{{ devops.project }}/_apis/build/definitions?api-version=5.0-preview.6
+{{/ if }}
+auth:
+  resource: 499b84ac-1321-427f-aa17-267ca6975798
+  client: e8f3cc86-b3b2-4ebb-867c-9c314925b384
+body:
+{{# if build.id }}
+  id: {{ build.id }}
+  revision: {{ build.revision }}
+{{/ if }}
+  name: {{ build.name }}
+  path: "{{ build.path }}"
+  description: "{{ build.description }}"
+  comment: Saved by Atlas workflow 403-devops-pipelines
+  process:
+    resources:
+      queues:
+      - id: {{ queue.id }}
+      endpoints:
+    yamlFilename: {{ build.yamlFilename }}
+    type: 2
+  processParameters: {}
+  badgeEnabled: true
+  repository:
+    properties:
+      cleanOptions: 0
+      labelSources: 0
+      labelSourcesFormat: $(build.buildNumber)
+      reportBuildStatus: true
+      gitLfsSupport: false
+      skipSyncSource: false
+      checkoutNestedSubmodules: false
+      fetchDepth: 0
+    id: {{ repository.id }}
+    type: TfsGit
+    defaultBranch: refs/heads/master
+    clean: false
+    checkoutSubmodules: false
+{{# if build.continuousIntegration }}    
+  triggers:
+  - triggerType: continuousIntegration
+    branchFilters: {{# if build.continuousIntegration.branchFilters }} {{{ json build.continuousIntegration.branchFilters }}} {{ else }} [] {{/ if }}
+    pathFilters: []
+    # settingsSourceType: 2
+    batchChanges: true
+    maxConcurrentBuildsPerBranch: 1
+{{/ if }}    
+  queue:
+    id: {{ queue.id }}
+  queueStatus: enabled
+  variables:
+    system.debug:
+      value: false
+      allowOverride: true
+  retentionRules:
+  - branches:
+    - +refs/heads/*
+    artifacts: []
+    artifactTypesToDelete:
+    - FilePath
+    - SymbolStore
+    daysToKeep: 10
+    minimumToKeep: 1
+    deleteBuildRecord: true
+    deleteTestResults: true
+  tags: ["tool:Atlas"]
+  jobAuthorizationScope: projectCollection
+  jobTimeoutInMinutes: 60
+  jobCancelTimeoutInMinutes: 5
