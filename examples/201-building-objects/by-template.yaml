@@ -1,0 +1,34 @@
+
+hash-to-list:
+{{# each hashes }}
+- name: "{{ @key }}"
+  value: {{{ json @value }}}
+{{/ each }}
+
+hash-to-flat-list:
+{{# each hashes }}
+- name: "{{ @key }}"
+  {{# each @value }}
+  "{{ @key }}": {{{ json @value }}}
+  {{/ each }}
+{{/ each }}
+
+list-to-hash:
+{{# each lists }}
+  "{{ name }}": {{{ json value }}}
+{{/ each }}
+
+list-drill-down:
+{{# each lists }}
+- name: "{{ name }}"
+  {{# each value }}
+  "{{ @key }}": {{{ json @value }}}
+  {{/ each }}
+{{/ each }}
+  
+
+hash-drill-down:
+{{# each hashes }}
+  "{{ @key }}": {{{ json color }}}
+{{/ each }}
+

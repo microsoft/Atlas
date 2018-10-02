@@ -1,0 +1,159 @@
+
+values: {{{ json }}}
+
+operations:
+
+- message: Listing build queues
+  request: apis/devops/distributedtask-queue-list.yaml
+  output:
+    devops:
+      queues: (value)
+
+- message: Listing policy types
+  request: apis/devops/policy-type-list.yaml
+  output:
+    devops:
+      policy:
+        types: (value)
+
+- message: Listing policy configurations
+  request: apis/devops/policy-configuration-list.yaml
+  output:
+    devops:
+      policies: (value)
+
+- message: Listing groups
+  request: apis/devops/graph-group-list.yaml
+  output:
+    devops:
+      graph:
+        groups: (value)
+
+{{# each devops.repository }}
+- message: Processing repository {{ name }}
+  values:
+    repository: ( devops.repository.{{ @key }} )
+
+  operations:
+  - message: Finding existing git repository
+    request: apis/devops/git-repository-get.yaml
+    output:
+      properties: (@)
+
+  output:
+    devops:
+      repository:
+        {{ @key }}:
+          id: (properties.id)
+          properties: (properties)
+{{/ each }}
+
+{{# each devops.build }}
+- message: "Processing build {{ path }}\\\\{{ name }}"
+  target: x
+  values:
+    repository: (devops.repository.{{ repository }}.properties)
+    queue: ( devops.queues[?name=='{{ queue }}'] | [0] )
+    build: (devops.build.{{ @key }})
+
+  operations:
+  - message: Finding existing build definition
+    request: apis/devops/build-definition-query.yaml
+    output:
+      build:
+        id: "( value[?name=='{{ name }}' && path=='{{ path }}'] | [0].id )"
+        revision: "( value[?name=='{{ name }}' && path=='{{ path }}'] | [0].revision )"
+
+  - message: Getting build definition details
+    condition: (build.id != null)
+    request: apis/devops/build-definition-get.yaml
+    output:
+      existing: (@)
+
+  - message: Create or update build definition
+    request: apis/devops/build-definition-save.yaml
+    output:
+      properties: (@)
+
+  output:
+    devops:
+      build:
+        {{ @key }}:
+          properties: (properties)
+{{/ each }}
+
+{{# each devops.release }}
+- message: "Processing release {{ path }}\\\\{{ name }}"
+  target: y
+  values:
+    build: ( devops.build.{{ build }}.properties )
+    queue: ( devops.queues[?name=='{{ queue }}'] | [0] )
+    release: (devops.release.{{ @key }})  
+
+  operations:
+  - message: Finding existing release definition
+    request: apis/devops/release-definition-query.yaml
+    output: "( value[?name=='{{ name }}' && path=='{{ path }}'] | [0].{release:{id:id, revision:revision}} )"
+
+  - message: Getting release definition details
+    condition: (release.id != null)
+    request: apis/devops/release-definition-get.yaml
+    output:
+      existing: (@)
+
+  - message: Create or update release definition
+    request: apis/devops/release-definition-save.yaml
+    output:
+      properties: (@)
+
+  output:
+    devops:
+      release:
+        {{ @key }}:
+          properties: (properties)
+{{/ each }}
+
+{{# each devops.repository }}
+- message: Processing policy for repository {{ name }}
+  target: z
+  values:
+    repository: ( devops.repository.{{ @key }} )
+
+  operations:
+  - template: branch-policy-assign-properties.yaml
+    write: branch-policy-assign-properties.yaml
+
+  - template: branch-policy-assign-properties.yaml
+    output: (@)
+
+  - template: branch-policy-build-list.yaml
+    write: branch-policy-build-list.yaml
+
+  - message: Building branch policy list
+    template: branch-policy-build-list.yaml
+    output: 
+      foreach: (@)
+
+  - message: Saving branch policies
+    condition: (length(foreach || `[]`) != `0` )
+    operations:
+    - message: (['Saving "', policy.type.displayName, '" on branch ', policy.settings.scope[0].refName])
+      values:
+        policy: ( foreach[0] )
+      request: apis/devops/policy-configuration-save.yaml
+      output:
+        policy: ( to_object( [[ to_string(id), {properties:@} ]] ) )
+    output:
+      foreach: ( foreach[1:] )
+      policy: ( policy )
+    repeat:
+      condition: ( length(foreach) != `0` )
+  output:
+    policy: ( policy )
+{{/ each }}
+
+output:
+  repository: ( to_object( items(devops.repository)[*].[[0], [1].properties] ) )
+  build: ( to_object( items(devops.build)[*].[[0], [1].properties] ) )
+  release: ( to_object( items(devops.release)[*].[[0], [1].properties] ) )
+  policy: ( to_object( items(policy)[*].[[0], [1].properties] ) )

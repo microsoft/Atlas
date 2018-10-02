@@ -1,0 +1,81 @@
+devops:
+  organization: atlas-test
+  project: example-403
+  repository:
+    code:
+      name: Example
+      branches:
+        "refs/heads/master":
+          "Require a merge strategy":
+            settings:
+              useSquashMerge: true
+          "Build":
+            settings:
+              buildDefinitionId: pr
+              queueOnSourceUpdateOnly: true
+              manualQueueOnly: false
+              displayName: PR Build
+              validDuration: 720
+          "Minimum number of reviewers":
+            settings:
+              minimumApproverCount: 1
+              creatorVoteCounts: false
+              resetOnSourcePush: true
+          "Required reviewers":
+            settings:
+              requiredReviewerIds:
+              - '[example-403]\example-403 Team'
+              message: Review necessary
+  build:
+    pr:
+      name: Example-PR
+      path: \Example
+      description: Pull request verification build
+      queue: Hosted VS2017
+      repository: code
+      yamlFilename: azure-pipelines.yml
+    ci:
+      name: Example-CI
+      path: \Example
+      description: Continuous integration build
+      queue: Hosted VS2017
+      repository: code
+      yamlFilename: azure-pipelines.yml
+      continuousIntegration:
+        branchFilters:
+        - +refs/heads/master
+  release:
+    cd:
+      name: Example-CD
+      path: \Example
+      description: Continuous deployment release
+      queue: Hosted VS2017
+      build: ci
+      triggerConditions:
+      - sourceBranch: master
+      stages:
+      - name: Testing
+        steps:
+        - taskId: 6c731c3c-3c68-459a-a5c9-bde6e6595b5b # Bash script
+          version: 3.*
+          enabled: true
+          inputs: 
+            targetType: inline
+            script: echo Hello Testing
+      - name: Staging
+        steps:
+        - taskId: 6c731c3c-3c68-459a-a5c9-bde6e6595b5b # Bash script
+          version: 3.*
+          enabled: true
+          inputs: 
+            targetType: inline
+            script: echo Hello Staging
+      - name: Production
+        steps:
+        - taskId: 6c731c3c-3c68-459a-a5c9-bde6e6595b5b # Bash script
+          version: 3.*
+          enabled: true
+          inputs: 
+            targetType: inline
+            script: echo Hello Production
+

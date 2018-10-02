@@ -1,0 +1,13 @@
+
+{{# each repository.branches }}
+{{# each @value }}
+- type: {{{ json type }}}
+  {{# query "( items[? type.id==`$1` && settings.scope[?refName==`$2` && repositoryId==`$3`] ] )" type.id @../key ../../repository.id items=../../devops.policies }}
+  id: {{ id }}
+  revision: {{ revision }}
+  {{/ query }}
+  isEnabled: true
+  isBlocking: true
+  settings: {{{ json settings }}}
+{{/ each }}
+{{/ each }}
