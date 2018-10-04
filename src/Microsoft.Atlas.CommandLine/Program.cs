@@ -3,6 +3,7 @@
 
 using System;
 using System.Linq;
+using System.Reflection;
 using System.Runtime.InteropServices;
 using Microsoft.Atlas.CommandLine.Accounts;
 using Microsoft.Atlas.CommandLine.Blueprints;
@@ -33,9 +34,13 @@ namespace Microsoft.Atlas.CommandLine
             Console.SetOut(secretTracker.FilterTextWriter(new ColorConsoleWriter(ColorConsole.GetOutput())));
             Console.SetError(secretTracker.FilterTextWriter(new ColorConsoleWriter(ColorConsole.GetError())));
 
+            var attributes = typeof(Program).GetTypeInfo().Assembly.GetCustomAttributes(typeof(AssemblyInformationalVersionAttribute));
+            var assemblyVersionAttribute = attributes.SingleOrDefault() as AssemblyInformationalVersionAttribute;
+
             var console = services.GetRequiredService<IConsole>();
 
-            console.WriteLine("Atlas".Color(ConsoleColor.Cyan));
+            var consoleTitle = $"Atlas version {assemblyVersionAttribute?.InformationalVersion}";
+            console.WriteLine(consoleTitle.Color(ConsoleColor.Cyan));
 
             var app = services.GetRequiredService<CommandLineApplicationServices>();
 
