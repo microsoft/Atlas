@@ -40,7 +40,7 @@ operations:
   - message: Waiting for deployment to complete...
     request: apis/azure/deployments/get.yaml
     output:
-      deploymentStatus: (@)
+      deploymentStatus: (result.body)
     repeat:
       condition: deploymentStatus.properties.provisioningState == 'Accepted' || deploymentStatus.properties.provisioningState == 'Running'
       delay: PT5S
@@ -61,7 +61,7 @@ operations:
   request: apis/azure/storage/listkeys.yaml
   output: 
     storage:
-      key: (keys[0].value)
+      key: (result.body.keys[0].value)
 
 - message: Writing sleet.json
   template: sleet.json
