@@ -37,7 +37,7 @@
 
   <PropertyGroup>
     <CodeAnalysisRuleSet>$(MSBuildThisFileDirectory)build\analyzers.ruleset</CodeAnalysisRuleSet>
-    <TreatWarningsAsErrors Condition=" '$(Configuration)' == 'Debug' ">true</TreatWarningsAsErrors>
+    <TreatWarningsAsErrors Condition=" '$(Configuration)' == 'Release' ">true</TreatWarningsAsErrors>
     <WarningsAsErrors />
 
     <!-- CS7034: The specified version string does not conform to the required format - major[.minor[.build[.revision]]] -->
