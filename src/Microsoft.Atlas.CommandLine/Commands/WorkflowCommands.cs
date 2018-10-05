@@ -339,14 +339,12 @@ namespace Microsoft.Atlas.CommandLine.Commands
                     };
                     try
                     {
-                        WorkflowModel.Request request = null;
-                        object response = null;
-                        object resultOut = null;
+                        object result = null;
 
                         // First special type of operation - executing a request
                         if (!string.IsNullOrWhiteSpace(operation.request))
                         {
-                            request = context.TemplateEngine.Render<WorkflowModel.Request>(
+                            WorkflowModel.Request request = context.TemplateEngine.Render<WorkflowModel.Request>(
                                 operation.request,
                                 context.Values);
 
@@ -384,23 +382,27 @@ namespace Microsoft.Atlas.CommandLine.Commands
                                         body = request.body,
                                         secret = request.secret,
                                     };
-                                    var jsonResponse = await client.SendAsync(jsonRequest);
-                                    logentry["response"] = jsonResponse;
 
+                                    var jsonResponse = await client.SendAsync(jsonRequest);
                                     if ((int)jsonResponse.status >= 400)
                                     {
                                         throw new ApplicationException($"Request failed with status code {jsonResponse.status}");
                                     }
 
-                                    response = jsonResponse.body;
+                                    result = new WorkflowModel.Response
+                                    {
+                                        status = (int)jsonResponse.status,
+                                        headers = jsonResponse.headers,
+                                        body = jsonResponse.body,
+                                    };
+
+                                    logentry["response"] = result;
                                 }
                                 catch
                                 {
                                     // TODO - retry logic here?
                                     throw;
                                 }
-
-                                resultOut = response;
                             }
                         }
 
@@ -423,14 +425,14 @@ namespace Microsoft.Atlas.CommandLine.Commands
                             }
                             else
                             {
-                                resultOut = context.TemplateEngine.Render<object>(operation.template, context.Values);
+                                result = context.TemplateEngine.Render<object>(operation.template, context.Values);
                             }
                         }
 
                         // Third special type of operation - nested operations
                         if (operation.operations != null)
                         {
-                            resultOut = await ExecuteOperations(context, operation.operations);
+                            result = await ExecuteOperations(context, operation.operations);
                         }
 
                         // If output is specifically stated - use it to query
@@ -439,12 +441,14 @@ namespace Microsoft.Atlas.CommandLine.Commands
                             if (operation.operations != null)
                             {
                                 // for nested operations, output expressions can pull in the current operation's cumulative values as well
-                                context.AddValuesOut(ProcessValues(operation.output, MergeUtils.Merge(resultOut, context.Values) ?? context.Values));
+                                context.AddValuesOut(ProcessValues(operation.output, MergeUtils.Merge(result, context.Values) ?? context.Values));
                             }
-                            else if (resultOut != null)
+                            else if (result != null)
                             {
-                                // for request and template operations, output expressions are based only on the current operation to avoid collisions
-                                context.AddValuesOut(ProcessValues(operation.output, resultOut));
+                                // for request and template operations, the current operation result is a well-known property to avoid collisions
+                                var merged = MergeUtils.Merge(new Dictionary<object, object> { { "result", result } }, context.Values);
+
+                                context.AddValuesOut(ProcessValues(operation.output, merged));
                             }
                             else
                             {
@@ -473,9 +477,9 @@ namespace Microsoft.Atlas.CommandLine.Commands
                         }
 
                         // otherwise if output is unstated, and there are nested operations with output - those flows back as effective output
-                        if (operation.output == null && operation.operations != null && resultOut != null)
+                        if (operation.output == null && operation.operations != null && result != null)
                         {
-                            context.AddValuesOut(resultOut);
+                            context.AddValuesOut(result);
                         }
                     }
                     catch (Exception ex)

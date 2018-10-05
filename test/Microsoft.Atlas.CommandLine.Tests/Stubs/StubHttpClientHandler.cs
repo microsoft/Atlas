@@ -2,9 +2,13 @@
 // Licensed under the MIT license.
 
 using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Net;
 using System.Net.Http;
 using System.Threading;
 using System.Threading.Tasks;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Newtonsoft.Json;
 
 namespace Microsoft.Atlas.CommandLine.Tests.Stubs
@@ -27,8 +31,7 @@ namespace Microsoft.Atlas.CommandLine.Tests.Stubs
                     var responseMessage = new HttpResponseMessage()
                     {
                         RequestMessage = request,
-                        StatusCode = response.status,
-                        Content = new StringContent(response.body.ToString())
+                        StatusCode = (HttpStatusCode)response.status,
                     };
 
                     if (response.body is byte[] responseBytes)
@@ -42,6 +45,18 @@ namespace Microsoft.Atlas.CommandLine.Tests.Stubs
                     else if (response.body != null)
                     {
                         responseMessage.Content = new StringContent(JsonConvert.SerializeObject(response.body));
+                    }
+
+                    foreach (var header in response.headers ?? Enumerable.Empty<KeyValuePair<object, object>>())
+                    {
+                        var name = Convert.ToString(header.Key);
+                        foreach (var value in ((List<object>)header.Value).Cast<string>())
+                        {
+                            if (!responseMessage.Headers.TryAddWithoutValidation(name, value))
+                            {
+                                Assert.IsTrue(responseMessage.Content.Headers.TryAddWithoutValidation(name, value));
+                            }
+                        }
                     }
 
                     return responseMessage;

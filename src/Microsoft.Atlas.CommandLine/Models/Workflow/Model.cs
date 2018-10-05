@@ -52,6 +52,13 @@ namespace Microsoft.Atlas.CommandLine.Models.Workflow
             }
         }
 
+        public class Response
+        {
+            public int status { get; set; }
+            public IDictionary<object, object> headers { get; set; }
+            public object body { get; set; }
+        }
+
         public class Repeat
         {
             public string condition { get; set; }

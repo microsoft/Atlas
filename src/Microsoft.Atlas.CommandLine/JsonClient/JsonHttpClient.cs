@@ -99,7 +99,10 @@ namespace Microsoft.Atlas.CommandLine.JsonClient
 
             var jsonResponse = new JsonResponse
             {
-                status = response.StatusCode
+                status = (int)response.StatusCode,
+                headers = response.Headers
+                    .Concat(response?.Content?.Headers ?? Enumerable.Empty<KeyValuePair<string, IEnumerable<string>>>())
+                    .ToDictionary(kv => (object)kv.Key, kv => (object)kv.Value.ToList<object>()),
             };
 
             // var responseBody = await response.Content.ReadAsStringAsync();
@@ -112,7 +115,7 @@ namespace Microsoft.Atlas.CommandLine.JsonClient
             // Information is added to secret tracker as soon as possible
             if (!string.IsNullOrEmpty(jsonRequest.secret) && jsonResponse.body != null)
             {
-                var searchResult = _jmesPath.Search(jsonRequest.secret, jsonResponse.body);
+                var searchResult = _jmesPath.Search(jsonRequest.secret, new { result = jsonResponse });
 
                 var secrets = searchResult as IEnumerable<object>;
                 if (secrets != null)
