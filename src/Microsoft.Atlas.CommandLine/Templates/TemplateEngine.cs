@@ -12,6 +12,7 @@ using DevLab.JmesPath;
 using DevLab.JmesPath.Functions;
 using HandlebarsDotNet;
 using HandlebarsDotNet.Compiler;
+using Microsoft.Atlas.CommandLine.Queries;
 using Microsoft.Atlas.CommandLine.Templates.FileSystems;
 using Microsoft.Atlas.CommandLine.Templates.TextWriters;
 
@@ -282,15 +283,7 @@ namespace Microsoft.Atlas.CommandLine.Templates
             var query = string.Format(formatString, args: formatArguments.ToArray());
             var json = arguments.OfType<HashParameterDictionary>().SingleOrDefault() ?? (object)context;
 
-            var jmespath = new JmesPath();
-            jmespath.FunctionRepository
-                .Register<ItemsFunction>()
-                .Register<ToObjectFunction>()
-                .Register<ZipFunction>();
-
-            var token = Services.Serializers.JTokenTranserializer(json);
-            var transformOutput = jmespath.Transform(token, query);
-            var transformObject = Services.Serializers.YamlDeserializer.Deserialize<object>(transformOutput.ToString());
+            var transformObject = Services.JmesPathQuery.Search(query, json);
 
             return transformObject;
         }

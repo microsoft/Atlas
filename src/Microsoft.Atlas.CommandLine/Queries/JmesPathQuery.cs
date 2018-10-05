@@ -21,7 +21,10 @@ namespace Microsoft.Atlas.CommandLine.Queries
             _jmespath.FunctionRepository
                 .Register<ItemsFunction>()
                 .Register<ToObjectFunction>()
-                .Register<ZipFunction>();
+                .Register<ZipFunction>()
+                .Register<DistinctByFunction>()
+                .Register<DistinctFunction>()
+                .Register<BitsFunction>();
             _serializers = serializers;
         }
 
