@@ -212,12 +212,12 @@ namespace Microsoft.Atlas.CommandLine.Tests
                           request: request.yaml
                           output:
                             things:
-                              one: (keys[0].value)
-                              two: (keys[1].value)
+                              one: (result.body.keys[0].value)
+                              two: (result.body.keys[1].value)
                       request.yaml: |
                         method: GET
                         url: https://localhost/
-                        secret: keys[*].value
+                        secret: result.body.keys[*].value
             ");
 
             var stubHttpClients = Yaml<StubHttpClientHandlerFactory>(@"
@@ -231,6 +231,48 @@ namespace Microsoft.Atlas.CommandLine.Tests
                           value: alpha
                         - name: key-2
                           value: beta
+            ");
+
+            InitializeServices(stubBlueprints, stubHttpClients);
+
+            var result = Services.App.Execute("deploy", "hide-secrets");
+
+            Assert.AreEqual(0, result);
+
+            Console.AssertContainsInOrder("Fetching secrets", "one: xxxxxxxx", "two: xxxxxxxx");
+        }
+
+        [TestMethod]
+        public void ResponseHeadersMayBeSecret()
+        {
+            var stubBlueprints = Yaml<StubBlueprintManager>(@"
+                Blueprints:
+                  hide-secrets:
+                    Files:
+                      workflow.yaml: |
+                        operations:
+                        - message: Fetching secrets
+                          request: request.yaml
+                          output:
+                            things:
+                              one: (result.headers.""Set-Cookie""[0])
+                              two: (result.headers.""Set-Cookie""[1])
+                      request.yaml: |
+                        method: GET
+                        url: https://localhost/
+                        secret: result.headers.""Set-Cookie""
+            ");
+
+            var stubHttpClients = Yaml<StubHttpClientHandlerFactory>(@"
+                Responses:
+                  https://localhost/:
+                    GET:
+                      status: 200
+                      headers:
+                        Set-Cookie:
+                        - secret-cookie-one
+                        - secret-cookie-two
+                      body: doesn't matter
             ");
 
             InitializeServices(stubBlueprints, stubHttpClients);

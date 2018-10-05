@@ -7,27 +7,27 @@ operations:
   request: apis/devops/distributedtask-queue-list.yaml
   output:
     devops:
-      queues: (value)
+      queues: (result.body.value)
 
 - message: Listing policy types
   request: apis/devops/policy-type-list.yaml
   output:
     devops:
       policy:
-        types: (value)
+        types: (result.body.value)
 
 - message: Listing policy configurations
   request: apis/devops/policy-configuration-list.yaml
   output:
     devops:
-      policies: (value)
+      policies: (result.body.value)
 
 - message: Listing groups
   request: apis/devops/graph-group-list.yaml
   output:
     devops:
       graph:
-        groups: (value)
+        groups: (result.body.value)
 
 {{# each devops.repository }}
 - message: Processing repository {{ name }}
@@ -38,7 +38,7 @@ operations:
   - message: Finding existing git repository
     request: apis/devops/git-repository-get.yaml
     output:
-      properties: (@)
+      properties: (result.body)
 
   output:
     devops:
@@ -60,19 +60,19 @@ operations:
     request: apis/devops/build-definition-query.yaml
     output:
       build:
-        id: "( value[?name=='{{ name }}' && path=='{{ path }}'] | [0].id )"
-        revision: "( value[?name=='{{ name }}' && path=='{{ path }}'] | [0].revision )"
+        id: "( result.body.value[?name=='{{ name }}' && path=='{{ path }}'] | [0].id )"
+        revision: "( result.body.value[?name=='{{ name }}' && path=='{{ path }}'] | [0].revision )"
 
   - message: Getting build definition details
     condition: (build.id != null)
     request: apis/devops/build-definition-get.yaml
     output:
-      existing: (@)
+      existing: (result.body)
 
   - message: Create or update build definition
     request: apis/devops/build-definition-save.yaml
     output:
-      properties: (@)
+      properties: (result.body)
 
   output:
     devops:
@@ -91,18 +91,18 @@ operations:
   operations:
   - message: Finding existing release definition
     request: apis/devops/release-definition-query.yaml
-    output: "( value[?name=='{{ name }}' && path=='{{ path }}'] | [0].{release:{id:id, revision:revision}} )"
+    output: "( result.body.value[?name=='{{ name }}' && path=='{{ path }}'] | [0].{release:{id:id, revision:revision}} )"
 
   - message: Getting release definition details
     condition: (release.id != null)
     request: apis/devops/release-definition-get.yaml
     output:
-      existing: (@)
+      existing: (result.body)
 
   - message: Create or update release definition
     request: apis/devops/release-definition-save.yaml
     output:
-      properties: (@)
+      properties: (result.body)
 
   output:
     devops:
@@ -118,18 +118,12 @@ operations:
 
   operations:
   - template: branch-policy-assign-properties.yaml
-    write: branch-policy-assign-properties.yaml
-
-  - template: branch-policy-assign-properties.yaml
-    output: (@)
-
-  - template: branch-policy-build-list.yaml
-    write: branch-policy-build-list.yaml
+    output: (result)
 
   - message: Building branch policy list
     template: branch-policy-build-list.yaml
     output: 
-      foreach: (@)
+      foreach: (result)
 
   - message: Saving branch policies
     condition: (length(foreach || `[]`) != `0` )
@@ -139,7 +133,7 @@ operations:
         policy: ( foreach[0] )
       request: apis/devops/policy-configuration-save.yaml
       output:
-        policy: ( to_object( [[ to_string(id), {properties:@} ]] ) )
+        policy: ( result.body.to_object( [[ to_string(id), {properties:@} ]] ) )
     output:
       foreach: ( foreach[1:] )
       policy: ( policy )

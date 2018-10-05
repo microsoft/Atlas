@@ -11,4 +11,4 @@ operations:
     tenant: {{azure.tenant}}
   request: azure-subscriptions-list.yaml
   output:
-    subscriptions: (value[].{ subscriptionId:subscriptionId, displayName:displayName })
+    subscriptions: (result.body.value[].{ subscriptionId:subscriptionId, displayName:displayName })
