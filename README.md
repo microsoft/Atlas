@@ -149,6 +149,12 @@ cd Atlas
 build.cmd *or* ./build.sh
 ```
 
+To run locally from source, run the following command (script):
+
+```
+./atlas.sh
+```
+
 ## Contributing
 
 This project welcomes contributions and suggestions. Most contributions require you to
