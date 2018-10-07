@@ -10,7 +10,7 @@ operations:
 
 - message: This is a good way to break out of a workflow if something is going wrong
 
-- message: Having a condition to the throw operation enables you determine when if the throw should happen
+- message: Having a condition to the throw operation enables you determine if the throw should happen
 
 - condition: first.color != 'green'
   message: Unexpected first color

@@ -134,9 +134,11 @@ namespace Microsoft.Atlas.CommandLine.Tests
 
             InitializeServices(stubBlueprints, stubHttpClients);
 
-            var ex = Assert.ThrowsException<ApplicationException>(() => Services.App.Execute("deploy", "the-test"));
+            var ex = Assert.ThrowsException<RequestException>(() => Services.App.Execute("deploy", "the-test"));
 
             Assert.IsTrue(ex.Message.Contains("503"));
+
+            Assert.AreEqual(503, ex.Response.status);
 
             Console.AssertContainsInOrder("Catching 404", "Not Catching 503");
 
@@ -181,7 +183,7 @@ namespace Microsoft.Atlas.CommandLine.Tests
             var result = Services.App.Execute("deploy", "the-test");
 
             Assert.AreEqual(0, result);
- 
+
             Console.AssertContainsInOrder(
                 "Catching 400",
                 "Still Running",

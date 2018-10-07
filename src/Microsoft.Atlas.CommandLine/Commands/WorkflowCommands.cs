@@ -400,7 +400,12 @@ namespace Microsoft.Atlas.CommandLine.Commands
 
                                     if (response.status >= 400)
                                     {
-                                        throw new ApplicationException($"Request failed with status code {jsonResponse.status}");
+                                        var error = new RequestException($"Request failed with status code {jsonResponse.status}")
+                                        {
+                                            Request = request,
+                                            Response = response,
+                                        };
+                                        throw error;
                                     }
                                 }
                             }
@@ -534,7 +539,12 @@ namespace Microsoft.Atlas.CommandLine.Commands
         private object MergeError(Exception exception, object context)
         {
             var yaml = _serializers.YamlSerializer.Serialize(new { error = exception });
-            var error = _serializers.YamlDeserializer.Deserialize<object>(yaml);
+            var error = _serializers.YamlDeserializer.Deserialize<object>($@"
+{yaml}
+  type: 
+    name: {exception.GetType().Name}
+    fullName: {exception.GetType().FullName}
+");
             var mergedContext = MergeUtils.Merge(error, context);
             return mergedContext;
         }

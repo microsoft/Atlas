@@ -7,7 +7,7 @@ operations:
   write: example.yaml
   catch:
     output: 
-      missing-file-error: (error.{ message:message, file:FileName })
+      missing-file-error: (error.{ type:type.name, message:message, file:FileName })
 
 - message: An operation can catch errors thrown from any nested operations
 
@@ -22,7 +22,7 @@ operations:
   - message: This operation won't be reached
   catch:
     output: 
-      nested-operation-error: (error.{ message:message, details:details })
+      nested-operation-error: (error.{ type:type.name, message:message, details:details })
 
 - message: Errors can be caught conditionally
 
@@ -37,6 +37,7 @@ operations:
     - examples/107-outputs/workflow.yaml
     - No-Such-File.txt
     - examples/108-looping/workflow.yaml
+    - README.md
   operations:
   - values:
       path: (foreach[0])
@@ -46,11 +47,12 @@ operations:
         path: (path)
         contentlength: ( to_number( result.headers."Content-Length"[0] ) )
     catch:
-      condition: result.status == `404`
+      condition: result.status == `404` || contains(['SyntaxErrorException', 'YamlException'], error.type.name)
       output:
         result: 
           path: (path)
-          failure: File not found
+          exception: (error.type.name)
+          message: (error.message)
   output:
     foreach: (foreach[1:])
     results: ([results, [result]] [])
@@ -59,4 +61,4 @@ operations:
 
 - message: (['Number of downloads - ', length(results[].contentlength) ])
 - message: (['Total content length - ', sum(results[].contentlength) ])
-- message: (['Number of errors - ', length(results[].failure) ])
+- message: (['Number of errors - ', length(results[].message) ])

@@ -23,7 +23,6 @@ namespace Microsoft.Atlas.CommandLine.Serialization
                 .DisableAliases()
                 .WithAttributeOverride<Exception>(e => e.TargetSite, new YamlIgnoreAttribute())
                 .WithAttributeOverride<Exception>(e => e.Message, new YamlMemberAttribute { Alias = "message" })
-                .WithAttributeOverride<OperationException>(e => e.Details, new YamlMemberAttribute { Alias = "details" })
                 .WithEventEmitter(DoubleQuoteAmbiguousStringScalarEmitter.Factory)
                 .WithTypeConverter(new ByteArrayConverter())
                 .Build();
