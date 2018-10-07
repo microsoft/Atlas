@@ -54,7 +54,7 @@ namespace Microsoft.Atlas.CommandLine.Tests
                           - message: Throwing operation
                             throw: { message: boom }
                           catch:
-                            condition: Message == 'boom'
+                            condition: error.message == 'boom'
                         - message: Still Running
             ");
 
@@ -95,7 +95,7 @@ namespace Microsoft.Atlas.CommandLine.Tests
         }
 
         [TestMethod]
-        public void InvalidStatusCodeDetailsCanBeCaught()
+        public void CatchByStatusCode()
         {
             var stubBlueprints = Yaml<StubBlueprintManager>(@"
                 Blueprints:
@@ -103,24 +103,77 @@ namespace Microsoft.Atlas.CommandLine.Tests
                     Files:
                       workflow.yaml: |
                         operations:
-                        - message: Catching operation
-                          operations:
-                          - message: Making Bad Request
-                            request: request.yaml
+                        - message: Catching 404
+                          request: notfound.yaml
                           catch:
-                            condition: result.status == 404
+                            condition: result.status == `404`
+                        - message: Not Catching 503
+                          request: servererror.yaml
+                          catch:
+                            condition: result.status == `404`
                         - message: Still Running
-                      request.yaml: |
+                      notfound.yaml: |
                         method: GET
-                        url: https://localhost/bad-request
+                        url: https://localhost/notfound
+                      servererror.yaml: |
+                        method: GET
+                        url: https://localhost/servererror
             ");
 
             var stubHttpClients = Yaml<StubHttpClientHandlerFactory>(@"
                 Responses:
-                  https://localhost/bad-request:
+                  https://localhost/notfound:
                     GET:
                       status: 404
-                      body: No Such Page
+                      body: Page error
+                  https://localhost/servererror:
+                    GET:
+                      status: 503
+                      body: Page error
+            ");
+
+            InitializeServices(stubBlueprints, stubHttpClients);
+
+            var ex = Assert.ThrowsException<ApplicationException>(() => Services.App.Execute("deploy", "the-test"));
+
+            Assert.IsTrue(ex.Message.Contains("503"));
+
+            Console.AssertContainsInOrder("Catching 404", "Not Catching 503");
+
+            Console.AssertNotContains("Still Running");
+        }
+
+        [TestMethod]
+        public void ExceptionAndResultDetailsCanBeSavedInCatch()
+        {
+            var stubBlueprints = Yaml<StubBlueprintManager>(@"
+                Blueprints:
+                  the-test:
+                    Files:
+                      workflow.yaml: |
+                        operations:
+                        - message: Catching 400
+                          request: badrequest.yaml
+                          catch:
+                            output:
+                              the-result: (result)
+                              the-error: (error)
+                        - message: Still Running
+                      badrequest.yaml: |
+                        method: GET
+                        url: https://localhost/badrequest
+            ");
+
+            var stubHttpClients = Yaml<StubHttpClientHandlerFactory>(@"
+                Responses:
+                  https://localhost/badrequest:
+                    GET:
+                      status: 400
+                      headers: { Content-Type: ['application/json'] }
+                      body: 
+                        oops:
+                          code: 1234
+                          summary: This is a bad request
             ");
 
             InitializeServices(stubBlueprints, stubHttpClients);
@@ -128,8 +181,60 @@ namespace Microsoft.Atlas.CommandLine.Tests
             var result = Services.App.Execute("deploy", "the-test");
 
             Assert.AreEqual(0, result);
+ 
+            Console.AssertContainsInOrder(
+                "Catching 400",
+                "Still Running",
+                "the-result:",
+                "status: 400",
+                "body:",
+                "oops:",
+                "code:",
+                "1234",
+                "summary: This is a bad request",
+                "the-error:",
+                "message:",
+                "400");
+        }
 
-            Console.AssertContainsInOrder("d:", "one", "two", "three", "four", "five", "six");
+        [TestMethod]
+        public void ThrowDetailsCanBeSavedInCatch()
+        {
+            var stubBlueprints = Yaml<StubBlueprintManager>(@"
+                Blueprints:
+                  the-test:
+                    Files:
+                      workflow.yaml: |
+                        operations:
+                        - message: Catching Exception
+                          operations:
+                          - message: Throwing Exception
+                            throw:
+                              message: one
+                              details:
+                                x: two
+                                y: three
+                          catch:
+                            output:
+                              the-details: (error.details)
+                              the-message: (error.message)
+                        - message: Still Running
+            ");
+
+            InitializeServices(stubBlueprints);
+
+            var result = Services.App.Execute("deploy", "the-test");
+
+            Assert.AreEqual(0, result);
+
+            Console.AssertContainsInOrder(
+                "Catching Exception",
+                "Throwing Exception",
+                "Still Running",
+                "the-details:",
+                "x: two",
+                "y: three",
+                "the-message: one");
         }
 
         public class ServiceContext : ServiceContextBase

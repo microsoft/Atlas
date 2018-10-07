@@ -295,8 +295,6 @@ namespace Microsoft.Atlas.CommandLine.Commands
 
             var patternOkay = context.PatternMatcher.IsMatch(context.Path);
 
-            var message = ConvertToString(ProcessValues(operation.message, context.Values));
-
             var conditionOkay = true;
             if (!string.IsNullOrEmpty(operation.condition))
             {
@@ -306,6 +304,8 @@ namespace Microsoft.Atlas.CommandLine.Commands
 
             for (var shouldExecute = patternOkay && conditionOkay; shouldExecute; shouldExecute = await EvaluateRepeat(context))
             {
+                var message = ConvertToString(ProcessValues(operation.message, context.Values));
+
                 if (!string.IsNullOrEmpty(message))
                 {
                     _console.WriteLine();
@@ -507,25 +507,33 @@ namespace Microsoft.Atlas.CommandLine.Commands
 
         private bool CatchCondition(Exception ex, WorkflowModel.Catch @catch, object outputContext)
         {
-            if (@catch == null)
+            try
             {
-                return false;
-            }
+                if (@catch == null)
+                {
+                    return false;
+                }
 
-            if (string.IsNullOrEmpty(@catch.condition))
+                if (string.IsNullOrEmpty(@catch.condition))
+                {
+                    return true;
+                }
+
+                var mergedContext = MergeError(ex, outputContext);
+                var conditionResult = _jmesPathQuery.Search(@catch.condition, mergedContext);
+                var conditionIsTrue = ConditionBoolean(conditionResult);
+                return conditionIsTrue;
+            }
+            catch (Exception ex2)
             {
-                return true;
+                Console.Error.WriteLine($"{"Fatal".Color(ConsoleColor.Red)}: exception processing catch condition: {ex2.Message.Color(ConsoleColor.DarkRed)}");
+                throw;
             }
-
-            var mergedContext = MergeError(ex, outputContext);
-            var conditionResult = _jmesPathQuery.Search(@catch.condition, mergedContext);
-            var conditionIsTrue = ConditionBoolean(conditionResult);
-            return conditionIsTrue;
         }
 
         private object MergeError(Exception exception, object context)
         {
-            var yaml = _serializers.YamlSerializer.Serialize(exception);
+            var yaml = _serializers.YamlSerializer.Serialize(new { error = exception });
             var error = _serializers.YamlDeserializer.Deserialize<object>(yaml);
             var mergedContext = MergeUtils.Merge(error, context);
             return mergedContext;

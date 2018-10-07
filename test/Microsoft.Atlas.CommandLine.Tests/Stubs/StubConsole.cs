@@ -35,5 +35,12 @@ namespace Microsoft.Atlas.CommandLine.Tests.Stubs
                 startIndex = segmentIndex + segment.Length;
             }
         }
+
+        internal void AssertNotContains(string text)
+        {
+            var output = OutStringWriter.GetStringBuilder().ToString();
+
+            Assert.IsFalse(output.Contains(text), $"Output does not contain {text}");
+        }
     }
 }
