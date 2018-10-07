@@ -296,7 +296,7 @@ namespace Microsoft.Atlas.CommandLine.Commands
             var patternOkay = context.PatternMatcher.IsMatch(context.Path);
 
             var message = ConvertToString(ProcessValues(operation.message, context.Values));
-	        var write = ConvertToString(ProcessValues(operation.write, context.Values));
+            var write = ConvertToString(ProcessValues(operation.write, context.Values));
 
             var conditionOkay = true;
             if (!string.IsNullOrEmpty(operation.condition))
