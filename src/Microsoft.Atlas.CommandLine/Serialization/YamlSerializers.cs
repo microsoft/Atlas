@@ -20,6 +20,7 @@ namespace Microsoft.Atlas.CommandLine.Serialization
 
             YamlSerializer = new SerializerBuilder()
                 .DisableAliases()
+                .WithAttributeOverride<Exception>(e => e.TargetSite, new YamlIgnoreAttribute())
                 .WithEventEmitter(DoubleQuoteAmbiguousStringScalarEmitter.Factory)
                 .WithTypeConverter(new ByteArrayConverter())
                 .Build();

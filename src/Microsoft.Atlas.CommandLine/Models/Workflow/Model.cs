@@ -29,6 +29,9 @@ namespace Microsoft.Atlas.CommandLine.Models.Workflow
             [YamlMember(Alias = "throw")]
             public Throw @throw { get; set; }
 
+            [YamlMember(Alias = "catch")]
+            public Catch @catch { get; set; }
+
             public string request { get; set; }
             public string template { get; set; }
             public string write { get; set; }
@@ -70,6 +73,12 @@ namespace Microsoft.Atlas.CommandLine.Models.Workflow
         {
             public string message { get; set; }
             public object details { get; set; }
+        }
+
+        public class Catch
+        {
+            public string condition { get; set; }
+            public object output { get; set; }
         }
     }
 }
