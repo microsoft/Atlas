@@ -32,7 +32,7 @@ operations:
 
 - message: ([ 'Fetching ', foreach[0] ])
   values:
-    results: []
+    downloads: []
     foreach: 
     - examples/107-outputs/workflow.yaml
     - No-Such-File.txt
@@ -43,22 +43,22 @@ operations:
       path: (foreach[0])
     request: fetch-github-file.yaml
     output:
-      result: 
+      append: 
         path: (path)
         contentlength: ( to_number( result.headers."Content-Length"[0] ) )
     catch:
       condition: result.status == `404` || contains(['SyntaxErrorException', 'YamlException'], error.type.name)
       output:
-        result: 
+        append: 
           path: (path)
           exception: (error.type.name)
           message: (error.message)
   output:
+    downloads: ([downloads, append] [])
     foreach: (foreach[1:])
-    results: ([results, [result]] [])
   repeat:
     condition: (foreach[0] != null)
 
-- message: (['Number of downloads - ', length(results[].contentlength) ])
-- message: (['Total content length - ', sum(results[].contentlength) ])
-- message: (['Number of errors - ', length(results[].message) ])
+- message: (['Number of downloads - ', length(downloads[].contentlength) ])
+- message: (['Total content length - ', sum(downloads[].contentlength) ])
+- message: (['Number of errors - ', length(downloads[].message) ])
