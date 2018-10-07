@@ -149,9 +149,12 @@ cd Atlas
 build.cmd *or* ./build.sh
 ```
 
-To run locally from source, run the following command (script):
+#### Running Atlas from source
+
+To run locally from source, run the following commands:
 
 ```
+dotnet restore
 ./atlas.sh
 ```
 
