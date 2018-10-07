@@ -296,6 +296,7 @@ namespace Microsoft.Atlas.CommandLine.Commands
             var patternOkay = context.PatternMatcher.IsMatch(context.Path);
 
             var message = ConvertToString(ProcessValues(operation.message, context.Values));
+	    var write = ConvertToString(ProcessValues(operation.write, context.Values));
 
             var conditionOkay = true;
             if (!string.IsNullOrEmpty(operation.condition))
@@ -328,7 +329,7 @@ namespace Microsoft.Atlas.CommandLine.Commands
                                 { "repeat", operation.repeat },
                                 { "request", operation.request },
                                 { "template", operation.template },
-                                { "write", operation.write },
+                                { "write", write },
                             }
                         },
                         { "valuesIn", context.ValuesIn },
@@ -409,9 +410,9 @@ namespace Microsoft.Atlas.CommandLine.Commands
                         // Second special type of operation - rendering a template
                         if (!string.IsNullOrWhiteSpace(operation.template))
                         {
-                            if (!string.IsNullOrEmpty(operation.write))
+                            if (!string.IsNullOrEmpty(write))
                             {
-                                var targetPath = Path.Combine(OutputDirectory.Required(), operation.write);
+                                var targetPath = Path.Combine(OutputDirectory.Required(), write);
 
                                 Directory.CreateDirectory(Path.GetDirectoryName(targetPath));
 
