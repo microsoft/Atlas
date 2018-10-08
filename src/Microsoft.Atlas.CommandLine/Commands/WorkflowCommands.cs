@@ -313,7 +313,7 @@ namespace Microsoft.Atlas.CommandLine.Commands
                     _console.WriteLine($"{new string(' ', context.Indent * 2)}- {message.Color(ConsoleColor.Cyan)}");
                 }
 
-                var debugPath = Path.Combine(OutputDirectory.Required(), "logs", $"{++_operationCount:000}-{new string('-', context.Indent * 2)}{new string((message ?? operation.write ?? operation.request ?? operation.template ?? string.Empty).Select(ch => char.IsLetterOrDigit(ch) ? ch : '-').ToArray())}.yaml");
+                var debugPath = Path.Combine(OutputDirectory.Required(), "logs", $"{++_operationCount:000}-{new string('-', context.Indent * 2)}{new string((message ?? write ?? operation.request ?? operation.template ?? string.Empty).Select(ch => char.IsLetterOrDigit(ch) ? ch : '-').ToArray())}.yaml");
                 Directory.CreateDirectory(Path.GetDirectoryName(debugPath));
                 using (var writer = _secretTracker.FilterTextWriter(File.CreateText(debugPath)))
                 {
