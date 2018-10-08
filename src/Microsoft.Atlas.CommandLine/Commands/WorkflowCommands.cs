@@ -235,8 +235,8 @@ namespace Microsoft.Atlas.CommandLine.Commands
 
             if (generateOnly == false)
             {
-                var context = new ExecutionContext(templateEngine, patternMatcher, null);
-                context.AddValuesIn(ProcessValues(workflow.values, context.Values));
+                var context = new ExecutionContext(templateEngine, patternMatcher, values);
+                context.AddValuesIn(ProcessValues(workflow.values, context.Values) ?? context.Values);
 
                 var resultOut = await ExecuteOperations(context, workflow.operations);
 
@@ -305,6 +305,7 @@ namespace Microsoft.Atlas.CommandLine.Commands
             for (var shouldExecute = patternOkay && conditionOkay; shouldExecute; shouldExecute = await EvaluateRepeat(context))
             {
                 var message = ConvertToString(ProcessValues(operation.message, context.Values));
+                var write = ConvertToString(ProcessValues(operation.write, context.Values));
 
                 if (!string.IsNullOrEmpty(message))
                 {
@@ -312,7 +313,7 @@ namespace Microsoft.Atlas.CommandLine.Commands
                     _console.WriteLine($"{new string(' ', context.Indent * 2)}- {message.Color(ConsoleColor.Cyan)}");
                 }
 
-                var debugPath = Path.Combine(OutputDirectory.Required(), "logs", $"{++_operationCount:000}-{new string('-', context.Indent * 2)}{new string((message ?? operation.write ?? operation.request ?? operation.template ?? string.Empty).Select(ch => char.IsLetterOrDigit(ch) ? ch : '-').ToArray())}.yaml");
+                var debugPath = Path.Combine(OutputDirectory.Required(), "logs", $"{++_operationCount:000}-{new string('-', context.Indent * 2)}{new string((message ?? write ?? operation.request ?? operation.template ?? string.Empty).Select(ch => char.IsLetterOrDigit(ch) ? ch : '-').ToArray())}.yaml");
                 Directory.CreateDirectory(Path.GetDirectoryName(debugPath));
                 using (var writer = _secretTracker.FilterTextWriter(File.CreateText(debugPath)))
                 {
@@ -328,7 +329,7 @@ namespace Microsoft.Atlas.CommandLine.Commands
                                 { "repeat", operation.repeat },
                                 { "request", operation.request },
                                 { "template", operation.template },
-                                { "write", operation.write },
+                                { "write", write },
                             }
                         },
                         { "valuesIn", context.ValuesIn },
@@ -413,9 +414,9 @@ namespace Microsoft.Atlas.CommandLine.Commands
                             // Second special type of operation - rendering a template
                             if (!string.IsNullOrWhiteSpace(operation.template))
                             {
-                                if (!string.IsNullOrEmpty(operation.write))
+                                if (!string.IsNullOrEmpty(write))
                                 {
-                                    var targetPath = Path.Combine(OutputDirectory.Required(), operation.write);
+                                    var targetPath = Path.Combine(OutputDirectory.Required(), write);
 
                                     Directory.CreateDirectory(Path.GetDirectoryName(targetPath));
 
