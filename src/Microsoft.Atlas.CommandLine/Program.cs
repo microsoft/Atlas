@@ -118,6 +118,7 @@ namespace Microsoft.Atlas.CommandLine
 
             app.Command("help", help =>
             {
+                help.Description = "Command to show this help message";
                 var command = help.Argument("command", "Show help for particular arguments", true);
 
                 help.OnExecute(() =>
@@ -134,6 +135,7 @@ namespace Microsoft.Atlas.CommandLine
 
             app.Command("account", account =>
             {
+                account.Description = "Command for account related operations.";
                 account.Command("clear", clear =>
                 {
                     clear.OnExecute<AccountCommands>();
@@ -174,6 +176,7 @@ namespace Microsoft.Atlas.CommandLine
 
             app.Command("generate", generate =>
             {
+                generate.Description = "Command to generate artifacts";
                 generate.Argument("blueprint", "Path or url to atlas blueprint");
 
                 generate.Option("-f|--values", "Input file containing parameter values", CommandOptionType.MultipleValue, inherited: true);
@@ -185,6 +188,7 @@ namespace Microsoft.Atlas.CommandLine
 
             app.Command("deploy", deploy =>
             {
+                deploy.Description = "Command to deploy";
                 deploy.Argument("blueprint", "Path or url to atlas blueprint");
                 deploy.Argument("target", "Name of workflow yaml file inside template", multipleValues: true);
 
