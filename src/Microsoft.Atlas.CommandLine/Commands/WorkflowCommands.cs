@@ -235,8 +235,8 @@ namespace Microsoft.Atlas.CommandLine.Commands
 
             if (generateOnly == false)
             {
-                var context = new ExecutionContext(templateEngine, patternMatcher, null);
-                context.AddValuesIn(ProcessValues(workflow.values, context.Values));
+                var context = new ExecutionContext(templateEngine, patternMatcher, values);
+                context.AddValuesIn(ProcessValues(workflow.values, context.Values) ?? context.Values);
 
                 var resultOut = await ExecuteOperations(context, workflow.operations);
 
