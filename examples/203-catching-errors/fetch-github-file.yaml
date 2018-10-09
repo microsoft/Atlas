@@ -1,0 +1,2 @@
+method: GET
+url: https://raw.githubusercontent.com/Microsoft/Atlas/master/{{ path }}

@@ -1,0 +1,64 @@
+
+operations:
+- message: An operation can catch errors which it throws
+
+- message: Rendering a missing template
+  template: no-such-template.yaml
+  write: example.yaml
+  catch:
+    output: 
+      missing-file-error: (error.{ type:type.name, message:message, file:FileName })
+
+- message: An operation can catch errors thrown from any nested operations
+
+- message: Catching nested errors
+  operations:
+  - message: This operation is fine
+  - message: This operation throws an error
+    throw: 
+      message: Something bad
+      details:
+        one: two
+  - message: This operation won't be reached
+  catch:
+    output: 
+      nested-operation-error: (error.{ type:type.name, message:message, details:details })
+
+- message: Errors can be caught conditionally
+
+- message: It's a good idea to catch a specific, known condition if possible
+
+- message: otherwise your workflow will continue to execute when anything unexpected happens
+
+- message: ([ 'Fetching ', foreach[0] ])
+  values:
+    downloads: []
+    foreach: 
+    - examples/107-outputs/workflow.yaml
+    - No-Such-File.txt
+    - examples/108-looping/workflow.yaml
+    - README.md
+  operations:
+  - values:
+      path: (foreach[0])
+    request: fetch-github-file.yaml
+    output:
+      append: 
+        path: (path)
+        contentlength: ( to_number( result.headers."Content-Length"[0] ) )
+    catch:
+      condition: result.status == `404` || contains(['SyntaxErrorException', 'YamlException'], error.type.name)
+      output:
+        append: 
+          path: (path)
+          exception: (error.type.name)
+          message: (error.message)
+  output:
+    downloads: ([downloads, append] [])
+    foreach: (foreach[1:])
+  repeat:
+    condition: (foreach[0] != null)
+
+- message: (['Number of downloads - ', length(downloads[].contentlength) ])
+- message: (['Total content length - ', sum(downloads[].contentlength) ])
+- message: (['Number of errors - ', length(downloads[].message) ])

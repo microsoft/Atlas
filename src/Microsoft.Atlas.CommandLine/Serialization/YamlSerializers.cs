@@ -3,6 +3,7 @@
 
 using System;
 using Microsoft.Atlas.CommandLine.Commands;
+using Microsoft.Atlas.CommandLine.Execution;
 using Newtonsoft.Json.Linq;
 using YamlDotNet.Serialization;
 
@@ -20,6 +21,8 @@ namespace Microsoft.Atlas.CommandLine.Serialization
 
             YamlSerializer = new SerializerBuilder()
                 .DisableAliases()
+                .WithAttributeOverride<Exception>(e => e.TargetSite, new YamlIgnoreAttribute())
+                .WithAttributeOverride<Exception>(e => e.Message, new YamlMemberAttribute { Alias = "message" })
                 .WithEventEmitter(DoubleQuoteAmbiguousStringScalarEmitter.Factory)
                 .WithTypeConverter(new ByteArrayConverter())
                 .Build();

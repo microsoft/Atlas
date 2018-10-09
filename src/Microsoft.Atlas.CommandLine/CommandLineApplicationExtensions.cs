@@ -73,7 +73,7 @@ namespace Microsoft.Atlas.CommandLine
             return defaultValue;
         }
 
-        public static void OnExecute<TCommand>(this CommandLineApplication app, Func<TCommand, Task<int>> onExecute)
+        public static void OnExecute<TCommand>(this CommandLineApplication app, Func<TCommand, int> onExecute)
         {
             app.OnExecute(() =>
             {
@@ -110,11 +110,12 @@ namespace Microsoft.Atlas.CommandLine
                 if (helpOption.HasValue())
                 {
                     app.ShowHelp();
-                    return Task.FromResult(0);
+                    return 0;
                 }
                 else
                 {
-                    return (Task<int>)method.Invoke(cmd, new object[0]);
+                    var task = (Task<int>)method.Invoke(cmd, new object[0]);
+                    return task.GetAwaiter().GetResult();
                 }
             });
         }
