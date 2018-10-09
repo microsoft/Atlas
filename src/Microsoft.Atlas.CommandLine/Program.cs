@@ -118,7 +118,7 @@ namespace Microsoft.Atlas.CommandLine
 
             app.Command("help", help =>
             {
-                help.Description = "Command to show this help message";
+                help.Description = "Show help information";
                 var command = help.Argument("command", "Show help for particular arguments", true);
 
                 help.OnExecute(() =>
@@ -135,20 +135,23 @@ namespace Microsoft.Atlas.CommandLine
 
             app.Command("account", account =>
             {
-                account.Description = "Command for account related operations.";
+                account.Description = "Manages authentication credentials";
                 account.Command("clear", clear =>
                 {
+                    clear.Description = "Remove any authentication credentials which have been stored";
                     clear.OnExecute<AccountCommands>();
                 });
 
                 account.Command("show", show =>
                 {
+                    show.Description = " Displays the credentials have been stored";
                     show.Option("-n|--name", "Names to show", CommandOptionType.MultipleValue);
                     show.OnExecute<AccountCommands>();
                 });
 
                 account.Command("add", add =>
                 {
+                    add.Description = "Stores authentication credentials to be used by non-interactive deploy";
                     add.Option("-n|--name", "Unique name for entry being added", CommandOptionType.SingleValue);
                     add.Option("--resource", "Resource guid or uri being authorized", CommandOptionType.SingleValue);
                     add.Option("--authority", "OAuth token authority url", CommandOptionType.SingleValue);
@@ -176,7 +179,7 @@ namespace Microsoft.Atlas.CommandLine
 
             app.Command("generate", generate =>
             {
-                generate.Description = "Command to generate artifacts";
+                generate.Description = "Processes a workflow without executing any operations";
                 generate.Argument("blueprint", "Path or url to atlas blueprint");
 
                 generate.Option("-f|--values", "Input file containing parameter values", CommandOptionType.MultipleValue, inherited: true);
@@ -188,7 +191,7 @@ namespace Microsoft.Atlas.CommandLine
 
             app.Command("deploy", deploy =>
             {
-                deploy.Description = "Command to deploy";
+                deploy.Description = "Processes a workflow and executes the operations";
                 deploy.Argument("blueprint", "Path or url to atlas blueprint");
                 deploy.Argument("target", "Name of workflow yaml file inside template", multipleValues: true);
 
