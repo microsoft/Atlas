@@ -7,6 +7,7 @@ using System.Reflection;
 using System.Runtime.InteropServices;
 using Microsoft.Atlas.CommandLine.Accounts;
 using Microsoft.Atlas.CommandLine.Blueprints;
+using Microsoft.Atlas.CommandLine.Blueprints.Providers;
 using Microsoft.Atlas.CommandLine.Commands;
 using Microsoft.Atlas.CommandLine.ConsoleOutput;
 using Microsoft.Atlas.CommandLine.JsonClient;
@@ -84,6 +85,7 @@ namespace Microsoft.Atlas.CommandLine
                 .AddTransient<IPatternMatcherFactory, PatternMatcherFactory>()
 
                 .AddTransient<IBlueprintManager, BlueprintManager>()
+                .AddTransient<IBlueprintPackageProvider, HttpsFilesBlueprintPackageProvider>()
                 .AddTransient<IBlueprintPackageProvider, DirectoryBlueprintPackageProvider>()
                 .AddTransient<IBlueprintPackageProvider, ArchiveBlueprintPackageProvider>()
 
