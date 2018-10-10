@@ -26,7 +26,7 @@ Atlas is currently under active development.
 
 Daily builds of the Atlas CLI are available as self-contained downloads:
 
-| Platform | [Master branch (0.1)][Master Branch] | [Latest build][Latest Json] |
+| Platform | [Master Branch (0.1)][Master Branch] | [Latest Build][Latest Json] |
 |:------:|:------:|:------:|
 | **Windows x64** | [Download latest zip][Zip Latest] | [![Zip Status]][Zip Latest] |
 | **Linux x64** | [Download latest tar.gz][Zip Latest] | [![Tarball Status]][Tarball Latest] |
@@ -44,9 +44,9 @@ If you want to use a package manager:
 
 ## Getting Started
 
-From a console window, `mkdir hello` to create a new subfolder.
+From a console window, `mkdir demo` to create a new subfolder.
 
-Add a `hello/workflow.yaml` file to declare operations:
+Add a `demo/workflow.yaml` file to declare operations:
 
 ```
 operations:
@@ -66,7 +66,7 @@ info:
 Run it!
 
 ```
-> atlas deploy hello --set info.name=Atlas
+> atlas deploy demo --set info.name=Atlas
 
 Atlas
 
