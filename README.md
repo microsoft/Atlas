@@ -44,7 +44,16 @@ If you want to use a package manager:
 
 ## Getting Started
 
-From a console window, `mkdir demo` to create a new subfolder.
+An existing workflow can be executed directly from a public web server. You 
+can run any of the [examples][Atlas Examples] in this repository with the `atlas deploy` command:
+
+```
+atlas deploy https://github.com/Microsoft/Atlas/tree/master/examples/101-messages
+```
+
+#### Creating a new workflow
+
+To create a new workflow, from a console window execute `mkdir demo` to create a new subfolder.
 
 Add a `demo/workflow.yaml` file to declare operations:
 
@@ -55,7 +64,7 @@ operations:
 - message: "All values: {{ json . }}"
 ```
 
-Add a `hello/values.yaml` file to declare defaults:
+Add a `demo/values.yaml` file to declare defaults:
 
 ```
 info:
@@ -77,7 +86,9 @@ Atlas
   - All values: {"info": {"greeting": "Hello", "name": "Atlas"}}
 ```
 
-Clone the [Atlas Examples](https://github.com/Microsoft/Atlas/tree/master/examples) folder to see additional
+#### Exploring the examples
+
+You can also clone the Atlas GitHub repo to explore the [examples][Atlas Examples] and see
 kinds of operations Atlas can perform.
 
 ```
@@ -183,6 +194,7 @@ email to ensure we received your original message. Further information, includin
 the [Security TechCenter](https://technet.microsoft.com/en-us/security/default).
 
 [Atlas Logo]: https://github.com/Microsoft/Atlas/raw/master/docs/icon-128.png
+[Atlas Examples]: https://github.com/Microsoft/Atlas/tree/master/examples
 [Handlebars]: http://handlebarsjs.com/
 [YAML]: http://yaml.org/
 [JSON]: http://json.org/

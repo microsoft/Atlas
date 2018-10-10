@@ -3,15 +3,15 @@
 
 using System.IO;
 
-namespace Microsoft.Atlas.CommandLine.Blueprints
+namespace Microsoft.Atlas.CommandLine.Blueprints.Providers
 {
-    public class DirectoryBlueprintPackageProvider : IBlueprintPackageProvider
+    public class ArchiveBlueprintPackageProvider : IBlueprintPackageProvider
     {
         public IBlueprintPackage TryGetBlueprintPackage(string blueprint)
         {
-            if (Directory.Exists(blueprint))
+            if (File.Exists(blueprint))
             {
-                return new DirectoryBlueprintPackage(blueprint);
+                return new ArchiveBlueprintPackage(blueprint);
             }
 
             return null;

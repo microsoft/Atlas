@@ -4,7 +4,7 @@
 using System;
 using System.IO;
 
-namespace Microsoft.Atlas.CommandLine.Blueprints
+namespace Microsoft.Atlas.CommandLine.Blueprints.Providers
 {
     public class ArchiveBlueprintPackage : IBlueprintPackage
     {
