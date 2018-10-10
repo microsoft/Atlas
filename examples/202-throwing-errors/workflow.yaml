@@ -1,0 +1,27 @@
+
+values:
+  first: 
+    color: green
+  second:
+    color: blue
+
+operations:
+- message: An operation can throw an exception with a message and structured details
+
+- message: This is a good way to break out of a workflow if something is going wrong
+
+- message: Having a condition to the throw operation enables you determine if the throw should happen
+
+- condition: first.color != 'green'
+  message: Unexpected first color
+  throw: 
+    message: (['Color must be green, not ', first.color])
+    details: (first)
+
+- condition: second.color != 'green'
+  message: Unexpected second color
+  throw: 
+    message: (['Color must be green, not ', second.color])
+    details: (second)
+
+- message: This operation will never be reached

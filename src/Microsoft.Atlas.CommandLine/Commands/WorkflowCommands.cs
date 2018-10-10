@@ -235,8 +235,8 @@ namespace Microsoft.Atlas.CommandLine.Commands
 
             if (generateOnly == false)
             {
-                var context = new ExecutionContext(templateEngine, patternMatcher, null);
-                context.AddValuesIn(ProcessValues(workflow.values, context.Values));
+                var context = new ExecutionContext(templateEngine, patternMatcher, values);
+                context.AddValuesIn(ProcessValues(workflow.values, context.Values) ?? context.Values);
 
                 var resultOut = await ExecuteOperations(context, workflow.operations);
 
@@ -295,8 +295,6 @@ namespace Microsoft.Atlas.CommandLine.Commands
 
             var patternOkay = context.PatternMatcher.IsMatch(context.Path);
 
-            var message = ConvertToString(ProcessValues(operation.message, context.Values));
-
             var conditionOkay = true;
             if (!string.IsNullOrEmpty(operation.condition))
             {
@@ -306,13 +304,16 @@ namespace Microsoft.Atlas.CommandLine.Commands
 
             for (var shouldExecute = patternOkay && conditionOkay; shouldExecute; shouldExecute = await EvaluateRepeat(context))
             {
+                var message = ConvertToString(ProcessValues(operation.message, context.Values));
+                var write = ConvertToString(ProcessValues(operation.write, context.Values));
+
                 if (!string.IsNullOrEmpty(message))
                 {
                     _console.WriteLine();
                     _console.WriteLine($"{new string(' ', context.Indent * 2)}- {message.Color(ConsoleColor.Cyan)}");
                 }
 
-                var debugPath = Path.Combine(OutputDirectory.Required(), "logs", $"{++_operationCount:000}-{new string('-', context.Indent * 2)}{new string((message ?? operation.write ?? operation.request ?? operation.template ?? string.Empty).Select(ch => char.IsLetterOrDigit(ch) ? ch : '-').ToArray())}.yaml");
+                var debugPath = Path.Combine(OutputDirectory.Required(), "logs", $"{++_operationCount:000}-{new string('-', context.Indent * 2)}{new string((message ?? write ?? operation.request ?? operation.template ?? string.Empty).Select(ch => char.IsLetterOrDigit(ch) ? ch : '-').ToArray())}.yaml");
                 Directory.CreateDirectory(Path.GetDirectoryName(debugPath));
                 using (var writer = _secretTracker.FilterTextWriter(File.CreateText(debugPath)))
                 {
@@ -328,7 +329,7 @@ namespace Microsoft.Atlas.CommandLine.Commands
                                 { "repeat", operation.repeat },
                                 { "request", operation.request },
                                 { "template", operation.template },
-                                { "write", operation.write },
+                                { "write", write },
                             }
                         },
                         { "valuesIn", context.ValuesIn },
@@ -337,42 +338,44 @@ namespace Microsoft.Atlas.CommandLine.Commands
                         { "response", null },
                         { "cumulativeValues", context.Values },
                     };
+
                     try
                     {
-                        object result = null;
+                        // object result = null;
+                        object outputContext = context.Values;
 
-                        // First special type of operation - executing a request
-                        if (!string.IsNullOrWhiteSpace(operation.request))
+                        try
                         {
-                            WorkflowModel.Request request = context.TemplateEngine.Render<WorkflowModel.Request>(
-                                operation.request,
-                                context.Values);
-
-                            logentry["request"] = request;
-
-                            HttpAuthentication auth = null;
-                            if (request.auth != null)
+                            // First special type of operation - executing a request
+                            if (!string.IsNullOrWhiteSpace(operation.request))
                             {
-                                // TODO: remove these defaults
-                                auth = new HttpAuthentication
+                                var request = context.TemplateEngine.Render<WorkflowModel.Request>(
+                                    operation.request,
+                                    context.Values);
+
+                                logentry["request"] = request;
+
+                                HttpAuthentication auth = null;
+                                if (request.auth != null)
                                 {
-                                    tenant = request?.auth?.tenant ?? "common",
-                                    resourceId = request?.auth?.resource ?? "499b84ac-1321-427f-aa17-267ca6975798",
-                                    clientId = request?.auth?.client ?? "e8f3cc86-b3b2-4ebb-867c-9c314925b384",
-                                    interactive = IsInteractive
-                                };
-                            }
+                                    // TODO: remove these defaults
+                                    auth = new HttpAuthentication
+                                    {
+                                        tenant = request?.auth?.tenant ?? "common",
+                                        resourceId = request?.auth?.resource ?? "499b84ac-1321-427f-aa17-267ca6975798",
+                                        clientId = request?.auth?.client ?? "e8f3cc86-b3b2-4ebb-867c-9c314925b384",
+                                        interactive = IsInteractive
+                                    };
+                                }
 
-                            var client = _clientFactory.Create(auth);
+                                var client = _clientFactory.Create(auth);
 
-                            var method = new HttpMethod(request.method ?? "GET");
-                            if (IsDryRun && method.Method != "GET")
-                            {
-                                _console.WriteLine($"Skipping {method.Method.ToString().Color(ConsoleColor.DarkYellow)} {request.url}");
-                            }
-                            else
-                            {
-                                try
+                                var method = new HttpMethod(request.method ?? "GET");
+                                if (IsDryRun && method.Method != "GET")
+                                {
+                                    _console.WriteLine($"Skipping {method.Method.ToString().Color(ConsoleColor.DarkYellow)} {request.url}");
+                                }
+                                else
                                 {
                                     var jsonRequest = new JsonRequest
                                     {
@@ -384,102 +387,106 @@ namespace Microsoft.Atlas.CommandLine.Commands
                                     };
 
                                     var jsonResponse = await client.SendAsync(jsonRequest);
-                                    if ((int)jsonResponse.status >= 400)
-                                    {
-                                        throw new ApplicationException($"Request failed with status code {jsonResponse.status}");
-                                    }
 
-                                    result = new WorkflowModel.Response
+                                    var response = new WorkflowModel.Response
                                     {
                                         status = (int)jsonResponse.status,
                                         headers = jsonResponse.headers,
                                         body = jsonResponse.body,
                                     };
 
-                                    logentry["response"] = result;
-                                }
-                                catch
-                                {
-                                    // TODO - retry logic here?
-                                    throw;
-                                }
-                            }
-                        }
+                                    logentry["response"] = response;
 
-                        // Second special type of operation - rendering a template
-                        if (!string.IsNullOrWhiteSpace(operation.template))
-                        {
-                            if (!string.IsNullOrEmpty(operation.write))
-                            {
-                                var targetPath = Path.Combine(OutputDirectory.Required(), operation.write);
+                                    outputContext = MergeUtils.Merge(new Dictionary<object, object> { { "result", response } }, outputContext);
 
-                                Directory.CreateDirectory(Path.GetDirectoryName(targetPath));
-
-                                using (var targetWriter = File.CreateText(targetPath))
-                                {
-                                    if (!string.IsNullOrWhiteSpace(operation.template))
+                                    if (response.status >= 400)
                                     {
-                                        context.TemplateEngine.Render(operation.template, context.Values, targetWriter);
+                                        var error = new RequestException($"Request failed with status code {jsonResponse.status}")
+                                        {
+                                            Request = request,
+                                            Response = response,
+                                        };
+                                        throw error;
                                     }
                                 }
                             }
-                            else
+
+                            // Second special type of operation - rendering a template
+                            if (!string.IsNullOrWhiteSpace(operation.template))
                             {
-                                result = context.TemplateEngine.Render<object>(operation.template, context.Values);
+                                if (!string.IsNullOrEmpty(write))
+                                {
+                                    var targetPath = Path.Combine(OutputDirectory.Required(), write);
+
+                                    Directory.CreateDirectory(Path.GetDirectoryName(targetPath));
+
+                                    using (var targetWriter = File.CreateText(targetPath))
+                                    {
+                                        if (!string.IsNullOrWhiteSpace(operation.template))
+                                        {
+                                            context.TemplateEngine.Render(operation.template, context.Values, targetWriter);
+                                        }
+                                    }
+                                }
+
+                                if (operation.output != null)
+                                {
+                                    var templateResult = context.TemplateEngine.Render<object>(operation.template, context.Values);
+
+                                    outputContext = MergeUtils.Merge(new Dictionary<object, object> { { "result", templateResult } }, outputContext);
+                                }
                             }
-                        }
 
-                        // Third special type of operation - nested operations
-                        if (operation.operations != null)
-                        {
-                            result = await ExecuteOperations(context, operation.operations);
-                        }
-
-                        // If output is specifically stated - use it to query
-                        if (operation.output != null)
-                        {
+                            // Third special type of operation - nested operations
                             if (operation.operations != null)
                             {
-                                // for nested operations, output expressions can pull in the current operation's cumulative values as well
-                                context.AddValuesOut(ProcessValues(operation.output, MergeUtils.Merge(result, context.Values) ?? context.Values));
-                            }
-                            else if (result != null)
-                            {
-                                // for request and template operations, the current operation result is a well-known property to avoid collisions
-                                var merged = MergeUtils.Merge(new Dictionary<object, object> { { "result", result } }, context.Values);
+                                var nestedResult = await ExecuteOperations(context, operation.operations);
 
-                                context.AddValuesOut(ProcessValues(operation.output, merged));
+                                if (operation.output == null)
+                                {
+                                    // if output is unstated, and there are nested operations with output - those flows back as effective output
+                                    context.AddValuesOut(nestedResult);
+                                }
+                                else
+                                {
+                                    // if output is stated, nested operations with output are visible to output queries
+                                    outputContext = MergeUtils.Merge(nestedResult, context.Values) ?? context.Values;
+                                }
                             }
-                            else
+
+                            // If output is specifically stated - use it to query
+                            if (operation.output != null)
                             {
-                                // there are no values coming out of this operation - output queries are based only on cumulative values
-                                context.AddValuesOut(ProcessValues(operation.output, context.Values));
+                                context.AddValuesOut(ProcessValues(operation.output, outputContext));
+                            }
+
+                            if (operation.@throw != null)
+                            {
+                                var throwMessage = ConvertToString(ProcessValues(operation.@throw.message, context.Values));
+                                throwMessage = string.IsNullOrEmpty(throwMessage) ? message : throwMessage;
+
+                                var throwDetails = ProcessValues(operation.@throw.details, context.Values);
+
+                                _console.WriteLine(throwMessage.Color(ConsoleColor.DarkRed));
+                                if (throwDetails != null)
+                                {
+                                    _console.WriteLine(_serializers.YamlSerializer.Serialize(throwDetails).Color(ConsoleColor.DarkRed));
+                                }
+
+                                throw new OperationException(string.IsNullOrEmpty(throwMessage) ? message : throwMessage)
+                                {
+                                    Details = throwDetails
+                                };
                             }
                         }
-
-                        if (operation.@throw != null)
+                        catch (Exception ex) when (CatchCondition(ex, operation.@catch, outputContext))
                         {
-                            var throwMessage = ConvertToString(ProcessValues(operation.@throw.message, context.Values));
-                            throwMessage = string.IsNullOrEmpty(throwMessage) ? message : throwMessage;
-
-                            var throwDetails = ProcessValues(operation.@throw.details, context.Values);
-
-                            _console.WriteLine(throwMessage.Color(ConsoleColor.DarkRed));
-                            if (throwDetails != null)
+                            if (operation.@catch.output != null)
                             {
-                                _console.WriteLine(_serializers.YamlSerializer.Serialize(throwDetails).Color(ConsoleColor.DarkRed));
+                                var mergedContext = MergeError(ex, outputContext);
+                                var catchDetails = ProcessValues(operation.@catch.output, mergedContext);
+                                context.AddValuesOut(catchDetails);
                             }
-
-                            throw new OperationException(string.IsNullOrEmpty(throwMessage) ? message : throwMessage)
-                            {
-                                Details = throwDetails
-                            };
-                        }
-
-                        // otherwise if output is unstated, and there are nested operations with output - those flows back as effective output
-                        if (operation.output == null && operation.operations != null && result != null)
-                        {
-                            context.AddValuesOut(result);
                         }
                     }
                     catch (Exception ex)
@@ -502,6 +509,45 @@ namespace Microsoft.Atlas.CommandLine.Commands
                     }
                 }
             }
+        }
+
+        private bool CatchCondition(Exception ex, WorkflowModel.Catch @catch, object outputContext)
+        {
+            try
+            {
+                if (@catch == null)
+                {
+                    return false;
+                }
+
+                if (string.IsNullOrEmpty(@catch.condition))
+                {
+                    return true;
+                }
+
+                var mergedContext = MergeError(ex, outputContext);
+                var conditionResult = _jmesPathQuery.Search(@catch.condition, mergedContext);
+                var conditionIsTrue = ConditionBoolean(conditionResult);
+                return conditionIsTrue;
+            }
+            catch (Exception ex2)
+            {
+                Console.Error.WriteLine($"{"Fatal".Color(ConsoleColor.Red)}: exception processing catch condition: {ex2.Message.Color(ConsoleColor.DarkRed)}");
+                throw;
+            }
+        }
+
+        private object MergeError(Exception exception, object context)
+        {
+            var yaml = _serializers.YamlSerializer.Serialize(new { error = exception });
+            var error = _serializers.YamlDeserializer.Deserialize<object>($@"
+{yaml}
+  type: 
+    name: {exception.GetType().Name}
+    fullName: {exception.GetType().FullName}
+");
+            var mergedContext = MergeUtils.Merge(error, context);
+            return mergedContext;
         }
 
         private async Task<bool> EvaluateRepeat(ExecutionContext context)

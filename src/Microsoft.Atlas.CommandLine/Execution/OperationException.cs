@@ -2,6 +2,7 @@
 // Licensed under the MIT license.
 
 using System;
+using YamlDotNet.Serialization;
 
 namespace Microsoft.Atlas.CommandLine.Execution
 {
@@ -43,6 +44,7 @@ namespace Microsoft.Atlas.CommandLine.Execution
         {
         }
 
+        [YamlMember(Alias = "details")]
         public object Details { get; internal set; }
     }
 }

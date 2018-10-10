@@ -2,6 +2,7 @@
 // Licensed under the MIT license.
 
 using System;
+using System.IO;
 using System.Threading.Tasks;
 using Microsoft.Atlas.CommandLine.Commands;
 using Microsoft.Atlas.CommandLine.Tests.Stubs;
@@ -62,7 +63,7 @@ Blueprints:
 
             InitializeServices(stubs);
 
-            var ex = Assert.ThrowsException<AggregateException>(() =>
+            var ex = Assert.ThrowsException<ApplicationException>(() =>
             {
                 Services.App.Execute("deploy", "bad-file-name");
             });
@@ -84,7 +85,7 @@ Blueprints:
 
             InitializeServices(stubs);
 
-            var ex = Assert.ThrowsException<AggregateException>(() =>
+            var ex = Assert.ThrowsException<FileNotFoundException>(() =>
             {
                 var result = Services.App.Execute("deploy", "-f", "missing-values.yaml", "the-test");
             });
@@ -289,7 +290,7 @@ Responses:
 
             InitializeServices(stubBlueprints, stubRequests);
 
-            var error = Assert.ThrowsException<AggregateException>(() =>
+            var error = Assert.ThrowsException<InvalidOperationException>(() =>
             {
                 Services.App.Execute("deploy", "the-test", "--non-interactive");
             });
