@@ -26,7 +26,7 @@ Atlas is currently under active development.
 
 Daily builds of the Atlas CLI are available as self-contained downloads:
 
-| Platform | [Master branch (0.1)][Master Branch] | [Latest build][Latest Json] |
+| Platform | [Master Branch (0.1)][Master Branch] | [Latest Build][Latest Json] |
 |:------:|:------:|:------:|
 | **Windows x64** | [Download latest zip][Zip Latest] | [![Zip Status]][Zip Latest] |
 | **Linux x64** | [Download latest tar.gz][Zip Latest] | [![Tarball Status]][Tarball Latest] |
@@ -53,9 +53,9 @@ atlas deploy https://github.com/Microsoft/Atlas/tree/master/examples/101-message
 
 #### Creating a new workflow
 
-To create a new workflow, from a console window execute `mkdir hello` to create a new subfolder.
+To create a new workflow, from a console window execute `mkdir demo` to create a new subfolder.
 
-Add a `hello/workflow.yaml` file to declare operations:
+Add a `demo/workflow.yaml` file to declare operations:
 
 ```
 operations:
@@ -64,7 +64,7 @@ operations:
 - message: "All values: {{ json . }}"
 ```
 
-Add a `hello/values.yaml` file to declare defaults:
+Add a `demo/values.yaml` file to declare defaults:
 
 ```
 info:
@@ -75,7 +75,7 @@ info:
 Run it!
 
 ```
-> atlas deploy hello --set info.name=Atlas
+> atlas deploy demo --set info.name=Atlas
 
 Atlas
 
