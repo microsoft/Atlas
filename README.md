@@ -29,7 +29,7 @@ Daily builds of the Atlas CLI are available as self-contained downloads:
 | Platform | [Master Branch (0.1)][Master Branch] | [Latest Build][Latest Json] |
 |:------:|:------:|:------:|
 | **Windows x64** | [Download latest zip][Zip Latest] | [![Zip Status]][Zip Latest] |
-| **Linux x64** | [Download latest tar.gz][Zip Latest] | [![Tarball Status]][Tarball Latest] |
+| **Linux x64** | [Download latest tar.gz][Tarball Latest] | [![Tarball Status]][Tarball Latest] |
 
 If you want to use a package manager:
 
