@@ -36,7 +36,7 @@ namespace Microsoft.Atlas.CommandLine.OAuth2
 
             // https://login.microsoftonline.com
             // https://login.windows.net
-            var authority = $"https://login.windows.net/{ tenant ?? "common" }";
+            var authority = $"https://login.windows.net/{tenant ?? "common"}";
 
             AccountEntry account = null;
             if (account == null)
