@@ -5,6 +5,6 @@ method: POST
 url: https://management.azure.com/subscriptions/{{azure.subscription}}/resourceGroups/{{azure.resourceGroupName}}/providers/Microsoft.Storage/storageAccounts/{{storage.account}}/listKeys?api-version=2018-03-01-preview
 auth:
   tenant: {{azure.tenant}}
-  resource: https://management.core.windows.net/
+  resource: https://management.azure.com/
   client: 04b07795-8ddb-461a-bbee-02f9e1bf7b46 # Azure CLI
 secret: result.body.keys[*].value

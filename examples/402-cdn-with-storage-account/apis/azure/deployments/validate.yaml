@@ -5,7 +5,7 @@ method: POST
 url: https://management.azure.com/subscriptions/{{azure.subscription}}/resourcegroups/{{azure.resourceGroupName}}/providers/Microsoft.Resources/deployments/{{deployment.name}}/validate?api-version=2018-02-01
 auth:
   tenant: {{azure.tenant}}
-  resource: https://management.core.windows.net/
+  resource: https://management.azure.com/
   client: 04b07795-8ddb-461a-bbee-02f9e1bf7b46 # Azure CLI
 body:
   properties: {{{json deployment.properties}}}
