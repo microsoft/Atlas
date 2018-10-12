@@ -36,27 +36,41 @@
         "azureSubscription"
       ],
       "type": "connectedService:AzureRM",
-      "label": "Azure Connection",
-      "helpMarkDown": "Select an Azure service endpoint.",
-      "defaultValue": "",
-      "required": false,
-      "groupName": "commands"
+      "label": "Azure subscription",
+      "helpMarkDown": "Credentials to use for Azure Resource Manager operations.",
+      "required": false
     },
     {
       "name": "command",
-      "type": "string",
-      "label": "command",
+      "type": "pickList",
+      "label": "Command",
       "defaultValue": "deploy",
       "required": true,
-      "helpMarkDown": "Atlas command to execute"
+      "options": {
+        "account add": "account add",
+        "account clear": "account clear",
+        "account show": "account show",
+        "deploy": "deploy",
+        "generate": "generate"
+      },
+      "helpMarkDown": "Select an Atlas command",
+      "groupName": "commands",
+      "properties": {
+        "EditableOptions": "True"
+      }
     },
     {
       "name": "arguments",
-      "type": "string",
-      "label": "arguments",
+      "type": "multiLine",
+      "properties": {
+          "resizable": "true",
+          "rows": "2"
+      },
+      "label": "Arguments",
       "defaultValue": "",
       "required": false,
-      "helpMarkDown": "Additional command line arguments"
+      "helpMarkDown": "Additional command line arguments",
+      "groupName": "commands"
     }
   ],
   "execution": {

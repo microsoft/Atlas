@@ -36,7 +36,7 @@ namespace Microsoft.Atlas.CommandLine.OAuth2
 
             // https://login.microsoftonline.com
             // https://login.windows.net
-            var authority = $"https://login.windows.net/{tenant ?? "common"}";
+            var authority = $"https://login.windows.net/{ tenant ?? "common" }";
 
             AccountEntry account = null;
             if (account == null)
@@ -64,10 +64,13 @@ namespace Microsoft.Atlas.CommandLine.OAuth2
 
             if (account != null)
             {
-                // TODO: split apart the idea of a bearer auth accesstoken and a basic auth PAT
                 if (!string.IsNullOrEmpty(account.token))
                 {
-                    var basic = $":{account.token}";
+                    return new AuthenticationHeaderValue("Bearer", account.token);
+                }
+                else if (!string.IsNullOrEmpty(account.password))
+                {
+                    var basic = $"{account.username}:{account.password}";
                     return new AuthenticationHeaderValue("Basic", Convert.ToBase64String(Encoding.ASCII.GetBytes(basic)));
                 }
                 else if (!string.IsNullOrEmpty(account.appid))
