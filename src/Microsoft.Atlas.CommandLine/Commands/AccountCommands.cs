@@ -130,6 +130,8 @@ namespace Microsoft.Atlas.CommandLine.Commands
                 appid = entry.appid,
                 secret = string.IsNullOrEmpty(entry.secret) ? entry.secret : "***",
                 token = string.IsNullOrEmpty(entry.token) ? entry.token : "***",
+                username = entry.username,
+                password = string.IsNullOrEmpty(entry.token) ? entry.password : "***",
             };
         }
     }
