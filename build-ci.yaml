@@ -89,12 +89,12 @@ steps:
     npm install -g tfx-cli
 
     cd $(Build.SourcesDirectory)/src/Tasks/AtlasInstallerV0
-    sed -ri 's/"Patch": [0-9]+"/"Patch": $(Build.BuildId)/' task.json
+    sed -ri 's/"Patch": [0-9]+/"Patch": $(Build.BuildId)/' task.json
     npm install
     tsc
 
     cd $(Build.SourcesDirectory)/src/Tasks/AtlasV0
-    sed -ri 's/"Patch": [0-9]+"/"Patch": $(Build.BuildId)/' task.json
+    sed -ri 's/"Patch": [0-9]+/"Patch": $(Build.BuildId)/' task.json
     npm install
     tsc
 
