@@ -6,7 +6,7 @@
             "type": "coreclr",
             "request": "launch",
             "preLaunchTask": "build",
-            "program": "${workspaceFolder}/src/Microsoft.Atlas.CommandLine/bin/Debug/netcoreapp2.0/atlas.dll",
+            "program": "${workspaceFolder}/src/Microsoft.Atlas.CommandLine/bin/Debug/netcoreapp2.1/atlas.dll",
             "args": [],
             "cwd": "${workspaceFolder}/src/Microsoft.Atlas.CommandLine",
             "console": "internalConsole",
