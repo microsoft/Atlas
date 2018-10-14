@@ -33,6 +33,7 @@ namespace Microsoft.Atlas.CommandLine.Templates
                 {
                     { "query", QueryHelper },
                     { "json", JsonHelper },
+                    { "yaml", YamlHelper },
                     { "guid", GuidHelper },
                     { "datetime", DateTimeHelper },
                     { "secret", SecretHelper },
@@ -231,6 +232,32 @@ namespace Microsoft.Atlas.CommandLine.Templates
             }
         }
 
+        private void YamlHelper(TextWriter output, object context, object[] arguments)
+        {
+            var indent = 0;
+            if (arguments.Length == 0)
+            {
+                output.Write(ToYamlString(context, indent));
+            }
+            else
+            {
+                var yaml = arguments.FirstOrDefault(argument => argument != null && argument.GetType().Name != "UndefinedBindingResult");
+
+                var options = arguments.Last() as IDictionary<string, object>;
+                if (options != null)
+                {
+                    if (options.TryGetValue("indent", out var indentOption))
+                    {
+                        indent = int.Parse(indentOption?.ToString());
+                        output.Write(ToYamlString(yaml, indent));
+                        return;
+                    }
+
+                    throw new ApplicationException("Unknown options");
+                }
+            }
+        }
+
         private void QueryHelper(TextWriter output, object context, object[] arguments)
         {
             var transformObject = QueryCore(context, arguments);
@@ -306,6 +333,29 @@ namespace Microsoft.Atlas.CommandLine.Templates
             }
 
             return Services.Serializers.JsonSerializer.Serialize(jsonObject)?.TrimEnd('\r', '\n');
+        }
+
+        private string ToYamlString(object yamlObject, int indent)
+        {
+            if (yamlObject == null)
+            {
+                return "null";
+            }
+
+            if (yamlObject is int yamlInt)
+            {
+                return yamlInt.ToString(System.Globalization.CultureInfo.InvariantCulture);
+            }
+
+            if (yamlObject is bool yamlBool)
+            {
+                return yamlBool ? "true" : "false";
+            }
+
+            var serializedYaml = Services.Serializers.YamlSerializer.Serialize(yamlObject).TrimEnd('\r', '\n');
+            return serializedYaml.Split(Environment.NewLine, StringSplitOptions.None)
+                                 .Select(line => Environment.NewLine + new string(' ', indent) + line)
+                                 .Aggregate((currentLine, nextLine) => currentLine + nextLine);
         }
 
         private class SimpleEncoder : ITextEncoder
