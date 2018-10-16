@@ -22,6 +22,9 @@ namespace Microsoft.Atlas.CommandLine.Models.Workflow
             public string message { get; set; }
             public string target { get; set; }
             public string condition { get; set; }
+
+            [YamlMember(Alias = "@foreach")]
+            public Foreach @foreach { get; set; }
             public Repeat repeat { get; set; }
             public object values { get; set; }
             public object output { get; set; }
@@ -60,6 +63,11 @@ namespace Microsoft.Atlas.CommandLine.Models.Workflow
             public int status { get; set; }
             public IDictionary<object, object> headers { get; set; }
             public object body { get; set; }
+        }
+
+        public class Foreach
+        {
+            public object values { get; set; }
         }
 
         public class Repeat

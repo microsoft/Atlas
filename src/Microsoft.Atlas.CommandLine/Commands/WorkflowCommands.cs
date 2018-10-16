@@ -288,6 +288,18 @@ namespace Microsoft.Atlas.CommandLine.Commands
         {
             var operation = context.Operation;
 
+            if (context.Operation.@foreach == null)
+            {
+                await ExecuteOperation(context);
+            }
+
+            ProcessValues(operation.@foreach.values, context.Values);
+        }
+
+        private async Task ExecuteOperationInner(ExecutionContext context)
+        {
+            var operation = context.Operation;
+
             if (operation.values != null)
             {
                 context.AddValuesIn(ProcessValues(operation.values, context.Values));
