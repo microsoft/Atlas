@@ -38,10 +38,10 @@ namespace Microsoft.Atlas.CommandLine.Templates.FileSystems
 
         private IEnumerable<string> WithoutPartialsFolder(string filePath)
         {
-            const string partialsFolder = "partials/";
-            if (filePath.StartsWith(partialsFolder, StringComparison.Ordinal))
+            const string PartialsFolder = "partials/";
+            if (filePath.StartsWith(PartialsFolder, StringComparison.Ordinal))
             {
-                yield return filePath.Substring(partialsFolder.Length);
+                yield return filePath.Substring(PartialsFolder.Length);
             }
 
             yield return filePath;
@@ -49,10 +49,10 @@ namespace Microsoft.Atlas.CommandLine.Templates.FileSystems
 
         private IEnumerable<string> WithoutExtension(string filePath)
         {
-            const string hbsExtension = "hbs";
-            if (filePath.EndsWith(hbsExtension))
+            const string HbsExtension = ".hbs";
+            if (filePath.EndsWith(HbsExtension))
             {
-                yield return filePath.Substring(0, filePath.Length - hbsExtension.Length);
+                yield return filePath.Substring(0, filePath.Length - HbsExtension.Length);
             }
 
             yield return filePath;
