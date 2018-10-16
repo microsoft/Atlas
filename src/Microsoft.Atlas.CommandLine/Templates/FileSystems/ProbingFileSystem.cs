@@ -38,25 +38,24 @@ namespace Microsoft.Atlas.CommandLine.Templates.FileSystems
 
         private IEnumerable<string> WithoutPartialsFolder(string filePath)
         {
-            yield return filePath;
-
-            const string partials = "partials/";
-            if (filePath.StartsWith(partials, StringComparison.Ordinal))
+            const string PartialsFolder = "partials/";
+            if (filePath.StartsWith(PartialsFolder, StringComparison.Ordinal))
             {
-                yield return filePath.Substring(partials.Length);
+                yield return filePath.Substring(PartialsFolder.Length);
             }
+
+            yield return filePath;
         }
 
         private IEnumerable<string> WithoutExtension(string filePath)
         {
-            yield return filePath;
-
-            if (Path.GetExtension(filePath) == ".hbs")
+            const string HbsExtension = ".hbs";
+            if (filePath.EndsWith(HbsExtension))
             {
-                yield return Path.Combine(
-                    Path.GetDirectoryName(filePath),
-                    Path.GetFileNameWithoutExtension(filePath));
+                yield return filePath.Substring(0, filePath.Length - HbsExtension.Length);
             }
+
+            yield return filePath;
         }
     }
 }
