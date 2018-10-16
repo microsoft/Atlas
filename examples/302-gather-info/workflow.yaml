@@ -12,11 +12,11 @@ operations:
 
 - message: (['Looking at tenant ', current.tenantId])
   values:
-    results: []
+    tenants: []
     current: (tenants[0])
     remaining: (tenants[1:])
   output:
-    results: ([results, current][])
+    tenants: ([tenants, current][])
     current: (remaining[0])
     remaining: (remaining[1:])
   repeat:
@@ -47,6 +47,9 @@ operations:
       current:
         subscriptions: (result.body.value[].{ subscriptionId:subscriptionId, displayName:displayName })
 
-output: 
-  details: (results)
-  subscriptions: (results[].subscriptions[].[displayName, ' (', subscriptionId, ')'].join('',@))
+- message: Arranging selection of azure.tenant and azure.subscription
+  template: selection.yaml
+  write: selection.yaml
+  output:
+    selection: (result)
+  
