@@ -3,6 +3,9 @@ using YamlDotNet.Serialization;
 
 namespace Microsoft.Atlas.CommandLine.Swagger.Models
 {
+    /// <summary>
+    /// https://github.com/OAI/OpenAPI-Specification/blob/master/versions/2.0.md
+    /// </summary>
     public class Swagger
     {
         public string swagger { get; set; }
@@ -136,10 +139,6 @@ namespace Microsoft.Atlas.CommandLine.Swagger.Models
     }
 
     public class Definitions : Dictionary<object, object>
-    {
-    }
-
-    public class Parameters : Dictionary<object, object>
     {
     }
 
