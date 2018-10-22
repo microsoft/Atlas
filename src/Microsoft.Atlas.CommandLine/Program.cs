@@ -99,6 +99,7 @@ namespace Microsoft.Atlas.CommandLine
 
                 .AddTransient<WorkflowCommands>()
                 .AddTransient<AccountCommands>()
+                .AddTransient<SwaggerCommands>()
 
                 .AddLogging(builder =>
                 {
@@ -176,6 +177,16 @@ namespace Microsoft.Atlas.CommandLine
                 {
                     account.ShowHelp();
                     return 1;
+                });
+            });
+
+            app.Command("swagger", swagger =>
+            {
+                swagger.Command("preview", preview =>
+                {
+                    preview.Argument("specs", "Swagger file path or url");
+
+                    preview.OnExecute<SwaggerCommands>();
                 });
             });
 

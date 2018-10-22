@@ -17,6 +17,7 @@ namespace Microsoft.Atlas.CommandLine.Serialization
                 .WithNodeTypeResolver(new NonStringScalarTypeResolver())
                 .WithTagMapping("tag:yaml.org,2002:binary", typeof(byte[]))
                 .WithTypeConverter(new ByteArrayConverter())
+                .WithTypeInspector<AnyMembersTypeInspector>(AnyMembersTypeInspector.Create)
                 .Build();
 
             YamlSerializer = new SerializerBuilder()

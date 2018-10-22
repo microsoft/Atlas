@@ -27,6 +27,11 @@
       "commandName": "Project",
       "commandLineArgs": "deploy 106-looping",
       "workingDirectory": "..\\..\\examples"
+    },
+    "swagger preview ": {
+      "commandName": "Project",
+      "commandLineArgs": "swagger preview https://raw.githubusercontent.com/Azure/azure-rest-api-specs/master/specification/resources/resource-manager/Microsoft.Resources/stable/2018-05-01/resources.json",
+      "workingDirectory": "..\\..\\examples"
     }
   }
 }
