@@ -15,6 +15,7 @@ using Microsoft.Atlas.CommandLine.OAuth2;
 using Microsoft.Atlas.CommandLine.Queries;
 using Microsoft.Atlas.CommandLine.Secrets;
 using Microsoft.Atlas.CommandLine.Serialization;
+using Microsoft.Atlas.CommandLine.Swagger;
 using Microsoft.Atlas.CommandLine.Targets;
 using Microsoft.Atlas.CommandLine.Templates;
 using Microsoft.Atlas.CommandLine.Templates.Helpers;
@@ -88,6 +89,9 @@ namespace Microsoft.Atlas.CommandLine
                 .AddTransient<IBlueprintPackageProvider, HttpsFilesBlueprintPackageProvider>()
                 .AddTransient<IBlueprintPackageProvider, DirectoryBlueprintPackageProvider>()
                 .AddTransient<IBlueprintPackageProvider, ArchiveBlueprintPackageProvider>()
+                .AddTransient<IBlueprintDecoratorProvider, SwaggerBlueprintDecoratorProvider>()
+
+                .AddTransient<IRequestGenerator, RequestGenerator>()
 
                 .AddSingleton<ITemplateEngineFactory, TemplateEngineFactory>()
                 .AddSingleton<TemplateEngineServices>()

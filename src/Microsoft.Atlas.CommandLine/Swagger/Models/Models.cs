@@ -6,7 +6,7 @@ namespace Microsoft.Atlas.CommandLine.Swagger.Models
     /// <summary>
     /// https://github.com/OAI/OpenAPI-Specification/blob/master/versions/2.0.md
     /// </summary>
-    public class Swagger
+    public class SwaggerDocument : VendorExtensions
     {
         public string swagger { get; set; }
         public Info info { get; set; }
@@ -25,15 +25,100 @@ namespace Microsoft.Atlas.CommandLine.Swagger.Models
         public ExternalDocumentation externalDocs { get; set; }
     }
 
-    public class Info : Dictionary<object, object>
+    public abstract class VendorExtensions
     {
+        [YamlAnyMembers]
+        public Dictionary<string, object> vendorExtensions { get; set; } = new Dictionary<string, object>();
     }
 
+    /// <summary>
+    /// The object provides metadata about the API. The metadata can be used by the clients if needed, and can be presented in the Swagger-UI for convenience.
+    /// </summary>
+    public class Info : VendorExtensions
+    {
+        /// <summary>
+        /// Required. The title of the application.
+        /// </summary>
+        public string title { get; set; }
+
+        /// <summary>
+        /// A short description of the application.GFM syntax can be used for rich text representation.
+        /// </summary>
+        public string description { get; set; }
+
+        /// <summary>
+        /// The Terms of Service for the API.
+        /// </summary>
+        public string termsOfService { get; set; }
+
+        /// <summary>
+        /// The contact information for the exposed API.
+        /// </summary>
+        public Contact contact { get; set; }
+
+        /// <summary>
+        /// The license information for the exposed API.
+        /// </summary>
+        public License license { get; set; }
+
+        /// <summary>
+        /// Required. Provides the version of the application API (not to be confused with the specification version).
+        /// </summary>
+        public string version { get; set; }
+    }
+
+    /// <summary>
+    /// Contact information for the exposed API.
+    /// </summary>
+    public class Contact : VendorExtensions
+    {
+        /// <summary>
+        /// The identifying name of the contact person/organization.
+        /// </summary>
+        public string name { get; set; }
+
+        /// <summary>
+        /// The URL pointing to the contact information. MUST be in the format of a URL.
+        /// </summary>
+        public string url { get; set; }
+
+        /// <summary>
+        /// The email address of the contact person/organization.MUST be in the format of an email address.
+        /// </summary>
+        public string email { get; set; }
+
+    }
+
+    /// <summary>
+    /// License information for the exposed API.
+    /// </summary>
+    public class License : VendorExtensions
+    {
+        /// <summary>
+        /// Required. The license name used for the API.
+        /// </summary>
+        public string name { get; set; }
+
+        /// <summary>
+        /// A URL to the license used for the API. MUST be in the format of a URL.
+        /// </summary>
+        public string url { get; set; }
+    }
+
+    /// <summary>
+    /// Holds the relative paths to the individual endpoints. The path is appended to the basePath in order to construct the full URL. The Paths may be empty, due to ACL constraints.
+    ///
+    /// A relative path to an individual endpoint. The field name MUST begin with a slash. The path is appended to the basePath in order to construct the full URL. Path templating is allowed.
+    /// </summary>
     public class Paths : Dictionary<string, PathItem>
     {
     }
 
-    public class PathItem
+    /// <summary>
+    /// Describes the operations available on a single path. A Path Item may be empty, due to ACL constraints.
+    /// The path itself is still exposed to the documentation viewer but they will not know which operations and parameters are available.
+    /// </summary>
+    public class PathItem : VendorExtensions
     {
         public Operation get { get; set; }
         public Operation put { get; set; }
@@ -80,7 +165,7 @@ namespace Microsoft.Atlas.CommandLine.Swagger.Models
         }
     }
 
-    public class Operation
+    public class Operation : VendorExtensions
     {
         public List<string> tags { get; set; }
         public string summary { get; set; }
@@ -94,9 +179,6 @@ namespace Microsoft.Atlas.CommandLine.Swagger.Models
         public List<string> schemes { get; set; }
         public bool deprecated { get; set; }
         public List<SecurityRequirement> security { get; set; }
-
-        [YamlAnyMembers]
-        public Dictionary<string, object> vendorExtensions { get; set; } = new Dictionary<string, object>();
     }
 
     public class Parameter : Reference
@@ -126,13 +208,9 @@ namespace Microsoft.Atlas.CommandLine.Swagger.Models
         public object uniqueItems { get; set; }
         public object @enum { get; set; }
         public object multipleOf { get; set; }
-
-        [YamlAnyMembers]
-        public Dictionary<string, object> vendorExtensions { get; set; } = new Dictionary<string, object>();
-
     }
 
-    public class Reference
+    public class Reference : VendorExtensions
     {
         [YamlMember(Alias = "$ref")]
         public string @ref { get; set; }

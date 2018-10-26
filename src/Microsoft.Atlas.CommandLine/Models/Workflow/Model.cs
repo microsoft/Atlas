@@ -42,9 +42,10 @@ namespace Microsoft.Atlas.CommandLine.Models.Workflow
         {
             public string method { get; set; }
             public string url { get; set; }
+            public IDictionary<string, object> query { get; set; }
+            public IDictionary<object, object> headers { get; set; }
             public Auth auth { get; set; }
             public object body { get; set; }
-            public IDictionary<object, object> headers { get; set; }
             public string secret { get; set; }
 
             public class Auth

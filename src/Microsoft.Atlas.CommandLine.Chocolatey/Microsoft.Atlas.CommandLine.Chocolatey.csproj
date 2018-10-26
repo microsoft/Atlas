@@ -5,6 +5,7 @@
     <PackageId>atlas-cli</PackageId>
     <IncludeBuildOutput>false</IncludeBuildOutput>
     <ContentTargetFolders>tools</ContentTargetFolders>
+    <LangVersion>7.1</LangVersion>
   </PropertyGroup>
 
   <ItemGroup>

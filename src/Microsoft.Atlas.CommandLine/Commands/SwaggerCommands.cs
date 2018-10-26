@@ -28,7 +28,7 @@ namespace Microsoft.Atlas.CommandLine.Commands
         {
             var specsUrl = Specs.Required();
             var specsJson = await new HttpClient().GetStringAsync(specsUrl);
-            var specs = _serializers.YamlDeserializer.Deserialize<Swagger.Models.Swagger>(specsJson);
+            var specs = _serializers.YamlDeserializer.Deserialize<Swagger.Models.SwaggerDocument>(specsJson);
 
             var refParameters = specs.parameters.ToDictionary(p => $"#/parameters/{p.Key}", p => p.Value);
 
@@ -47,28 +47,20 @@ namespace Microsoft.Atlas.CommandLine.Commands
 
                 foreach (var operationEntry in pathEntry.Value.operations)
                 {
-                    var operation = operationEntry.Key;
-                    var operationItem = operationEntry.Value;
-
-                    for (var index = 0; index < operationItem.parameters.Count(); ++index)
+                    var context = new Swagger.GenerateSingleRequestDefinitionContext
                     {
-                        if (operationItem.parameters[index].@ref != null)
+                        Swagger = specs,
+                        Path = pathEntry,
+                        Operation = operationEntry,
+                        BlueprintInfo = new Blueprints.Models.SwaggerBlueprintInfo
                         {
-                            operationItem.parameters[index] = refParameters[operationItem.parameters[index].@ref];
-                        }
-                    }
-
-                    foreach (var parameter in pathItem.parameters.Where(p1 => operationItem.parameters.Any(p2 => p1.@in == p2.@in && p1.name == p2.name)))
-                    {
-                        operationItem.parameters.Add(parameter);
-                    }
-
-                    Console.WriteLine($"{operationItem.operationId}{operationItem.vendorExtensions.Aggregate("", (a, b) => $"{a} {b.Key}={Stringify(b.Value)}")}");
-                    Console.WriteLine($"  {operation} {path}");
-                    foreach (var parameter in operationItem.parameters)
-                    {
-                        Console.WriteLine($"  {parameter.@in} {parameter.name}{(parameter.required ? "!" : "")}{parameter.vendorExtensions.Aggregate("", (a, b) => $"{a} {b.Key}={Stringify(b.Value)}")}");
-                    }
+                            target = "api/azure",
+                        },
+                    };
+                    var generator = new Swagger.RequestGenerator(new YamlSerializers());
+                    generator.GenerateSingleRequestDefinition(context);
+                    Console.WriteLine(context.GeneratedPath);
+                    Console.WriteLine(context.GeneratedContent);
                 }
             }
 
