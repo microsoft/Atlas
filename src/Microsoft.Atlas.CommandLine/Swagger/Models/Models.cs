@@ -16,7 +16,7 @@ namespace Microsoft.Atlas.CommandLine.Swagger.Models
         public List<string> consumes { get; set; }
         public List<string> produces { get; set; }
         public Paths paths { get; set; }
-        public Definitions definitions { get; set; }
+        public Dictionary<string, Schema> definitions { get; set; }
         public Dictionary<string, Parameter> parameters { get; set; }
         public Responses responses { get; set; }
         public SecurityDefinitions securityDefinitions { get; set; }
@@ -29,6 +29,12 @@ namespace Microsoft.Atlas.CommandLine.Swagger.Models
     {
         [YamlAnyMembers]
         public Dictionary<string, object> vendorExtensions { get; set; } = new Dictionary<string, object>();
+    }
+
+    public class Reference : VendorExtensions
+    {
+        [YamlMember(Alias = "$ref")]
+        public string @ref { get; set; }
     }
 
     /// <summary>
@@ -188,7 +194,7 @@ namespace Microsoft.Atlas.CommandLine.Swagger.Models
         public string description { get; set; }
         public bool required { get; set; }
 
-        public Dictionary<object, object> schema { get; set; }
+        public Schema schema { get; set; }
 
         public object type { get; set; }
         public object format { get; set; }
@@ -210,10 +216,39 @@ namespace Microsoft.Atlas.CommandLine.Swagger.Models
         public object multipleOf { get; set; }
     }
 
-    public class Reference : VendorExtensions
+    public class Schema : Reference
     {
-        [YamlMember(Alias = "$ref")]
-        public string @ref { get; set; }
+        public object format { get; set; }
+        public object title { get; set; }
+        public object description { get; set; }
+        public object @default { get; set; }
+        public object multipleOf { get; set; }
+        public object maximum { get; set; }
+        public object exclusiveMaximum { get; set; }
+        public object minimum { get; set; }
+        public object exclusiveMinimum { get; set; }
+        public object maxLength { get; set; }
+        public object minLength { get; set; }
+        public object pattern { get; set; }
+        public object maxItems { get; set; }
+        public object minItems { get; set; }
+        public object uniqueItems { get; set; }
+        public object maxProperties { get; set; }
+        public object minProperties { get; set; }
+        public List<string> required { get; set; }
+        public object @enum { get; set; }
+        public object type { get; set; }
+
+        public object items { get; set; }
+        public object allOf { get; set; }
+        public Dictionary<string, Schema> properties { get; set; }
+        public object additionalProperties { get; set; }
+
+        public string discriminator { get; set; }
+        public bool readOnly { get; set; }
+        public object xml { get; set; }
+        public ExternalDocumentation externalDocs { get; set; }
+        public object example { get; set; }
     }
 
     public class Definitions : Dictionary<object, object>

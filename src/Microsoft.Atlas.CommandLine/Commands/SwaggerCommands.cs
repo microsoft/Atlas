@@ -49,7 +49,7 @@ namespace Microsoft.Atlas.CommandLine.Commands
                 {
                     var context = new Swagger.GenerateSingleRequestDefinitionContext
                     {
-                        Swagger = specs,
+                        SwaggerDocument = specs,
                         Path = pathEntry,
                         Operation = operationEntry,
                         BlueprintInfo = new Blueprints.Models.SwaggerBlueprintInfo

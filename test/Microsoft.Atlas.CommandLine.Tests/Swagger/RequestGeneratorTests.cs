@@ -146,7 +146,7 @@ namespace Microsoft.Atlas.CommandLine.Tests.Swagger
             return new GenerateSingleRequestDefinitionContext
             {
                 TargetPrefix = targetPrefix,
-                Swagger = new SwaggerDocument
+                SwaggerDocument = new SwaggerDocument
                 {
                     info = new Info { title = infoTitle },
                     schemes = schemes != null ? schemes.Split(' ').ToList() : null,

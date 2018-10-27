@@ -31,6 +31,8 @@ namespace Microsoft.Atlas.CommandLine.Swagger
 
         public async Task Initialize(SwaggerBlueprintInfo info)
         {
+            var swaggerManager = new SwaggarDocumentManager(_yamlSerializers, _httpClientFactory);
+
             var swaggerDocuments = new List<SwaggerDocument>();
             var httpClient = _httpClientFactory.Create(null);
 
@@ -39,6 +41,7 @@ namespace Microsoft.Atlas.CommandLine.Swagger
                 var inputPath = info.source + input;
                 if (InnerPackage.Exists(input))
                 {
+                    // TODO : re-abstract this case into docmgr
                     using (var yamlReader = InnerPackage.OpenText(inputPath))
                     {
                         var swaggerDocument = _yamlSerializers.YamlDeserializer.Deserialize<SwaggerDocument>(yamlReader);
@@ -47,11 +50,11 @@ namespace Microsoft.Atlas.CommandLine.Swagger
                 }
                 else
                 {
-                    var uriParts = UriParts.Parse(inputPath);
+                    var uriParts = UriParts.Parse(info.source);
                     uriParts.RewriteGitHubUris();
-
-                    var yamlText = await httpClient.GetStringAsync(uriParts.ToString());
-                    var swaggerDocument = _yamlSerializers.YamlDeserializer.Deserialize<SwaggerDocument>(yamlText);
+                    var entry = await swaggerManager.LoadEntry(uriParts.ToString(), input);
+                    
+                    var swaggerDocument = entry.SwaggerDocument;
                     swaggerDocuments.Add(swaggerDocument);
                 }
             }
@@ -65,7 +68,8 @@ namespace Microsoft.Atlas.CommandLine.Swagger
                         var context = new GenerateSingleRequestDefinitionContext
                         {
                             BlueprintInfo = info,
-                            Swagger = swaggerDocument,
+                            SwaggerDocument = swaggerDocument,
+                            SwaggerManager = swaggerManager,
                             Path = pathEntry,
                             Operation = operationEntry,
                         };

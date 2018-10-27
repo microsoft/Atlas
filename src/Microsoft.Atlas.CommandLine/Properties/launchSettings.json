@@ -34,13 +34,18 @@
       "workingDirectory": "..\\..\\examples"
     },
     "deploy 302-gather-info": {
-        "commandName": "Project",
-        "commandLineArgs": "deploy 302-gather-info",
-        "workingDirectory": "..\\..\\examples"
-      },
-      "swagger preview ": {
+      "commandName": "Project",
+      "commandLineArgs": "deploy 302-gather-info",
+      "workingDirectory": "..\\..\\examples"
+    },
+    "swagger preview ": {
       "commandName": "Project",
       "commandLineArgs": "swagger preview https://raw.githubusercontent.com/Azure/azure-rest-api-specs/master/specification/resources/resource-manager/Microsoft.Resources/stable/2018-05-01/resources.json",
+      "workingDirectory": "..\\..\\examples"
+    },
+    "deploy 402-cdn-with-storage-account": {
+      "commandName": "Project",
+      "commandLineArgs": "deploy 402-cdn-with-storage-account",
       "workingDirectory": "..\\..\\examples"
     }
   }

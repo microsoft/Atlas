@@ -20,7 +20,7 @@ namespace Microsoft.Atlas.CommandLine.Swagger
         public void GenerateSingleRequestDefinition(GenerateSingleRequestDefinitionContext context)
         {
             var generatedPath = NormalizePath(context.TargetPrefix);
-            generatedPath += NormalizePath(context.Swagger.info.title);
+            generatedPath += NormalizePath(context.SwaggerDocument.info.title);
             var operationId = context.Operation.Value.operationId;
             foreach (var tag in context.Operation.Value.tags ?? Enumerable.Empty<string>())
             {
@@ -43,13 +43,13 @@ namespace Microsoft.Atlas.CommandLine.Swagger
             {
                 writer.WriteLine($"method: {context.Operation.Key.ToUpperInvariant()}");
 
-                var hasHttps = context.Swagger.schemes?.Contains("https", StringComparer.OrdinalIgnoreCase) ?? false;
-                var hasHttp = context.Swagger.schemes?.Contains("http", StringComparer.OrdinalIgnoreCase) ?? false;
+                var hasHttps = context.SwaggerDocument.schemes?.Contains("https", StringComparer.OrdinalIgnoreCase) ?? false;
+                var hasHttp = context.SwaggerDocument.schemes?.Contains("http", StringComparer.OrdinalIgnoreCase) ?? false;
                 var scheme = (hasHttp && !hasHttps) ? "http" : "https";
 
-                var host = context.Swagger.host ?? "{{ request.host }}";
+                var host = context.SwaggerDocument.host ?? "{{ request.host }}";
 
-                var basePath = context.Swagger.basePath ?? string.Empty;
+                var basePath = context.SwaggerDocument.basePath ?? string.Empty;
 
                 var path = context.Path.Key;
 
@@ -74,8 +74,36 @@ namespace Microsoft.Atlas.CommandLine.Swagger
                     writer.WriteLine(_yamlSerializers.YamlSerializer.Serialize(context.BlueprintInfo.extra));
                 }
 
+                var bodyParameter = parameters.SingleOrDefault(parameter => parameter.@in == "body");
+
+                if (bodyParameter != null)
+                {
+                    var bodySchema = Dereference(bodyParameter.schema, context);
+
+                    writer.WriteLine("body:");
+                    foreach (var property in bodySchema.properties)
+                    {
+                        var propertySchema = Dereference(property.Value, context);
+
+                        writer.WriteLine($"{{{{# if request.body.{property.Key} }}}}");
+                        writer.WriteLine($"  {property.Key}: {{{{{{ json request.body.{property.Key} }}}}}}");
+                        if (propertySchema.@default != null)
+                        {
+                            writer.WriteLine("{{ else }}");
+                            writer.WriteLine($"  {property.Key}: {_yamlSerializers.JsonSerializer.Serialize(propertySchema.@default)}");
+                        }
+
+                        writer.WriteLine($"{{{{/ if  }}}}");
+                    }
+                }
+
                 context.GeneratedContent = writer.GetStringBuilder().ToString();
             }
+        }
+
+        private Schema Dereference(Schema schema, GenerateSingleRequestDefinitionContext context)
+        {
+            return schema.@ref == null ? schema : (Schema)context.SwaggerManager.FindReference(schema);
         }
 
         private string GetParameterExpression(Parameter parameter, GenerateSingleRequestDefinitionContext context)
@@ -83,33 +111,24 @@ namespace Microsoft.Atlas.CommandLine.Swagger
             var parameterDefault = parameter.@default;
             if (parameterDefault == null && string.Equals(parameter.name, "api-version", StringComparison.Ordinal))
             {
-                parameterDefault = context?.Swagger?.info?.version;
+                parameterDefault = context?.SwaggerDocument?.info?.version;
             }
 
             if (parameterDefault != null)
             {
-                return $"{{{{# if parameters.{parameter.name} }}}}{{{{ parameters.{parameter.name} }}}}{{{{ else }}}}{parameterDefault}{{{{/ if }}}}";
+                return $"{{{{# if request.parameters.{parameter.name} }}}}{{{{ request.parameters.{parameter.name} }}}}{{{{ else }}}}{parameterDefault}{{{{/ if }}}}";
             }
             else
             {
-                return $"{{{{ parameters.{parameter.name} }}}}";
+                return $"{{{{ request.parameters.{parameter.name} }}}}";
             }
         }
 
         private List<Models.Parameter> GetParameterList(GenerateSingleRequestDefinitionContext context)
         {
-            var refParameters = context.Swagger.parameters.ToDictionary(kv => $"#/parameters/{kv.Key}", kv => kv.Value);
-
-            Models.Parameter LookupParameterRef(Models.Parameter parameter)
+            Parameter LookupParameterRef(Parameter parameter)
             {
-                if (parameter.@ref == null)
-                {
-                    return parameter;
-                }
-                else
-                {
-                    return refParameters[parameter.@ref];
-                }
+                return context.SwaggerManager.FindReference(parameter);
             }
 
             var operationParamters = context.Operation.Value.parameters.Select(LookupParameterRef);
