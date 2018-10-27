@@ -15,7 +15,7 @@ swagger:
   - Microsoft.Subscription/stable/2016-06-01/subscriptions.json
   extra:
     auth:
-      tenant: '{{ request.auth.tenant }}'
+      tenant: '{{ azure.tenant }}'
       resource: https://management.azure.com/
       client: 04b07795-8ddb-461a-bbee-02f9e1bf7b46
 ```

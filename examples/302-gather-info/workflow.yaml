@@ -4,10 +4,6 @@ operations:
 - message: REST APIs can be called
 
 - message: Listing Microsoft Azure tenants, see https://docs.microsoft.com/en-us/rest/api/resources/subscriptions/list
-  values: # These values apply to all three of the operations
-    request:
-      auth:
-        tenant: ( azure.tenant )
   request: apis/azure/SubscriptionClient/Tenants/List.yaml
   output:
     tenantIds: ( result.body.value[].tenantId )
@@ -19,9 +15,9 @@ operations:
   operations:
   - message: (['Looking at tenant ', tenantIds[0]])
     values: # These values apply to all three of the operations
+      azure:
+        tenant: ( tenantIds[0] )
       request:
-        auth:
-          tenant: ( tenantIds[0] )
         parameters:
           tenantID: ( tenantIds[0] )
 

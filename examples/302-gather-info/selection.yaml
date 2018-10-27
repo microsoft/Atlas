@@ -1,7 +1,6 @@
 
 {{# each tenants }}
 {{# each subscriptions }}
-
 - displayName: "{{ displayName }}"
   azure:
     tenant: {{ ../tenantId }}
