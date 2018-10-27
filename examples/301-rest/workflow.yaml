@@ -1,6 +1,5 @@
-
 operations:
-- message: Getting Microsoft Azure subscriptions, see https://docs.microsoft.com/en-us/rest/api/resources/subscriptions/list
+- message: Listing Azure subscriptions
   request: apis/azure/SubscriptionClient/Subscriptions/List.yaml
   output:
-    subscriptions: (result.body.value[].{ subscriptionId:subscriptionId, displayName:displayName })
+    subscriptions: ( result.body.value[] )
