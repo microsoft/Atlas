@@ -66,5 +66,6 @@ swagger:
       tenant: '{{ request.auth.tenant }}'
       resource: https://management.azure.com/
       client: 04b07795-8ddb-461a-bbee-02f9e1bf7b46
+    secret: result.body.keys[].value
 
 ```
