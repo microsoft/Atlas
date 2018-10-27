@@ -1,17 +1,5 @@
 
-
-values:
-  request:
-    auth:
-      tenant: ( azure.tenant )
-
 operations:
-- message: REST APIs can be called
-
-- message: Specify a tenant with --set azure.tenant=YOUR-TENANT-GUID or --set azure.tenant=YOUR-DOMAIN.onmicrosoft.com
-
-- message: Currently using tenant id {{ azure.tenant }}
-
 - message: Getting Microsoft Azure subscriptions, see https://docs.microsoft.com/en-us/rest/api/resources/subscriptions/list
   request: apis/azure/SubscriptionClient/Subscriptions/List.yaml
   output:

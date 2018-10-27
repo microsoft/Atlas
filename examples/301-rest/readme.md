@@ -1,6 +1,8 @@
 
 ## Demonstrates making a REST call
 
+Specify a tenant with `--set azure.tenant=YOUR-TENANT-GUID` or `--set azure.tenant=YOUR-DOMAIN.onmicrosoft.com`
+
 ``` yaml
 license: https://github.com/Microsoft/Atlas/blob/master/LICENSE
 ```
