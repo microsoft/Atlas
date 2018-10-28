@@ -1,9 +1,15 @@
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT license.
+
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using Microsoft.Atlas.CommandLine.Blueprints.Models;
+using Microsoft.Atlas.CommandLine.Serialization;
 using Microsoft.Atlas.CommandLine.Swagger;
 using Microsoft.Atlas.CommandLine.Swagger.Models;
+using Microsoft.Atlas.CommandLine.Tests.Stubs;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace Microsoft.Atlas.CommandLine.Tests.Swagger
@@ -12,26 +18,11 @@ namespace Microsoft.Atlas.CommandLine.Tests.Swagger
     public class RequestGeneratorTests
     {
         [TestMethod]
-        [DataRow("api/tests", "ExampleClient", new[] { "Examples" }, "Examples_CreateOrUpdate", "/api/tests/ExampleClient/Examples/CreateOrUpdate.yaml")]
-        [DataRow("api/tests", "ExampleClient", null, "Examples_CreateOrUpdate", "/api/tests/ExampleClient/Examples_CreateOrUpdate.yaml")]
-        [DataRow("api/tests", "ExampleClient", new[] { "One", "Two" }, "Examples_CreateOrUpdate", "/api/tests/ExampleClient/One/Two/Examples_CreateOrUpdate.yaml")]
-        [DataRow("api/tests", "ExampleClient", new[] { "Examples" }, "Delete", "/api/tests/ExampleClient/Examples/Delete.yaml")]
-        public void ResultingFilePathContainsPrefixTitleAndOperationId(string targetPrefix, string title, string[] operationTags, string operationId, string expectedPath)
-        {
-            var requestGenerator = new RequestGenerator();
-            var context = CreateContext(targetPrefix: targetPrefix, infoTitle: title, operationTags: operationTags, operationId: operationId);
-
-            requestGenerator.GenerateSingleRequestDefinition(context);
-
-            Assert.AreEqual(expectedPath, context.GeneratedPath);
-        }
-
-        [TestMethod]
         [DataRow("put", "method: PUT")]
         [DataRow("GET", "method: GET")]
         public void HttpMethodComesFromOperationKey(string operationKey, string expectedMethod)
         {
-            var requestGenerator = new RequestGenerator();
+            var requestGenerator = CreateRequestGenerator();
             var context = CreateContext(operationKey: operationKey);
 
             requestGenerator.GenerateSingleRequestDefinition(context);
@@ -48,7 +39,7 @@ namespace Microsoft.Atlas.CommandLine.Tests.Swagger
         [DataRow(new[] { "ws", "http", "wss" }, "url: http://")]
         public void HttpsIsUsedWhenPossibleHttpIsUsedOtherwise(string[] schemes, string expectedUrl)
         {
-            var requestGenerator = new RequestGenerator();
+            var requestGenerator = CreateRequestGenerator();
             var context = CreateContext(schemes: schemes != null ? string.Join(' ', schemes) : null);
 
             requestGenerator.GenerateSingleRequestDefinition(context);
@@ -62,7 +53,7 @@ namespace Microsoft.Atlas.CommandLine.Tests.Swagger
         [DataRow(null, "url: https://{{ request.host }}")]
         public void HostAppearsInUrl(string host, string expectedUrl)
         {
-            var requestGenerator = new RequestGenerator();
+            var requestGenerator = CreateRequestGenerator();
             var context = CreateContext(host: host);
 
             requestGenerator.GenerateSingleRequestDefinition(context);
@@ -76,7 +67,7 @@ namespace Microsoft.Atlas.CommandLine.Tests.Swagger
         [DataRow("/", "url: https://example.local/")]
         public void PathAppearsInUrl(string pathKey, string expectedUrl)
         {
-            var requestGenerator = new RequestGenerator();
+            var requestGenerator = CreateRequestGenerator();
             var context = CreateContext(pathKey: pathKey);
 
             requestGenerator.GenerateSingleRequestDefinition(context);
@@ -90,7 +81,7 @@ namespace Microsoft.Atlas.CommandLine.Tests.Swagger
         [DataRow("/another/prefix", "url: https://example.local/another/prefix/pets")]
         public void BasePathAppearsInUrl(string basePath, string expectedUrl)
         {
-            var requestGenerator = new RequestGenerator();
+            var requestGenerator = CreateRequestGenerator();
             var context = CreateContext(basePath: basePath);
 
             requestGenerator.GenerateSingleRequestDefinition(context);
@@ -98,38 +89,9 @@ namespace Microsoft.Atlas.CommandLine.Tests.Swagger
             Assert.IsTrue(context.GeneratedContent.Contains(expectedUrl, StringComparison.Ordinal), $"'{expectedUrl}' not found in\r\n{context.GeneratedContent}");
         }
 
-        [TestMethod]
-        public void RequiredParameterInPathIsTemplatized()
+        private static RequestGenerator CreateRequestGenerator()
         {
-            var requestGenerator = new RequestGenerator();
-            var context = CreateContext(pathKey: "/pets/{id}");
-            context.Operation.Value.parameters.Add(new Parameter
-            {
-                name = "id",
-                @in = "path",
-                required = true,
-            });
-
-            requestGenerator.GenerateSingleRequestDefinition(context);
-
-            Assert.IsTrue(context.GeneratedContent.Contains("/pets/{{ parameter request.id required=true }}", StringComparison.Ordinal), "Expected text not found in \r\n" + context.GeneratedContent);
-        }
-
-        [TestMethod]
-        public void DefaultParameterInPathIsTemplatized()
-        {
-            var requestGenerator = new RequestGenerator();
-            var context = CreateContext(pathKey: "/styles/{style}");
-            context.Operation.Value.parameters.Add(new Parameter
-            {
-                name = "style",
-                @in = "path",
-                @default = "plain",
-            });
-
-            requestGenerator.GenerateSingleRequestDefinition(context);
-
-            Assert.IsTrue(context.GeneratedContent.Contains("/styles/{{ parameter request.style default=\"plain\" }}", StringComparison.Ordinal), "Expected text not found in \r\n" + context.GeneratedContent);
+            return new RequestGenerator(new YamlSerializers());
         }
 
         private static GenerateSingleRequestDefinitionContext CreateContext(
@@ -145,7 +107,11 @@ namespace Microsoft.Atlas.CommandLine.Tests.Swagger
         {
             return new GenerateSingleRequestDefinitionContext
             {
-                TargetPrefix = targetPrefix,
+                SwaggarDocumentLoader = new StubSwaggarDocumentLoader(),
+                SwaggerReference = new SwaggerReference
+                {
+                    target = targetPrefix
+                },
                 SwaggerDocument = new SwaggerDocument
                 {
                     info = new Info { title = infoTitle },
@@ -153,7 +119,7 @@ namespace Microsoft.Atlas.CommandLine.Tests.Swagger
                     host = host,
                     basePath = basePath,
                 },
-                Path = KeyValuePair.Create(pathKey, new PathItem {}),
+                Path = KeyValuePair.Create(pathKey, new PathItem { }),
                 Operation = KeyValuePair.Create(operationKey, new Operation { tags = operationTags?.ToList(), operationId = operationId }),
             };
         }

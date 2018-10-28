@@ -9,5 +9,10 @@
             "strings": true
         },
         "editor.autoIndent": true
+    },
+    "[markdown]":{
+        "editor.insertSpaces": true,
+        "editor.tabSize": 2,
+        "editor.autoIndent": true
     }
 }

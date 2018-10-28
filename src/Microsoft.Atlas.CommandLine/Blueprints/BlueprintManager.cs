@@ -35,11 +35,11 @@ namespace Microsoft.Atlas.CommandLine.Blueprints
                 return null;
             }
 
-            var blueprintInfo = new BlueprintInfo();
+            var blueprintInfo = new WorkflowInfoDocument();
 
-            if (blueprintPackageCore.Exists("README.md"))
+            if (blueprintPackageCore.Exists("readme.md"))
             {
-                var readmeText = blueprintPackageCore.OpenText("README.md").ReadToEnd();
+                var readmeText = blueprintPackageCore.OpenText("readme.md").ReadToEnd();
                 var readmeDoc = Markdig.Markdown.Parse(readmeText);
 
                 var codeBlocks = readmeDoc.OfType<FencedCodeBlock>();
@@ -47,12 +47,12 @@ namespace Microsoft.Atlas.CommandLine.Blueprints
                 var yamlLines = yamlBlocks.SelectMany(yaml => yaml.Lines.Lines);
                 var yamlText = yamlLines.Aggregate(string.Empty, (a, b) => $"{a}{b}{Environment.NewLine}");
 
-                blueprintInfo = _yamlSerializers.YamlDeserializer.Deserialize<BlueprintInfo>(yamlText);
+                blueprintInfo = _yamlSerializers.YamlDeserializer.Deserialize<WorkflowInfoDocument>(yamlText);
             }
 
             var blueprintPackage = blueprintPackageCore;
 
-            foreach (var swaggerInfo in blueprintInfo.swagger)
+            foreach (var swaggerInfo in blueprintInfo.swagger.Values)
             {
                 foreach (var decoratorProvider in _decoratorProviders)
                 {

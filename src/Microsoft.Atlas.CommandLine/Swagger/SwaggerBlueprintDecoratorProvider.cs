@@ -1,3 +1,6 @@
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT license.
+
 using System.Threading.Tasks;
 using Microsoft.Atlas.CommandLine.Blueprints;
 using Microsoft.Atlas.CommandLine.Blueprints.Models;
@@ -24,7 +27,7 @@ namespace Microsoft.Atlas.CommandLine.Swagger
 
         public async Task<IBlueprintPackage> CreateDecorator<TInfo>(TInfo info, IBlueprintPackage package)
         {
-            if (info is SwaggerBlueprintInfo swaggerBlueprintInfo)
+            if (info is SwaggerReference swaggerBlueprintInfo)
             {
                 var decorator = new SwaggerBlueprintDecorator(
                     package,

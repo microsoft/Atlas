@@ -5,6 +5,8 @@ operations:
 - message: Validating inputs
 - {condition: (!azure.tenant),       output: { missing: {azure: {tenant: or --set azure.tenant=AAD_TENANT_ID }}}}
 - {condition: (!azure.subscription), output: { missing: {azure: {subscription: or --set azure.subscription=AZURE_SUBSCRIPTION_ID }}}}
+- {condition: (!latest.version),     output: { missing: {latest: {version: or --set latest.version=SEMVER_VERSION }}}}
+- {condition: (!latest.drop),        output: { missing: {latest: {version: or --set latest.drop=BUILD_ARTIFACTS_DIRECTORY }}}}
 
 - message: Input validation failed
   condition: (missing != null)

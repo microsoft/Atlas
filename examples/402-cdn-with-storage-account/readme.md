@@ -31,6 +31,20 @@ Run the following command
 
 See the `examples/401-linux-agent-pool/values.yaml` for other settings you would want to override.
 
+### About
+
+``` yaml
+info:
+  title: 402-cdn-with-storage-account
+  version: 0.1
+  description: Used by Atlas DevOps release pipeline
+  contact:
+    name: Microsoft
+    url: https://github.com/Microsoft/Atlas/issues/new
+  license:
+    name: MIT
+    url: https://github.com/Microsoft/Atlas/blob/master/LICENSE
+``` 
 
 ### API references
 
@@ -40,32 +54,34 @@ and the Storage REST API to list keys in order to upload files.
 ``` yaml
 swagger:
 
-- target: apis/azure
-  source: https://github.com/Azure/azure-rest-api-specs/tree/master/specification/resources/resource-manager/
-  inputs: 
-  - Microsoft.Resources/stable/2018-05-01/resources.json
-  # - Microsoft.Resources/stable/2016-09-01/links.json
-  # - Microsoft.Resources/stable/2016-06-01/subscriptions.json
-  # - Microsoft.Authorization/stable/2016-09-01/locks.json
-  # - Microsoft.Authorization/stable/2016-12-01/policyAssignments.json
-  # - Microsoft.Authorization/stable/2016-12-01/policyDefinitions.json
-  extra:
-    auth:
-      tenant: '{{ request.auth.tenant }}'
-      resource: https://management.azure.com/
-      client: 04b07795-8ddb-461a-bbee-02f9e1bf7b46
+  resources:
+    target: apis/azure
+    source: https://github.com/Azure/azure-rest-api-specs/tree/master/specification/resources/resource-manager/
+    inputs: 
+    - Microsoft.Resources/stable/2018-05-01/resources.json
+    # - Microsoft.Resources/stable/2016-09-01/links.json
+    # - Microsoft.Resources/stable/2016-06-01/subscriptions.json
+    # - Microsoft.Authorization/stable/2016-09-01/locks.json
+    # - Microsoft.Authorization/stable/2016-12-01/policyAssignments.json
+    # - Microsoft.Authorization/stable/2016-12-01/policyDefinitions.json
+    extra:
+      auth:
+        tenant: '{{ request.auth.tenant }}'
+        resource: https://management.azure.com/
+        client: 04b07795-8ddb-461a-bbee-02f9e1bf7b46
 
-- target: apis/azure
-  source: https://github.com/Azure/azure-rest-api-specs/tree/master/specification/storage/resource-manager/
-  inputs: 
-  - Microsoft.Storage/stable/2018-07-01/storage.json
-  - Microsoft.Storage/stable/2018-07-01/blob.json
-  - Microsoft.Storage/preview/2018-03-01-preview/managementpolicy.json
-  extra:
-    auth:
-      tenant: '{{ request.auth.tenant }}'
-      resource: https://management.azure.com/
-      client: 04b07795-8ddb-461a-bbee-02f9e1bf7b46
-    secret: result.body.keys[].value
+  storage:
+    target: apis/azure
+    source: https://github.com/Azure/azure-rest-api-specs/tree/master/specification/storage/resource-manager/
+    inputs: 
+    - Microsoft.Storage/stable/2018-07-01/storage.json
+    - Microsoft.Storage/stable/2018-07-01/blob.json
+    - Microsoft.Storage/preview/2018-03-01-preview/managementpolicy.json
+    extra:
+      auth:
+        tenant: '{{ request.auth.tenant }}'
+        resource: https://management.azure.com/
+        client: 04b07795-8ddb-461a-bbee-02f9e1bf7b46
+      secret: result.body.keys[].value
 
 ```

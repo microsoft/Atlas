@@ -1,3 +1,6 @@
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT license.
+
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -19,7 +22,7 @@ namespace Microsoft.Atlas.CommandLine.Swagger
 
         public void GenerateSingleRequestDefinition(GenerateSingleRequestDefinitionContext context)
         {
-            var generatedPath = NormalizePath(context.TargetPrefix);
+            var generatedPath = NormalizePath(context.SwaggerReference.target);
             generatedPath += NormalizePath(context.SwaggerDocument.info.title);
             var operationId = context.Operation.Value.operationId;
             foreach (var tag in context.Operation.Value.tags ?? Enumerable.Empty<string>())
@@ -35,7 +38,6 @@ namespace Microsoft.Atlas.CommandLine.Swagger
             generatedPath += NormalizePath(operationId + ".yaml");
 
             context.GeneratedPath = generatedPath.TrimStart('/');
-
 
             var parameters = GetParameterList(context);
 
@@ -69,9 +71,9 @@ namespace Microsoft.Atlas.CommandLine.Swagger
                     }
                 }
 
-                if (context.BlueprintInfo.extra != null)
+                if (context.SwaggerReference.extra != null)
                 {
-                    writer.WriteLine(_yamlSerializers.YamlSerializer.Serialize(context.BlueprintInfo.extra));
+                    writer.WriteLine(_yamlSerializers.YamlSerializer.Serialize(context.SwaggerReference.extra));
                 }
 
                 var bodyParameter = parameters.SingleOrDefault(parameter => parameter.@in == "body");
@@ -103,7 +105,7 @@ namespace Microsoft.Atlas.CommandLine.Swagger
 
         private Schema Dereference(Schema schema, GenerateSingleRequestDefinitionContext context)
         {
-            return schema.@ref == null ? schema : (Schema)context.SwaggerManager.FindReference(schema);
+            return context.SwaggarDocumentLoader.GetResolved(schema);
         }
 
         private string GetParameterExpression(Parameter parameter, GenerateSingleRequestDefinitionContext context)
@@ -128,7 +130,7 @@ namespace Microsoft.Atlas.CommandLine.Swagger
         {
             Parameter LookupParameterRef(Parameter parameter)
             {
-                return context.SwaggerManager.FindReference(parameter);
+                return context.SwaggarDocumentLoader.GetResolved(parameter);
             }
 
             var operationParamters = context.Operation.Value.parameters.Select(LookupParameterRef);

@@ -50,7 +50,7 @@ namespace Microsoft.Atlas.CommandLine.Tests.Stubs
                     foreach (var header in response.headers ?? Enumerable.Empty<KeyValuePair<object, object>>())
                     {
                         var name = Convert.ToString(header.Key);
-                        foreach (var value in ((List<object>)header.Value).Cast<string>())
+                        foreach (var value in ((List<object>)header.Value).Select(Convert.ToString))
                         {
                             if (!responseMessage.Headers.TryAddWithoutValidation(name, value))
                             {

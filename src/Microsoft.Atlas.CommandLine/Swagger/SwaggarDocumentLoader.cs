@@ -1,3 +1,6 @@
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT license.
+
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -9,7 +12,7 @@ using Microsoft.Atlas.CommandLine.Swagger.Models;
 
 namespace Microsoft.Atlas.CommandLine.Swagger
 {
-    public class SwaggarDocumentManager
+    public class SwaggarDocumentLoader : ISwaggarDocumentLoader
     {
         private readonly IYamlSerializers _yamlSerializers;
 
@@ -18,14 +21,33 @@ namespace Microsoft.Atlas.CommandLine.Swagger
 
         private readonly Dictionary<string, SwaggerDocumentEntry> _loaded = new Dictionary<string, SwaggerDocumentEntry>();
 
-        public SwaggarDocumentManager(IYamlSerializers yamlSerializers, IHttpClientFactory httpClientFactory)
+        public SwaggarDocumentLoader(IYamlSerializers yamlSerializers, IHttpClientFactory httpClientFactory)
         {
             _yamlSerializers = yamlSerializers;
             _httpClientFactory = httpClientFactory;
             _httpClient = _httpClientFactory.Create(null);
         }
 
-        public async Task<SwaggerDocumentEntry> LoadEntry(string basePath, string relativePath)
+        public async Task<SwaggerDocument> LoadDocument(string basePath, string relativePath)
+        {
+            return (await LoadEntry(basePath, relativePath)).SwaggerDocument;
+        }
+
+        public TObject GetResolved<TObject>(TObject refObject)
+            where TObject : Reference
+        {
+            foreach (var loaded in _loaded)
+            {
+                if (loaded.Value.References.TryGetValue(refObject, out var value))
+                {
+                    return (TObject)value;
+                }
+            }
+
+            return refObject;
+        }
+
+        private async Task<SwaggerDocumentEntry> LoadEntry(string basePath, string relativePath)
         {
             var effectivePath = CombinePaths(basePath, relativePath);
             if (_loaded.TryGetValue(effectivePath, out var value))
@@ -68,7 +90,7 @@ namespace Microsoft.Atlas.CommandLine.Swagger
                 entry.References[parameter] = targetEntry.Targets[fragment];
             }
 
-
+            // TODO: this probablyl isn't good enough - will need to recurse schema.properties to any depth looking for refs?
             var s1 = swaggerDocument.definitions.Where(kv => kv.Value.properties != null).SelectMany(kv => kv.Value.properties.Values);
             var s2 = parameters.Where(x => x.schema != null).Select(x => x.schema);
             var schemas = s1.Concat(s2);
@@ -114,19 +136,6 @@ namespace Microsoft.Atlas.CommandLine.Swagger
             return RemoveSlash(basePath) + "/" + relativePath;
         }
 
-        public TObject FindReference<TObject>(TObject refObject)
-        {
-            foreach (var loaded in _loaded)
-            {
-                if (loaded.Value.References.TryGetValue(refObject, out var value))
-                {
-                    return (TObject)value;
-                }
-            }
-
-            return refObject;
-        }
-
         private string RemoveSlash(string path)
         {
             var lastSlash = path.LastIndexOf('/');
@@ -136,8 +145,10 @@ namespace Microsoft.Atlas.CommandLine.Swagger
         public class SwaggerDocumentEntry
         {
             public SwaggerDocument SwaggerDocument { get; set; }
-            public Dictionary<string, object> Targets { get; } = new Dictionary<string, object>();
-            public Dictionary<object, object> References { get; } = new Dictionary<object, object>();
+
+            public Dictionary<string, Reference> Targets { get; } = new Dictionary<string, Reference>();
+
+            public Dictionary<Reference, Reference> References { get; } = new Dictionary<Reference, Reference>();
         }
     }
 }

@@ -1,3 +1,6 @@
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT license.
+
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
@@ -29,20 +32,20 @@ namespace Microsoft.Atlas.CommandLine.Swagger
             _yamlSerializers = yamlSerializers;
         }
 
-        public async Task Initialize(SwaggerBlueprintInfo info)
+        public async Task Initialize(SwaggerReference info)
         {
-            var swaggerManager = new SwaggarDocumentManager(_yamlSerializers, _httpClientFactory);
+            var swaggerDocumentLoader = new SwaggarDocumentLoader(_yamlSerializers, _httpClientFactory);
 
             var swaggerDocuments = new List<SwaggerDocument>();
             var httpClient = _httpClientFactory.Create(null);
 
             foreach (var input in info.inputs)
             {
-                var inputPath = info.source + input;
-                if (InnerPackage.Exists(input))
+                
+                if (string.IsNullOrEmpty(info.source))
                 {
                     // TODO : re-abstract this case into docmgr
-                    using (var yamlReader = InnerPackage.OpenText(inputPath))
+                    using (var yamlReader = InnerPackage.OpenText(input))
                     {
                         var swaggerDocument = _yamlSerializers.YamlDeserializer.Deserialize<SwaggerDocument>(yamlReader);
                         swaggerDocuments.Add(swaggerDocument);
@@ -52,9 +55,8 @@ namespace Microsoft.Atlas.CommandLine.Swagger
                 {
                     var uriParts = UriParts.Parse(info.source);
                     uriParts.RewriteGitHubUris();
-                    var entry = await swaggerManager.LoadEntry(uriParts.ToString(), input);
-                    
-                    var swaggerDocument = entry.SwaggerDocument;
+
+                    var swaggerDocument = await swaggerDocumentLoader.LoadDocument(uriParts.ToString(), input);
                     swaggerDocuments.Add(swaggerDocument);
                 }
             }
@@ -67,9 +69,9 @@ namespace Microsoft.Atlas.CommandLine.Swagger
                     {
                         var context = new GenerateSingleRequestDefinitionContext
                         {
-                            BlueprintInfo = info,
+                            SwaggerReference = info,
                             SwaggerDocument = swaggerDocument,
-                            SwaggerManager = swaggerManager,
+                            SwaggarDocumentLoader = swaggerDocumentLoader,
                             Path = pathEntry,
                             Operation = operationEntry,
                         };

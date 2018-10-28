@@ -1,3 +1,6 @@
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT license.
+
 using System;
 using System.Collections;
 using System.Linq;
@@ -52,7 +55,7 @@ namespace Microsoft.Atlas.CommandLine.Commands
                         SwaggerDocument = specs,
                         Path = pathEntry,
                         Operation = operationEntry,
-                        BlueprintInfo = new Blueprints.Models.SwaggerBlueprintInfo
+                        SwaggerReference = new Blueprints.Models.SwaggerReference
                         {
                             target = "api/azure",
                         },
@@ -73,6 +76,7 @@ namespace Microsoft.Atlas.CommandLine.Commands
             {
                 return _serializers.JsonSerializer.Serialize(value).TrimEnd('\r', '\n');
             }
+
             return Convert.ToString(value);
         }
     }

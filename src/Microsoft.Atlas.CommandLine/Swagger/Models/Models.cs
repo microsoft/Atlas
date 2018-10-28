@@ -1,5 +1,14 @@
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT license.
+
 using System.Collections.Generic;
 using YamlDotNet.Serialization;
+
+#pragma warning disable IDE1006 // Naming Styles
+#pragma warning disable SA1300 // Element must begin with upper-case letter
+#pragma warning disable SA1516 // Elements must be separated by blank line
+#pragma warning disable SA1649 // File name must match first type name
+#pragma warning disable SA1402 // File may only contain a single class
 
 namespace Microsoft.Atlas.CommandLine.Swagger.Models
 {
@@ -16,8 +25,8 @@ namespace Microsoft.Atlas.CommandLine.Swagger.Models
         public List<string> consumes { get; set; }
         public List<string> produces { get; set; }
         public Paths paths { get; set; }
-        public Dictionary<string, Schema> definitions { get; set; }
-        public Dictionary<string, Parameter> parameters { get; set; }
+        public Dictionary<string, Schema> definitions { get; set; } = new Dictionary<string, Schema>();
+        public Dictionary<string, Parameter> parameters { get; set; } = new Dictionary<string, Parameter>();
         public Responses responses { get; set; }
         public SecurityDefinitions securityDefinitions { get; set; }
         public List<SecurityRequirement> security { get; set; }
@@ -92,7 +101,6 @@ namespace Microsoft.Atlas.CommandLine.Swagger.Models
         /// The email address of the contact person/organization.MUST be in the format of an email address.
         /// </summary>
         public string email { get; set; }
-
     }
 
     /// <summary>
@@ -143,26 +151,32 @@ namespace Microsoft.Atlas.CommandLine.Swagger.Models
                 {
                     yield return KeyValuePair.Create("get", get);
                 }
+
                 if (put != null)
                 {
                     yield return KeyValuePair.Create("put", put);
                 }
+
                 if (post != null)
                 {
                     yield return KeyValuePair.Create("post", post);
                 }
+
                 if (delete != null)
                 {
                     yield return KeyValuePair.Create("delete", delete);
                 }
+
                 if (options != null)
                 {
                     yield return KeyValuePair.Create("options", options);
                 }
+
                 if (head != null)
                 {
                     yield return KeyValuePair.Create("head", head);
                 }
+
                 if (patch != null)
                 {
                     yield return KeyValuePair.Create("patch", patch);
@@ -274,5 +288,4 @@ namespace Microsoft.Atlas.CommandLine.Swagger.Models
     public class ExternalDocumentation : Dictionary<object, object>
     {
     }
-
 }
