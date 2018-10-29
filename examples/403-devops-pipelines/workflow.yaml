@@ -164,7 +164,7 @@ operations:
       request: apis/devops/Policy/Configurations/Update.yaml
       output:
         policy: ( result.body.to_object( [[ to_string(id), {properties:@} ]] ) )
-    - message: (['Creating "', policy.type.displayName, '" on branch ', policy.settings.scope[0].refName])
+    - message: (['Creating "', foreach[0].type.displayName, '" on branch ', foreach[0].settings.scope[0].refName])
       condition: ( foreach[0].id == null )
       values:
         request:
