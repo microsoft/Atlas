@@ -1,7 +1,6 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license.
 
-using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net.Http;
@@ -14,12 +13,12 @@ namespace Microsoft.Atlas.CommandLine.Tests.Stubs
     {
         public IDictionary<string, IDictionary<HttpMethod, JsonResponse>> Responses { get; set; }
 
+        public List<HttpRequestMessage> Requests { get; } = new List<HttpRequestMessage>();
+
         public HttpMessageHandler Create()
         {
             return new StubHttpClientHandler(this);
         }
-
-        public List<HttpRequestMessage> Requests { get; } = new List<HttpRequestMessage>();
 
         public HttpRequestMessage AssertRequest(string method, string url)
         {
