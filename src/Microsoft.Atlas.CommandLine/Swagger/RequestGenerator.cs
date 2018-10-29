@@ -90,7 +90,7 @@ namespace Microsoft.Atlas.CommandLine.Swagger
                 {
                     var bodySchema = Dereference(bodyParameter.schema, context);
 
-                    if (bodySchema.type == "object")
+                    if (string.IsNullOrEmpty(bodySchema.type) || bodySchema.type == "object")
                     {
                         writer.WriteLine("body:");
                         foreach (var property in bodySchema.properties)
