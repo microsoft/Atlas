@@ -71,6 +71,7 @@ namespace Microsoft.Atlas.CommandLine.Swagger
                         {
                             writer.WriteLine($"{{{{# if request.parameters.{parameter.name} }}}}");
                         }
+
                         writer.WriteLine($"  {parameter.name}: \"{GetParameterExpression(parameter, context)}\"");
                         if (parameter.required == false && parameter.@default == null)
                         {
@@ -93,7 +94,13 @@ namespace Microsoft.Atlas.CommandLine.Swagger
                     if (string.IsNullOrEmpty(bodySchema.type) || bodySchema.type == "object")
                     {
                         writer.WriteLine("body:");
-                        foreach (var property in bodySchema.properties)
+
+                        var allProperties = DereferenceAndFlattenAllOf(context, bodySchema, nestedSchema => true)
+                            .Distinct()
+                            .Where(schema => schema.properties != null)
+                            .SelectMany(schema => schema.properties);
+
+                        foreach (var property in allProperties)
                         {
                             var propertySchema = Dereference(property.Value, context);
 
@@ -115,6 +122,28 @@ namespace Microsoft.Atlas.CommandLine.Swagger
                 }
 
                 context.GeneratedContent = writer.GetStringBuilder().ToString();
+            }
+        }
+
+        private IEnumerable<Schema> DereferenceAndFlattenAllOf(GenerateSingleRequestDefinitionContext context, Schema schema, Func<Schema, bool> shouldRecurse)
+        {
+            var dereferencedSchema = Dereference(schema, context);
+
+            if (shouldRecurse(dereferencedSchema))
+            {
+                if (dereferencedSchema.allOf != null)
+                {
+                    bool NestedShouldRecurse(Schema nestedSchema) => nestedSchema != dereferencedSchema && shouldRecurse(nestedSchema);
+
+                    var transitiveSchemas = dereferencedSchema.allOf.SelectMany(nestedSchema => DereferenceAndFlattenAllOf(context, nestedSchema, NestedShouldRecurse));
+
+                    foreach (var transitiveSchema in transitiveSchemas)
+                    {
+                        yield return transitiveSchema;
+                    }
+                }
+
+                yield return dereferencedSchema;
             }
         }
 

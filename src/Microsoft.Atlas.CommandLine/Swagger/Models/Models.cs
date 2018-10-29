@@ -44,6 +44,16 @@ namespace Microsoft.Atlas.CommandLine.Swagger.Models
     {
         [YamlMember(Alias = "$ref")]
         public string @ref { get; set; }
+
+        public override string ToString()
+        {
+            if (!string.IsNullOrEmpty(@ref))
+            {
+                return @ref;
+            }
+
+            return base.ToString();
+        }
     }
 
     /// <summary>
@@ -254,7 +264,7 @@ namespace Microsoft.Atlas.CommandLine.Swagger.Models
         public string type { get; set; }
 
         public object items { get; set; }
-        public object allOf { get; set; }
+        public List<Schema> allOf { get; set; }
         public Dictionary<string, Schema> properties { get; set; }
         public object additionalProperties { get; set; }
 
@@ -263,10 +273,6 @@ namespace Microsoft.Atlas.CommandLine.Swagger.Models
         public object xml { get; set; }
         public ExternalDocumentation externalDocs { get; set; }
         public object example { get; set; }
-    }
-
-    public class Definitions : Dictionary<object, object>
-    {
     }
 
     public class Responses : Dictionary<object, object>
@@ -285,7 +291,9 @@ namespace Microsoft.Atlas.CommandLine.Swagger.Models
     {
     }
 
-    public class ExternalDocumentation : Dictionary<object, object>
+    public class ExternalDocumentation : VendorExtensions
     {
+        public string description { get; set; }
+        public string url { get; set; }
     }
 }

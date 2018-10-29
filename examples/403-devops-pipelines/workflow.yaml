@@ -154,7 +154,7 @@ operations:
   - message: Saving branch policies
     condition: (length(foreach || `[]`) != `0` )
     operations:
-    - message: (['Updating "', policy.type.displayName, '" on branch ', policy.settings.scope[0].refName])
+    - message: (['Updating "', foreach[0].type.displayName, '" on branch ', foreach[0].settings.scope[0].refName])
       condition: ( foreach[0].id != null )
       values:
         request:

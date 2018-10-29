@@ -74,7 +74,7 @@ namespace Microsoft.Atlas.CommandLine.Swagger
 
             _loaded.Add(effectivePath, entry);
 
-            var p1 = swaggerDocument.parameters.Select(kv => kv.Value);
+            var p1 = swaggerDocument.parameters.Values;
             var p2 = swaggerDocument.paths.Values.SelectMany(x => x.parameters);
             var p3 = swaggerDocument.paths.Values.SelectMany(x => x.operations).SelectMany(x => x.Value.parameters);
             var parameters = p1.Concat(p2).Concat(p3);
@@ -90,10 +90,9 @@ namespace Microsoft.Atlas.CommandLine.Swagger
                 entry.References[parameter] = targetEntry.Targets[fragment];
             }
 
-            // TODO: this probablyl isn't good enough - will need to recurse schema.properties to any depth looking for refs?
-            var s1 = swaggerDocument.definitions.Where(kv => kv.Value.properties != null).SelectMany(kv => kv.Value.properties.Values);
+            var s1 = swaggerDocument.definitions.Values;
             var s2 = parameters.Where(x => x.schema != null).Select(x => x.schema);
-            var schemas = s1.Concat(s2);
+            var schemas = s1.Concat(s2).SelectMany(FlattenSchemas);
 
             foreach (var schema in schemas.Where(x => x.@ref != null))
             {
@@ -109,6 +108,26 @@ namespace Microsoft.Atlas.CommandLine.Swagger
             return entry;
         }
 
+        private IEnumerable<Schema> FlattenSchemas(Schema schema)
+        {
+            yield return schema;
+            if (schema.allOf != null)
+            {
+                foreach (var nestedSchema in schema.allOf.SelectMany(FlattenSchemas))
+                {
+                    yield return nestedSchema;
+                }
+            }
+
+            if (schema.properties != null)
+            {
+                foreach (var nestedSchema in schema.properties.Values.SelectMany(FlattenSchemas))
+                {
+                    yield return nestedSchema;
+                }
+            }
+        }
+
         private string CombinePaths(string basePath, string relativePath)
         {
             if (string.IsNullOrEmpty(relativePath))
@@ -116,7 +135,7 @@ namespace Microsoft.Atlas.CommandLine.Swagger
                 return basePath;
             }
 
-            for (; ; )
+            for (; ;)
             {
                 if (relativePath.StartsWith("../"))
                 {

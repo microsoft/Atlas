@@ -41,7 +41,6 @@ namespace Microsoft.Atlas.CommandLine.Swagger
 
             foreach (var input in info.inputs)
             {
-                
                 if (string.IsNullOrEmpty(info.source))
                 {
                     // TODO : re-abstract this case into docmgr
