@@ -251,7 +251,7 @@ namespace Microsoft.Atlas.CommandLine.Swagger.Models
         public object minProperties { get; set; }
         public List<string> required { get; set; }
         public object @enum { get; set; }
-        public object type { get; set; }
+        public string type { get; set; }
 
         public object items { get; set; }
         public object allOf { get; set; }

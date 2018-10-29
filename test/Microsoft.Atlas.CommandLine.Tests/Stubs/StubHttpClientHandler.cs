@@ -24,9 +24,13 @@ namespace Microsoft.Atlas.CommandLine.Tests.Stubs
 
         protected override async Task<HttpResponseMessage> SendAsync(HttpRequestMessage request, CancellationToken cancellationToken)
         {
+            _factory.Requests.Add(request);
+
             if (_factory.Responses.TryGetValue(request.RequestUri.ToString(), out var address))
             {
-                if (address.TryGetValue(request.Method, out var response))
+                // Find method, or fall back to get if method is head
+                if (address.TryGetValue(request.Method, out var response) ||
+                    (request.Method == HttpMethod.Head && address.TryGetValue(HttpMethod.Get, out response)))
                 {
                     var responseMessage = new HttpResponseMessage()
                     {
@@ -34,17 +38,20 @@ namespace Microsoft.Atlas.CommandLine.Tests.Stubs
                         StatusCode = (HttpStatusCode)response.status,
                     };
 
-                    if (response.body is byte[] responseBytes)
+                    if (request.Method != HttpMethod.Head)
                     {
-                        responseMessage.Content = new ByteArrayContent(responseBytes);
-                    }
-                    else if (response.body is string responseString)
-                    {
-                        responseMessage.Content = new StringContent(responseString);
-                    }
-                    else if (response.body != null)
-                    {
-                        responseMessage.Content = new StringContent(JsonConvert.SerializeObject(response.body));
+                        if (response.body is byte[] responseBytes)
+                        {
+                            responseMessage.Content = new ByteArrayContent(responseBytes);
+                        }
+                        else if (response.body is string responseString)
+                        {
+                            responseMessage.Content = new StringContent(responseString);
+                        }
+                        else if (response.body != null)
+                        {
+                            responseMessage.Content = new StringContent(JsonConvert.SerializeObject(response.body));
+                        }
                     }
 
                     foreach (var header in response.headers ?? Enumerable.Empty<KeyValuePair<object, object>>())
@@ -63,6 +70,16 @@ namespace Microsoft.Atlas.CommandLine.Tests.Stubs
                 }
 
                 throw new ApplicationException($"Invalid request method {request.Method}");
+            }
+
+            // provide simple 404 response if the request is to an implied server
+            if (_factory.Responses.Any(kv => kv.Key.StartsWith($"{request.RequestUri.Scheme}://{request.RequestUri.Host}")))
+            {
+                return new HttpResponseMessage
+                {
+                    RequestMessage = request,
+                    StatusCode = HttpStatusCode.NotFound,
+                };
             }
 
             throw new ApplicationException($"Invalid request url {request.RequestUri}");

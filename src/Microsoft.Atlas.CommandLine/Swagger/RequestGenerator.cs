@@ -51,7 +51,7 @@ namespace Microsoft.Atlas.CommandLine.Swagger
 
                 var host = context.SwaggerDocument.host ?? "{{ request.host }}";
 
-                var basePath = context.SwaggerDocument.basePath ?? string.Empty;
+                var basePath = context.SwaggerDocument.basePath?.TrimEnd('/') ?? string.Empty;
 
                 var path = context.Path.Key;
 
@@ -67,7 +67,15 @@ namespace Microsoft.Atlas.CommandLine.Swagger
                     writer.WriteLine("query:");
                     foreach (var parameter in parameters.Where(parameter => parameter.@in == "query"))
                     {
-                        writer.WriteLine($"  {parameter.name}: {GetParameterExpression(parameter, context)}");
+                        if (parameter.required == false && parameter.@default == null)
+                        {
+                            writer.WriteLine($"{{{{# if request.parameters.{parameter.name} }}}}");
+                        }
+                        writer.WriteLine($"  {parameter.name}: \"{GetParameterExpression(parameter, context)}\"");
+                        if (parameter.required == false && parameter.@default == null)
+                        {
+                            writer.WriteLine($"{{{{/ if }}}}");
+                        }
                     }
                 }
 
@@ -82,20 +90,27 @@ namespace Microsoft.Atlas.CommandLine.Swagger
                 {
                     var bodySchema = Dereference(bodyParameter.schema, context);
 
-                    writer.WriteLine("body:");
-                    foreach (var property in bodySchema.properties)
+                    if (bodySchema.type == "object")
                     {
-                        var propertySchema = Dereference(property.Value, context);
-
-                        writer.WriteLine($"{{{{# if request.body.{property.Key} }}}}");
-                        writer.WriteLine($"  {property.Key}: {{{{{{ json request.body.{property.Key} }}}}}}");
-                        if (propertySchema.@default != null)
+                        writer.WriteLine("body:");
+                        foreach (var property in bodySchema.properties)
                         {
-                            writer.WriteLine("{{ else }}");
-                            writer.WriteLine($"  {property.Key}: {_yamlSerializers.JsonSerializer.Serialize(propertySchema.@default)}");
-                        }
+                            var propertySchema = Dereference(property.Value, context);
 
-                        writer.WriteLine($"{{{{/ if  }}}}");
+                            writer.WriteLine($"{{{{# if request.body.{property.Key} }}}}");
+                            writer.WriteLine($"  {property.Key}: {{{{{{ json request.body.{property.Key} }}}}}}");
+                            if (propertySchema.@default != null)
+                            {
+                                writer.WriteLine("{{ else }}");
+                                writer.WriteLine($"  {property.Key}: {_yamlSerializers.JsonSerializer.Serialize(propertySchema.@default)}");
+                            }
+
+                            writer.WriteLine($"{{{{/ if  }}}}");
+                        }
+                    }
+                    else
+                    {
+                        writer.WriteLine($"body: {{{{{{ json request.body }}}}}}");
                     }
                 }
 
@@ -150,12 +165,7 @@ namespace Microsoft.Atlas.CommandLine.Swagger
 
         private string NormalizePath(string path)
         {
-            return '/' + path.Trim('/');
-        }
-
-        private string ToPathString(object defaultValue)
-        {
-            return defaultValue?.ToString() ?? string.Empty;
+            return '/' + path.Replace(" ", string.Empty).Trim('/');
         }
     }
 }

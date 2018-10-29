@@ -19,8 +19,6 @@ namespace Microsoft.Atlas.CommandLine.Tests.Swagger
             var stubHttpClients = Yaml<StubHttpClientHandlerFactory>(@"
 Responses:
   https://example.net/the-test/readme.md:
-    HEAD:
-      status: 200
     GET:
       status: 200
       body: |
@@ -28,15 +26,7 @@ Responses:
         info:
             title: TheTest
         ```
-  https://example.net/the-test/values.yaml:
-    HEAD:
-      status: 404
-  https://example.net/the-test/model.yaml:
-    HEAD:
-      status: 404
   https://example.net/the-test/workflow.yaml:
-    HEAD:
-      status: 200
     GET:
       status: 200
       body:
@@ -67,8 +57,6 @@ Responses:
             var stubHttpClients = Yaml<StubHttpClientHandlerFactory>($@"
 Responses:
   https://example.net/the-test/readme.md:
-    HEAD:
-      status: 200
     GET:
       status: 200
       body: |
@@ -82,15 +70,7 @@ Responses:
             inputs:
             - testing/swagger.json
         ```
-  https://example.net/the-test/values.yaml:
-    HEAD:
-      status: 404
-  https://example.net/the-test/model.yaml:
-    HEAD:
-      status: 404
   https://example.net/the-test/workflow.yaml:
-    HEAD:
-      status: 200
     GET:
       status: 200
       body:
@@ -131,8 +111,6 @@ Responses:
             var stubHttpClients = Yaml<StubHttpClientHandlerFactory>($@"
 Responses:
   https://example.net/the-test/readme.md:
-    HEAD:
-      status: 200
     GET:
       status: 200
       body: |
@@ -146,15 +124,7 @@ Responses:
             inputs:
             - testing/swagger.json
         ```
-  https://example.net/the-test/values.yaml:
-    HEAD:
-      status: 404
-  https://example.net/the-test/model.yaml:
-    HEAD:
-      status: 404
   https://example.net/the-test/workflow.yaml:
-    HEAD:
-      status: 200
     GET:
       status: 200
       body:
@@ -199,8 +169,6 @@ Responses:
             var stubHttpClients = Yaml<StubHttpClientHandlerFactory>($@"
 Responses:
   https://example.net/the-test/readme.md:
-    HEAD:
-      status: 200
     GET:
       status: 200
       body: |
@@ -214,15 +182,7 @@ Responses:
             inputs:
             - testing/swagger.json
         ```
-  https://example.net/the-test/values.yaml:
-    HEAD:
-      status: 404
-  https://example.net/the-test/model.yaml:
-    HEAD:
-      status: 404
   https://example.net/the-test/workflow.yaml:
-    HEAD:
-      status: 200
     GET:
       status: 200
       body:
@@ -234,8 +194,8 @@ Responses:
                 one: uno
                 two: dos
               body:
-                three: tres
-                four: 4
+                four: quatro
+                five: 5
           output: ( result )
   https://example.org/specs/testing/swagger.json:
     GET:
@@ -280,6 +240,12 @@ Responses:
             Assert.AreEqual(0, result);
 
             Console.AssertContainsInOrder("request has arrived");
+
+            var put = stubHttpClients.AssertRequest("PUT", "https://example.com/somethings/uno?two=dos");
+            var body = await put.Content.ReadAsStringAsync();
+
+            Assert.IsTrue(body.Contains("\"four\": \"quatro\""), "Unable to find expected text in " + body);
+            Assert.IsTrue(body.Contains("\"five\": 5"), "Unable to find expected text in " + body);
         }
 
         [TestMethod]
@@ -288,8 +254,6 @@ Responses:
             var stubHttpClients = Yaml<StubHttpClientHandlerFactory>($@"
 Responses:
   https://example.net/the-test/readme.md:
-    HEAD:
-      status: 200
     GET:
       status: 200
       body: |
@@ -303,15 +267,7 @@ Responses:
             inputs:
             - testing/swagger.json
         ```
-  https://example.net/the-test/values.yaml:
-    HEAD:
-      status: 404
-  https://example.net/the-test/model.yaml:
-    HEAD:
-      status: 404
   https://example.net/the-test/workflow.yaml:
-    HEAD:
-      status: 200
     GET:
       status: 200
       body:
@@ -338,12 +294,14 @@ Responses:
               parameters:
               - name: api-version
                 in: query
+                required: true
           /v{{api-version}}/method/two:
             get:
               operationId: MethodTwo
               parameters:
               - name: api-version
                 in: path
+                required: true
   https://example.com/method/one?api-version=5.0-preview.2:
     GET:
       status: 200
@@ -366,6 +324,66 @@ Responses:
             Assert.AreEqual(0, result);
 
             Console.AssertContainsInOrder("request has arrived", "request has arrived");
+        }
+
+        [TestMethod]
+        public async Task SpacesAreRemoved()
+        {
+            var stubHttpClients = Yaml<StubHttpClientHandlerFactory>($@"
+Responses:
+  https://example.net/the-test/readme.md:
+    GET:
+      status: 200
+      body: |
+        ``` yaml
+        info:
+          title: TheTest
+        swagger:
+          foo:
+            target: apis/tests
+            source: https://example.org/specs/
+            inputs:
+            - testing/swagger.json
+        ```
+  https://example.net/the-test/workflow.yaml:
+    GET:
+      status: 200
+      body:
+        operations:
+        - request: apis/tests/TestingClient/TagOne/TagTwo/MethodOne.yaml
+  https://example.org/specs/testing/swagger.json:
+    GET:
+      status: 200
+      body:
+        swagger: 2.0
+        info:
+          title: Testing Client
+          version: 5.0-preview.2
+        host: example.com
+        paths:
+          /path:
+            get:
+              tags:
+              - Tag One
+              - Tag Two
+              operationId: Method One
+  https://example.com/path:
+    GET:
+      status: 200
+      body:
+      - request has arrived
+");
+
+            InitializeServices(stubHttpClients);
+
+            var result = Services.App.Execute("deploy", "https://example.net/the-test");
+
+            System.Console.Error.WriteLine(Console.ErrorStringWriter.ToString());
+            System.Console.Out.WriteLine(Console.OutStringWriter.ToString());
+
+            Assert.AreEqual(0, result);
+
+            stubHttpClients.AssertRequest("GET", "https://example.com/path");
         }
 
         public class ServiceContext : ServiceContextBase

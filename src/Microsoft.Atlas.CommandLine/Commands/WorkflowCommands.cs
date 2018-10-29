@@ -254,10 +254,10 @@ namespace Microsoft.Atlas.CommandLine.Commands
                 }
             }
 
-            var patternMatcher = _patternMatcherFactory.Create(Target.Values.Any() ? Target.Values : new List<string>() { "/**" });
-
             if (generateOnly == false)
             {
+                var patternMatcher = _patternMatcherFactory.Create(Target.Values.Any() ? Target.Values : new List<string>() { "/**" });
+
                 var context = new ExecutionContext(templateEngine, patternMatcher, values);
                 context.AddValuesIn(ProcessValues(workflow.values, context.Values) ?? context.Values);
 

@@ -47,6 +47,11 @@
       "commandName": "Project",
       "commandLineArgs": "deploy 402-cdn-with-storage-account",
       "workingDirectory": "..\\..\\examples"
+    },
+    "generate 403-devops-pipelines": {
+      "commandName": "Project",
+      "commandLineArgs": "generate 403-devops-pipelines",
+      "workingDirectory": "..\\..\\examples"
     }
   }
 }
