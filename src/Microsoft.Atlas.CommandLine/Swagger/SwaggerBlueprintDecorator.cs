@@ -77,9 +77,25 @@ namespace Microsoft.Atlas.CommandLine.Swagger
 
                         _requestGenerator.GenerateSingleRequestDefinition(context);
 
-                        GeneratedFiles.Add(
-                            context.GeneratedPath,
-                            context.GeneratedContent);
+                        if (GeneratedFiles.ContainsKey(context.GeneratedPath))
+                        {
+                            for (var index = 2; index != 200; ++index)
+                            {
+                                if (!GeneratedFiles.ContainsKey($"{context.GeneratedPath}.{index}"))
+                                {
+                                    GeneratedFiles.Add(
+                                        $"{context.GeneratedPath}.{index}",
+                                        context.GeneratedContent);
+                                    break;
+                                }
+                            }
+                        }
+                        else
+                        {
+                            GeneratedFiles.Add(
+                                context.GeneratedPath,
+                                context.GeneratedContent);
+                        }
                     }
                 }
             }
