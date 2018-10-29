@@ -1,7 +1,0 @@
-# https://docs.microsoft.com/en-us/rest/api/vsts/build/definitions/list?view=vsts-rest-5.0
-
-method: GET
-url: "https://dev.azure.com/{{ devops.organization }}/{{ devops.project }}/_apis/build/definitions?name={{ build.name }}&path={{ build.path }}&api-version=5.0-preview.6"
-auth:
-  resource: 499b84ac-1321-427f-aa17-267ca6975798
-  client: e8f3cc86-b3b2-4ebb-867c-9c314925b384

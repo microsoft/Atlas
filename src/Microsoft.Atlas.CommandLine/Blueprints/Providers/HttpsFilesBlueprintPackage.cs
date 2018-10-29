@@ -2,7 +2,9 @@
 // Licensed under the MIT license.
 
 using System;
+using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Net.Http;
 using Microsoft.Atlas.CommandLine.OAuth2;
 
@@ -35,6 +37,8 @@ namespace Microsoft.Atlas.CommandLine.Blueprints.Providers
             response.EnsureSuccessStatusCode();
             return true;
         }
+
+        public IEnumerable<string> GetGeneratedPaths() => Enumerable.Empty<string>();
 
         public TextReader OpenText(string path)
         {

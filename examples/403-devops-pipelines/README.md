@@ -22,3 +22,24 @@ devops:
               requiredReviewerIds:
               - {YOUR_REVIEWER_GROUP} # e.g. '[YOUR_PROJECT_NAME]\YOUR_PROJECT_NAME Team'
 ```
+
+``` yaml
+
+
+swagger:
+
+  devops:
+    target: apis/devops
+    source: https://github.com/MicrosoftDocs/vsts-rest-api-specs/tree/master/specification/
+    inputs: 
+    - build/5.0/build.json
+    - distributedTask/5.0/taskAgent.json
+    - policy/5.0/policy.json
+    - graph/5.0/graph.json
+    - git/5.0/git.json
+    - release/5.0/release.json
+    extra:
+      auth:
+        resource: 499b84ac-1321-427f-aa17-267ca6975798
+        client: e8f3cc86-b3b2-4ebb-867c-9c314925b384
+```

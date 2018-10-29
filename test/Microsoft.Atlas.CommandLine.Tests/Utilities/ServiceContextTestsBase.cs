@@ -4,6 +4,7 @@
 using System;
 using System.Linq;
 using System.Net.Http;
+using Microsoft.Atlas.CommandLine.Serialization;
 using Microsoft.Atlas.CommandLine.Tests.Stubs;
 using Microsoft.Atlas.CommandLine.Tests.Utilities;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
@@ -40,6 +41,7 @@ namespace Microsoft.Atlas.CommandLine.Tests
 
         protected T Yaml<T>(string input) => new DeserializerBuilder()
             .WithTypeConverter(new HttpMethodConverter())
+            .WithNodeTypeResolver(new NonStringScalarTypeResolver())
             .Build().Deserialize<T>(input);
 
         private class HttpMethodConverter : IYamlTypeConverter

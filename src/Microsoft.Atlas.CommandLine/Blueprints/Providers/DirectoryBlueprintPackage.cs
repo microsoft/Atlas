@@ -1,7 +1,9 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license.
 
+using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 
 namespace Microsoft.Atlas.CommandLine.Blueprints.Providers
 {
@@ -15,6 +17,8 @@ namespace Microsoft.Atlas.CommandLine.Blueprints.Providers
         }
 
         public bool Exists(string path) => File.Exists(ActualPath(path));
+
+        public IEnumerable<string> GetGeneratedPaths() => Enumerable.Empty<string>();
 
         public TextReader OpenText(string path) => File.OpenText(ActualPath(path));
 

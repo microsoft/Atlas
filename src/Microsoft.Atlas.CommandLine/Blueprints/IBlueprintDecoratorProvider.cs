@@ -5,8 +5,8 @@ using System.Threading.Tasks;
 
 namespace Microsoft.Atlas.CommandLine.Blueprints
 {
-    public interface IBlueprintManager
+    public interface IBlueprintDecoratorProvider
     {
-        Task<IBlueprintPackage> GetBlueprintPackage(string blueprint);
+        Task<IBlueprintPackage> CreateDecorator<TInfo>(TInfo info, IBlueprintPackage package);
     }
 }

@@ -11,6 +11,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Xml;
 using Microsoft.Atlas.CommandLine.Blueprints;
+using Microsoft.Atlas.CommandLine.Blueprints.Providers;
 using Microsoft.Atlas.CommandLine.ConsoleOutput;
 using Microsoft.Atlas.CommandLine.Execution;
 using Microsoft.Atlas.CommandLine.JsonClient;
@@ -84,7 +85,7 @@ namespace Microsoft.Atlas.CommandLine.Commands
         {
             if (OutputDirectory.HasValue())
             {
-                Directory.CreateDirectory(OutputDirectory.Value());
+                Directory.CreateDirectory(Path.GetDirectoryName(Path.Combine(OutputDirectory.Value(), filename)));
 
                 using (var writer = _secretTracker.FilterTextWriter(File.CreateText(Path.Combine(OutputDirectory.Value(), filename))))
                 {
@@ -113,7 +114,21 @@ namespace Microsoft.Atlas.CommandLine.Commands
                 }
             }
 
-            var blueprint = _blueprintManager.GetBlueprintPackage(Blueprint.Required());
+            var generatedPath = Path.Combine(OutputDirectory.Required(), "generated");
+            if (Directory.Exists(generatedPath))
+            {
+                foreach (var file in Directory.EnumerateFiles(generatedPath, "*.*", new EnumerationOptions { RecurseSubdirectories = true }))
+                {
+                    File.Delete(file);
+                }
+
+                foreach (var folder in Directory.EnumerateDirectories(generatedPath))
+                {
+                    Directory.Delete(folder, recursive: true);
+                }
+            }
+
+            var blueprint = await _blueprintManager.GetBlueprintPackage(Blueprint.Required());
             if (blueprint == null)
             {
                 throw new ApplicationException($"Unable to locate blueprint {Blueprint.Required()}");
@@ -231,10 +246,18 @@ namespace Microsoft.Atlas.CommandLine.Commands
 
             var workflow = _serializers.YamlDeserializer.Deserialize<WorkflowModel>(new StringReader(workflowContents.ToString()));
 
-            var patternMatcher = _patternMatcherFactory.Create(Target.Values.Any() ? Target.Values : new List<string>() { "/**" });
+            foreach (var generatedFile in blueprint.GetGeneratedPaths())
+            {
+                using (var generatedContent = blueprint.OpenText(generatedFile))
+                {
+                    GenerateOutput($"generated/{generatedFile}", writer => writer.Write(generatedContent.ReadToEnd()));
+                }
+            }
 
             if (generateOnly == false)
             {
+                var patternMatcher = _patternMatcherFactory.Create(Target.Values.Any() ? Target.Values : new List<string>() { "/**" });
+
                 var context = new ExecutionContext(templateEngine, patternMatcher, values);
                 context.AddValuesIn(ProcessValues(workflow.values, context.Values) ?? context.Values);
 
@@ -371,6 +394,15 @@ namespace Microsoft.Atlas.CommandLine.Commands
                                 var client = _clientFactory.Create(auth);
 
                                 var method = new HttpMethod(request.method ?? "GET");
+
+                                var parts = UriParts.Parse(request.url);
+                                foreach (var query in request.query ?? Enumerable.Empty<KeyValuePair<string, object>>())
+                                {
+                                    parts.Query = parts.Query.Add(query.Key, Convert.ToString(query.Value));
+                                }
+
+                                var url = parts.ToString();
+
                                 if (IsDryRun && method.Method != "GET")
                                 {
                                     _console.WriteLine($"Skipping {method.Method.ToString().Color(ConsoleColor.DarkYellow)} {request.url}");
@@ -380,7 +412,7 @@ namespace Microsoft.Atlas.CommandLine.Commands
                                     var jsonRequest = new JsonRequest
                                     {
                                         method = method,
-                                        url = request.url,
+                                        url = url,
                                         headers = request.headers,
                                         body = request.body,
                                         secret = request.secret,
