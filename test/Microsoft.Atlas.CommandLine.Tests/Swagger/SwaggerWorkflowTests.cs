@@ -389,6 +389,7 @@ Responses:
         public class ServiceContext : ServiceContextBase
         {
             public CommandLineApplicationServices App { get; set; }
+
             public IBlueprintManager BlueprintManager { get; set; }
         }
     }
