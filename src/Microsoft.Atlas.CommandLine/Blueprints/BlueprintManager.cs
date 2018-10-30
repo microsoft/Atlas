@@ -44,10 +44,14 @@ namespace Microsoft.Atlas.CommandLine.Blueprints
 
                 var codeBlocks = readmeDoc.OfType<FencedCodeBlock>();
                 var yamlBlocks = codeBlocks.Where(cb => string.Equals(cb.Info, "yaml", StringComparison.Ordinal));
-                var yamlLines = yamlBlocks.SelectMany(yaml => yaml.Lines.Lines);
-                var yamlText = yamlLines.Aggregate(string.Empty, (a, b) => $"{a}{b}{Environment.NewLine}");
 
-                blueprintInfo = _yamlSerializers.YamlDeserializer.Deserialize<WorkflowInfoDocument>(yamlText);
+                if (yamlBlocks.Any())
+                {
+                    var yamlLines = yamlBlocks.SelectMany(yaml => yaml.Lines.Lines);
+                    var yamlText = yamlLines.Aggregate(string.Empty, (a, b) => $"{a}{b}{Environment.NewLine}");
+
+                    blueprintInfo = _yamlSerializers.YamlDeserializer.Deserialize<WorkflowInfoDocument>(yamlText);
+                }
             }
 
             var blueprintPackage = blueprintPackageCore;
