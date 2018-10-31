@@ -1,29 +1,9 @@
 steps:
 
-- task: Docker@1
-  displayName: 'Build atlas-cli runtime image'
-  inputs:
-    dockerFile: Dockerfile.cli
-    arguments: '--target runtime'
-    imageName: 'atlas-cli:0.1.$(Build.BuildId)'
-    qualifyImageName: false
-
-- task: Docker@1
-  displayName: 'Build atlas-cli test image'
-  inputs:
-    dockerFile: Dockerfile.cli
-    arguments: '--target test'
-    imageName: 'atlas-cli:test'
-    qualifyImageName: false
-
-- task: Docker@1
-  displayName: 'Run atlas-cli test image'
-  inputs:
-    command: 'Run an image'
-    imageName: 'atlas-cli:test'
-    qualifyImageName: false
-    volumes: '$(Build.ArtifactStagingDirectory)/TestResults:/app/test/Microsoft.Atlas.CommandLine.Tests/TestResults'
-    runInBackground: false
+- script: |
+    docker build -f Dockerfile.cli --target runtime --tag atlasprivate.azurecr.io/atlas-cli:0.1.$(Build.BuildId) .
+    docker build -f Dockerfile.cli --target test --tag atlasprivate.azurecr.io/atlas-cli:test .
+    docker run --rm -v $(Build.ArtifactStagingDirectory)/TestResults:/app/test/Microsoft.Atlas.CommandLine.Tests/TestResults atlasprivate.azurecr.io/atlas-cli:test
 
 - task: Docker@1
   displayName: 'Push an image'
