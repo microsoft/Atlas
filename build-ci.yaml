@@ -1,5 +1,39 @@
 steps:
 
+- task: Docker@1
+  displayName: 'Build atlas-cli runtime image'
+  inputs:
+    dockerFile: Dockerfile.cli
+    arguments: '--target runtime'
+    imageName: 'atlas-cli:0.1.$(Build.BuildId)'
+    qualifyImageName: false
+
+- task: Docker@1
+  displayName: 'Build atlas-cli test image'
+  inputs:
+    dockerFile: Dockerfile.cli
+    arguments: '--target test'
+    imageName: 'atlas-cli:test'
+    qualifyImageName: false
+
+- task: Docker@1
+  displayName: 'Run atlas-cli test image'
+  inputs:
+    command: 'Run an image'
+    imageName: 'atlas-cli:test'
+    qualifyImageName: false
+    volumes: '$(Build.ArtifactStagingDirectory)/TestResults:/app/test/Microsoft.Atlas.CommandLine.Tests/TestResults'
+    runInBackground: false
+
+- task: Docker@1
+  displayName: 'Push an image'
+  inputs:
+    azureSubscriptionEndpoint: 'atlas-downloads'
+    azureContainerRegistry: atlasprivate.azurecr.io
+    command: 'Push an image'
+    imageName: 'atlas-cli:0.1.$(Build.BuildId)'
+    includeSourceTags: true
+
 # Node Tool Installer
 # Finds or Downloads and caches specified version spec of Node and adds it to the PATH.
 - task: NodeTool@0
@@ -26,31 +60,6 @@ steps:
   continueOnError: true
   inputs:
     governanceProduct: '70f3e0d8-e9ab-e811-bce7-00155d7fb5a6'  
-
-- task: Docker@1
-  displayName: 'Build atlas-cli runtime image'
-  inputs:
-    dockerFile: Dockerfile.cli
-    arguments: '--target runtime'
-    imageName: 'atlas-cli:0.1.$(Build.BuildId)'
-    qualifyImageName: false
-
-- task: Docker@1
-  displayName: 'Build atlas-cli test image'
-  inputs:
-    dockerFile: Dockerfile.cli
-    arguments: '--target test'
-    imageName: 'atlas-cli:test'
-    qualifyImageName: false
-
-- task: Docker@1
-  displayName: 'Run atlas-cli test image'
-  inputs:
-    command: 'Run an image'
-    imageName: 'atlas-cli:test'
-    qualifyImageName: false
-    volumes: '$(Build.ArtifactStagingDirectory)/TestResults:/app/test/Microsoft.Atlas.CommandLine.Tests/TestResults'
-    runInBackground: false
 
 - task: DotNetCoreCLI@2
   displayName: dotnet build
