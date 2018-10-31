@@ -50,7 +50,7 @@ operations:
     deployment:
       name: storage-and-keyvault-{{ guid (datetime add="PT0S") }}
       properties:
-        mode: Incremental
+        mode: Complete
         template: {{> templates/step1/azuredeploy.json }}
         parameters: 
           location:
@@ -83,8 +83,8 @@ operations:
       deploymentStatus: (result.body)
     repeat:
       condition: deploymentStatus.properties.provisioningState == 'Accepted' || deploymentStatus.properties.provisioningState == 'Running'
-      delay: PT5S
-      timeout: PT4M
+      delay: PT30S
+      timeout: PT90M
 
   - message: Deployment failed
     condition: deploymentStatus.properties.provisioningState != 'Succeeded'
