@@ -5,8 +5,14 @@ steps:
     docker build -f Dockerfile.cli --target test --tag atlasprivate.azurecr.io/atlas-cli:test .
     docker run --rm -v $(Build.ArtifactStagingDirectory)/TestResults:/app/test/Microsoft.Atlas.CommandLine.Tests/TestResults atlasprivate.azurecr.io/atlas-cli:test
 
+- task: PublishTestResults@2
+  inputs:
+    testRunner: VSTest
+    testResultsFiles: '$(Build.ArtifactStagingDirectory)/TestResults/*.trx'
+
 - task: Docker@1
-  displayName: 'Push an image'
+  displayName: 'Push atlas-cli to atlasprivate.azurecr.io'
+  condition: and(succeeded(), eq(variables['Build.SourceBranch'], 'refs/heads/master'))
   inputs:
     azureSubscriptionEndpoint: 'atlas-downloads'
     azureContainerRegistry: atlasprivate.azurecr.io
@@ -44,11 +50,11 @@ steps:
 - task: DotNetCoreCLI@2
   displayName: dotnet build
 
-- task: DotNetCoreCLI@2
-  displayName: dotnet test
-  inputs:
-    command: test
-    projects: 'test/**/*.csproj'
+# - task: DotNetCoreCLI@2
+#   displayName: dotnet test
+#   inputs:
+#     command: test
+#     projects: 'test/**/*.csproj'
 
 - task: DotNetCoreCLI@2
   displayName: dotnet publish
