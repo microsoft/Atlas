@@ -1,5 +1,38 @@
 steps:
 
+- script: |
+    test_container_name=test-$(Build.BuildId)
+    publish_container_name=publish-$(Build.BuildId)
+
+    build_args=""
+    build_args+=" --build-arg BUILD_BUILDID=${BUILD_BUILDID}"
+    build_args+=" --build-arg BUILD_REPOSITORY_URI=${BUILD_REPOSITORY_URI}"
+    build_args+=" --build-arg BUILD_SOURCEBRANCHNAME=${BUILD_SOURCEBRANCHNAME}"
+    build_args+=" --build-arg BUILD_SOURCEVERSION=${BUILD_SOURCEVERSION}"
+    
+    # Create and run tests
+    echo "docker build -f Dockerfile.cli --target test --tag atlas-cli-test:0.1.$(Build.BuildId)"
+    docker build -f Dockerfile.cli ${build_args} --target test --tag atlas-cli-test:0.1.$(Build.BuildId) .
+    docker run --name ${test_container_name} atlas-cli-test:0.1.$(Build.BuildId)
+    docker cp ${test_container_name}:/app/test/Microsoft.Atlas.CommandLine.Tests/TestResults/. $(Build.ArtifactStagingDirectory)/TestResults
+    docker rm ${test_container_name}
+
+    # Package artifacts to publish
+    echo "docker build -f Dockerfile.cli --target publish --tag atlas-cli-publish:0.1.$(Build.BuildId)"
+    docker build -f Dockerfile.cli ${build_args} --target publish --tag atlas-cli-publish:0.1.$(Build.BuildId) .
+    docker create --name ${publish_container_name} atlas-cli-publish:0.1.$(Build.BuildId)
+    docker cp ${publish_container_name}:/out/. $(Build.ArtifactStagingDirectory)
+    docker rm ${publish_container_name}
+
+    # Build docker image to publish
+    echo "docker build -f Dockerfile.cli --target runtime --tag atlasprivate.azurecr.io/atlas-cli:0.1.$(Build.BuildId)"
+    docker build -f Dockerfile.cli ${build_args} --target runtime --tag atlasprivate.azurecr.io/atlas-cli:0.1.$(Build.BuildId) .
+
+- task: PublishTestResults@2
+  inputs:
+    testRunner: VSTest
+    testResultsFiles: '$(Build.ArtifactStagingDirectory)/TestResults/*.trx'
+
 # Node Tool Installer
 # Finds or Downloads and caches specified version spec of Node and adds it to the PATH.
 - task: NodeTool@0
@@ -27,57 +60,6 @@ steps:
   inputs:
     governanceProduct: '70f3e0d8-e9ab-e811-bce7-00155d7fb5a6'  
 
-- task: DotNetCoreCLI@2
-  displayName: dotnet build
-
-- task: DotNetCoreCLI@2
-  displayName: dotnet test
-  inputs:
-    command: test
-    projects: 'test/**/*.csproj'
-
-- task: DotNetCoreCLI@2
-  displayName: dotnet publish
-  inputs:
-    command: publish
-    publishWebProjects: false
-    projects: 'src/Microsoft.Atlas.CommandLine/Microsoft.Atlas.CommandLine.csproj'
-    arguments: '-o $(Build.ArtifactStagingDirectory)/atlas'
-    zipAfterPublish: false
-    modifyOutputPath: false
-
-- task: DotNetCoreCLI@2
-  displayName: dotnet pack
-  inputs:
-    command: pack
-    packagesToPack: 'src/Microsoft.Atlas.CommandLine/Microsoft.Atlas.CommandLine.csproj'
-    configuration: Release
-    packDirectory: '$(Build.ArtifactStagingDirectory)/tools'
-
-- task: DotNetCoreCLI@2
-  displayName: 'dotnet tarball'
-  inputs:
-    command: custom
-    projects: src/Microsoft.Atlas.CommandLine/Microsoft.Atlas.CommandLine.csproj
-    custom: msbuild
-    arguments: '/t:Restore,CreateTarball /p:RuntimeIdentifier=linux-x64 /p:TargetFramework=netcoreapp2.1 /p:Configuration=Release /p:ArchiveDir=$(Build.ArtifactStagingDirectory)/downloads'
-
-- task: DotNetCoreCLI@2
-  displayName: 'dotnet zip'
-  inputs:
-    command: custom
-    projects: src/Microsoft.Atlas.CommandLine/Microsoft.Atlas.CommandLine.csproj
-    custom: msbuild
-    arguments: '/t:Restore,CreateZip /p:RuntimeIdentifier=win10-x64 /p:TargetFramework=netcoreapp2.1 /p:Configuration=Release /p:ArchiveDir=$(Build.ArtifactStagingDirectory)/downloads'
-
-- task: DotNetCoreCLI@2
-  displayName: dotnet pack chocolatey
-  inputs:
-    command: pack
-    packagesToPack: 'src/Microsoft.Atlas.CommandLine.Chocolatey/Microsoft.Atlas.CommandLine.Chocolatey.csproj'
-    configuration: Release
-    packDirectory: '$(Build.ArtifactStagingDirectory)/chocolatey'
-
 - task: CopyFiles@2
   displayName: 'copy examples to $(Build.ArtifactStagingDirectory)'
   inputs:
@@ -102,8 +84,20 @@ steps:
     sed -ri 's/"version": "0.1.[0-9]+"/"version": "0.1.$(Build.BuildId)"/' vss-extension.json
     tfx extension create --manifest-globs vss-extension.json --output-path $(Build.ArtifactStagingDirectory)/vsts
 
+- task: Docker@1
+  displayName: 'docker push atlasprivate.azurecr.io/atlas-cli'
+  condition: and(succeeded(), eq(variables['Build.SourceBranch'], 'refs/heads/master'))
+  inputs:
+    azureSubscriptionEndpoint: 'atlas-downloads'
+    azureContainerRegistry: atlasprivate.azurecr.io
+    command: 'Push an image'
+    imageName: 'atlas-cli:0.1.$(Build.BuildId)'
+    includeSourceTags: true
+
 - task: PublishBuildArtifacts@1
   displayName: publish artifacts
   condition: and(succeeded(), eq(variables['Build.SourceBranch'], 'refs/heads/master'))
   inputs:
     PathtoPublish: '$(Build.ArtifactStagingDirectory)'
+
+
