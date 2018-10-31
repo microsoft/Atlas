@@ -12,16 +12,21 @@ RUN dotnet restore --force
 COPY src/. ./src/
 COPY test/. ./test/
 COPY docs/. ./docs/
-
-FROM restore as publish
-WORKDIR /app
-RUN dotnet publish src/Microsoft.Atlas.CommandLine/Microsoft.Atlas.CommandLine.csproj -c Release -o /out
-
-FROM microsoft/dotnet:2.1-runtime AS runtime
-WORKDIR /app
-COPY --from=publish /out ./
-ENTRYPOINT ["dotnet", "atlas.dll"]
+COPY LICENSE ./
+COPY ThirdPartyNotice.txt ./
 
 FROM restore AS test
 WORKDIR /app/test/Microsoft.Atlas.CommandLine.Tests
 ENTRYPOINT ["dotnet", "test", "--logger:trx", "-c", "Release"]
+
+FROM restore as publish
+WORKDIR /app
+RUN dotnet publish src/Microsoft.Atlas.CommandLine/Microsoft.Atlas.CommandLine.csproj -c Release -o /out/atlas
+RUN dotnet pack    src/Microsoft.Atlas.CommandLine/Microsoft.Atlas.CommandLine.csproj -c Release -o /out/tools
+RUN dotnet msbuild src/Microsoft.Atlas.CommandLine/Microsoft.Atlas.CommandLine.csproj /t:Restore,CreateTarball /p:RuntimeIdentifier=linux-x64 /p:TargetFramework=netcoreapp2.1 /p:Configuration=Release /p:ArchiveDir=/out/downloads
+RUN dotnet msbuild src/Microsoft.Atlas.CommandLine/Microsoft.Atlas.CommandLine.csproj /t:Restore,CreateZip     /p:RuntimeIdentifier=win10-x64 /p:TargetFramework=netcoreapp2.1 /p:Configuration=Release /p:ArchiveDir=/out/downloads
+
+FROM microsoft/dotnet:2.1-runtime AS runtime
+WORKDIR /app
+COPY --from=publish /out/atlas ./
+ENTRYPOINT ["dotnet", "atlas.dll"]
