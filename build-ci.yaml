@@ -5,7 +5,7 @@ steps:
     publish_container_name=publish-$(Build.BuildId)
 
     build_args=""
-    build_args+=" --build-arg BUILD_ID=${BUILD_ID}"
+    build_args+=" --build-arg BUILD_BUILDID=${BUILD_BUILDID}"
     build_args+=" --build-arg BUILD_REPOSITORY_URI=${BUILD_REPOSITORY_URI}"
     build_args+=" --build-arg BUILD_SOURCEBRANCHNAME=${BUILD_SOURCEBRANCHNAME}"
     build_args+=" --build-arg BUILD_SOURCEVERSION=${BUILD_SOURCEVERSION}"
