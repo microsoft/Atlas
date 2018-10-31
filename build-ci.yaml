@@ -5,9 +5,9 @@ steps:
     docker build -f Dockerfile.cli --target test --tag atlasprivate.azurecr.io/atlas-cli:test .
 
     testContainerName=test-$(Agent.Id)-$(System.DefinitionId)-$(Build.BuildId)
-    docker run --name $(testContainerName) atlasprivate.azurecr.io/atlas-cli:test
-    docker cp $(testContainerName):/app/test/Microsoft.Atlas.CommandLine.Tests/TestResults/. $(Build.ArtifactStagingDirectory)/TestResults
-    docker rm $(testContainerName)
+    docker run --name ${testContainerName} atlasprivate.azurecr.io/atlas-cli:test
+    docker cp ${testContainerName}:/app/test/Microsoft.Atlas.CommandLine.Tests/TestResults/. $(Build.ArtifactStagingDirectory)/TestResults
+    docker rm ${testContainerName}
 
 - task: PublishTestResults@2
   inputs:
