@@ -1,20 +1,26 @@
 steps:
 
 - script: |
-    testContainerName=test-$(Build.BuildId)
-    publishContainerName=publish-$(Build.BuildId)
+    test_container_name=test-$(Build.BuildId)
+    publish_container_name=publish-$(Build.BuildId)
 
-    docker build -f Dockerfile.cli --target test --tag atlas-cli-test:0.1.$(Build.BuildId) .
-    docker run --name ${testContainerName} atlas-cli-test:0.1.$(Build.BuildId)
-    docker cp ${testContainerName}:/app/test/Microsoft.Atlas.CommandLine.Tests/TestResults/. $(Build.ArtifactStagingDirectory)/TestResults
-    docker rm ${testContainerName}
+    build_args=""
+    build_args+=" --build-arg BUILD_ID=${BUILD_ID}"
+    build_args+=" --build-arg BUILD_REPOSITORY_URI=${BUILD_REPOSITORY_URI}"
+    build_args+=" --build-arg BUILD_SOURCEBRANCHNAME=${BUILD_SOURCEBRANCHNAME}"
+    build_args+=" --build-arg BUILD_SOURCEVERSION=${BUILD_SOURCEVERSION}"
+    
+    docker build -f Dockerfile.cli ${build_args} --target test --tag atlas-cli-test:0.1.$(Build.BuildId) .
+    docker run --name ${test_container_name} atlas-cli-test:0.1.$(Build.BuildId)
+    docker cp ${test_container_name}:/app/test/Microsoft.Atlas.CommandLine.Tests/TestResults/. $(Build.ArtifactStagingDirectory)/TestResults
+    docker rm ${test_container_name}
 
-    docker build -f Dockerfile.cli --target publish --tag atlas-cli-publish:0.1.$(Build.BuildId) .
-    docker create --name ${publishContainerName} atlas-cli-publish:0.1.$(Build.BuildId)
-    docker cp ${publishContainerName}:/out/. $(Build.ArtifactStagingDirectory)
-    docker rm ${publishContainerName}
+    docker build -f Dockerfile.cli ${build_args} --target publish --tag atlas-cli-publish:0.1.$(Build.BuildId) .
+    docker create --name ${publish_container_name} atlas-cli-publish:0.1.$(Build.BuildId)
+    docker cp ${publish_container_name}:/out/. $(Build.ArtifactStagingDirectory)
+    docker rm ${publish_container_name}
 
-    docker build -f Dockerfile.cli --target runtime --tag atlasprivate.azurecr.io/atlas-cli:0.1.$(Build.BuildId) .
+    docker build -f Dockerfile.cli ${build_args} --target runtime --tag atlasprivate.azurecr.io/atlas-cli:0.1.$(Build.BuildId) .
 
 - task: PublishTestResults@2
   inputs:

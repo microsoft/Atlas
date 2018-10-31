@@ -8,7 +8,7 @@ COPY build/. ./build/
 COPY src/Microsoft.Atlas.CommandLine/*.csproj ./src/Microsoft.Atlas.CommandLine/
 COPY src/Microsoft.Atlas.CommandLine.Chocolatey/*.csproj ./src/Microsoft.Atlas.CommandLine.Chocolatey/
 COPY test/Microsoft.Atlas.CommandLine.Tests/*.csproj ./test/Microsoft.Atlas.CommandLine.Tests/
-RUN dotnet restore --force
+RUN dotnet restore
 COPY src/. ./src/
 COPY test/. ./test/
 COPY docs/. ./docs/
@@ -21,10 +21,23 @@ ENTRYPOINT ["dotnet", "test", "--logger:trx", "-c", "Release"]
 
 FROM restore as publish
 WORKDIR /app
-RUN dotnet publish src/Microsoft.Atlas.CommandLine/Microsoft.Atlas.CommandLine.csproj -c Release -o /out/atlas
-RUN dotnet pack    src/Microsoft.Atlas.CommandLine/Microsoft.Atlas.CommandLine.csproj -c Release -o /out/tools
-RUN dotnet msbuild src/Microsoft.Atlas.CommandLine/Microsoft.Atlas.CommandLine.csproj /t:Restore,CreateTarball /p:RuntimeIdentifier=linux-x64 /p:TargetFramework=netcoreapp2.1 /p:Configuration=Release /p:ArchiveDir=/out/downloads
-RUN dotnet msbuild src/Microsoft.Atlas.CommandLine/Microsoft.Atlas.CommandLine.csproj /t:Restore,CreateZip     /p:RuntimeIdentifier=win10-x64 /p:TargetFramework=netcoreapp2.1 /p:Configuration=Release /p:ArchiveDir=/out/downloads
+ARG BUILD_BUILDID
+ARG BUILD_REPOSITORY_URI
+ARG BUILD_SOURCEBRANCHNAME
+ARG BUILD_SOURCEVERSION
+RUN \
+    BUILD_BUILDID=${BUILD_BUILDID} \
+    BUILD_REPOSITORY_URI=${BUILD_REPOSITORY_URI} \
+    BUILD_SOURCEBRANCHNAME=${BUILD_SOURCEBRANCHNAME} \
+    BUILD_SOURCEVERSION=${BUILD_SOURCEVERSION} \
+    dotnet publish src/Microsoft.Atlas.CommandLine/Microsoft.Atlas.CommandLine.csproj \
+        -c Release -o /out/atlas && \
+    dotnet pack    src/Microsoft.Atlas.CommandLine/Microsoft.Atlas.CommandLine.csproj \
+        -c Release -o /out/tools && \
+    dotnet msbuild src/Microsoft.Atlas.CommandLine/Microsoft.Atlas.CommandLine.csproj \
+        /t:Restore,CreateTarball /p:RuntimeIdentifier=linux-x64 /p:TargetFramework=netcoreapp2.1 /p:Configuration=Release /p:ArchiveDir=/out/downloads && \
+    dotnet msbuild src/Microsoft.Atlas.CommandLine/Microsoft.Atlas.CommandLine.csproj \
+        /t:Restore,CreateZip /p:RuntimeIdentifier=win10-x64 /p:TargetFramework=netcoreapp2.1 /p:Configuration=Release /p:ArchiveDir=/out/downloads
 
 FROM microsoft/dotnet:2.1-runtime AS runtime
 WORKDIR /app
