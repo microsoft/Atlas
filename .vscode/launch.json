@@ -1,4 +1,7 @@
 {
+    // Use IntelliSense to learn about possible attributes.
+    // Hover to view descriptions of existing attributes.
+    // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
     "version": "0.2.0",
     "configurations": [
         {
@@ -6,9 +9,9 @@
             "type": "coreclr",
             "request": "launch",
             "preLaunchTask": "build",
-            "program": "${workspaceFolder}/src/Microsoft.Atlas.CommandLine/bin/Debug/netcoreapp2.1/atlas.dll",
+            "program": "${workspaceFolder}/src/Microsoft.Atlas.Service/bin/Debug/netcoreapp2.1/Microsoft.Atlas.Service.dll",
             "args": [],
-            "cwd": "${workspaceFolder}/src/Microsoft.Atlas.CommandLine",
+            "cwd": "${workspaceFolder}/src/Microsoft.Atlas.Service",
             "console": "internalConsole",
             "stopAtEntry": false,
             "internalConsoleOptions": "openOnSessionStart"
