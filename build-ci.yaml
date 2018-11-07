@@ -53,7 +53,7 @@ steps:
     command: restore
     arguments: --force
 
-- task: ms.vss-governance-buildtask.governance-build-task-component-detection.ComponentGovernanceComponentDetection@0
+- task: ComponentGovernanceComponentDetection@0
   displayName: 'Component Detection'
   condition: and(succeeded(), eq(variables['Build.SourceBranch'], 'refs/heads/master'))
   continueOnError: true

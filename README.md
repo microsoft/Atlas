@@ -5,7 +5,6 @@
 [![Build Status]][Build Latest] 
 [![Zip Status]][Zip Latest]
 [![Tarball Status]][Tarball Latest]
-[![Choco Status]][Choco Latest]
 
 ![Atlas Logo]
 
@@ -36,11 +35,7 @@ If you want to use a package manager:
 #### Install global tool (Windows or Linux)
 
 1. If `dotnet --version` isn't >= 2.1.300 then [install or upgrade .NET Core](https://www.microsoft.com/net/download/dotnet-core/2.1)
-1. `dotnet tool install -g dotnet-atlas --add-source https://aka.ms/atlas-ci/index.json`
-
-#### Install using Chocolatey (Windows)
-1. If `choco` command is not available then [install Chocolatey](https://chocolatey.org/install#installing-chocolatey)
-1. `choco install atlas-cli -s https://www.myget.org/F/atlas-ci` 
+1. `dotnet tool install -g atlas-cli --add-source https://aka.ms/atlas-ci/index.json`
 
 ## Getting Started
 
@@ -204,8 +199,6 @@ the [Security TechCenter](https://technet.microsoft.com/en-us/security/default).
 [Azure DevOps REST API]: https://docs.microsoft.com/en-us/rest/api/vsts/?view=vsts-rest-5.0
 [Build Status]: https://msasg.visualstudio.com/Falcon/_apis/build/status/Atlas-CI?branch=master
 [Build Latest]: https://msasg.visualstudio.com/Falcon/_build/latest?definitionId=6598&branch=master
-[Choco Status]: https://img.shields.io/myget/atlas-ci/vpre/atlas-cli.svg?label=choco
-[Choco Latest]: #chocolatey
 [Zip Status]: https://img.shields.io/badge/dynamic/json.svg?label=win-x64&url=https%3A%2F%2Fsa2fitssy3mz7ig.blob.core.windows.net%2Fdownloads%2Flatest.json&query=%24[%27win10-x64%27].version
 [Zip Latest]: https://sa2fitssy3mz7ig.blob.core.windows.net/downloads/atlas-latest-win10-x64.zip
 [Tarball Status]: https://img.shields.io/badge/dynamic/json.svg?label=linux-x64&url=https%3A%2F%2Fsa2fitssy3mz7ig.blob.core.windows.net%2Fdownloads%2Flatest.json&query=%24[%27linux-x64%27].version

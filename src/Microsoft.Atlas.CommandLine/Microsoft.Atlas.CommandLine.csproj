@@ -9,7 +9,7 @@
     <UseSharedCompilation>false</UseSharedCompilation>
     <ApplicationIcon>..\..\docs\atlas.ico</ApplicationIcon>
     <PackAsTool>true</PackAsTool>
-    <PackageId>dotnet-atlas</PackageId>
+    <PackageId>atlas-cli</PackageId>
     <LangVersion>7.1</LangVersion>
   </PropertyGroup>
 
