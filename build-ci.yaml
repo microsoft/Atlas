@@ -25,8 +25,8 @@ steps:
     docker rm ${publish_container_name}
 
     # Build docker image to publish
-    echo "docker build -f Dockerfile.cli --target runtime --tag atlasprivate.azurecr.io/atlas-cli:0.1.$(Build.BuildId)"
-    docker build -f Dockerfile.cli ${build_args} --target runtime --tag atlasprivate.azurecr.io/atlas-cli:0.1.$(Build.BuildId) .
+    echo "docker build -f Dockerfile.cli --target runtime --tag atlasprivate.azurecr.io/microsoft/atlas-cli:0.1.$(Build.BuildId)"
+    docker build -f Dockerfile.cli ${build_args} --target runtime --tag atlasprivate.azurecr.io/microsoft/atlas-cli:0.1.$(Build.BuildId) .
 
 - task: PublishTestResults@2
   inputs:
@@ -85,13 +85,13 @@ steps:
     tfx extension create --manifest-globs vss-extension.json --output-path $(Build.ArtifactStagingDirectory)/vsts
 
 - task: Docker@1
-  displayName: 'docker push atlasprivate.azurecr.io/atlas-cli'
+  displayName: 'docker push atlasprivate.azurecr.io/microsoft/atlas-cli'
   condition: and(succeeded(), eq(variables['Build.SourceBranch'], 'refs/heads/master'))
   inputs:
     azureSubscriptionEndpoint: 'atlas-downloads'
     azureContainerRegistry: atlasprivate.azurecr.io
     command: 'Push an image'
-    imageName: 'atlas-cli:0.1.$(Build.BuildId)'
+    imageName: 'microsoft/atlas-cli:0.1.$(Build.BuildId)'
     includeSourceTags: true
 
 - task: PublishBuildArtifacts@1
