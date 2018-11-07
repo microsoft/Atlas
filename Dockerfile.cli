@@ -6,7 +6,6 @@ COPY Directory.Build.props ./
 COPY Directory.Build.targets ./
 COPY build/. ./build/
 COPY src/Microsoft.Atlas.CommandLine/*.csproj ./src/Microsoft.Atlas.CommandLine/
-COPY src/Microsoft.Atlas.CommandLine.Chocolatey/*.csproj ./src/Microsoft.Atlas.CommandLine.Chocolatey/
 COPY test/Microsoft.Atlas.CommandLine.Tests/*.csproj ./test/Microsoft.Atlas.CommandLine.Tests/
 RUN dotnet restore
 COPY src/. ./src/
