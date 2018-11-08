@@ -23,7 +23,7 @@ namespace Microsoft.Atlas.CommandLine.Models.Workflow
             public string target { get; set; }
             public string condition { get; set; }
 
-            [YamlMember(Alias = "@foreach")]
+            [YamlMember(Alias = "foreach")]
             public Foreach @foreach { get; set; }
             public Repeat repeat { get; set; }
             public object values { get; set; }
@@ -69,6 +69,7 @@ namespace Microsoft.Atlas.CommandLine.Models.Workflow
         public class Foreach
         {
             public object values { get; set; }
+            public object output { get; set; }
         }
 
         public class Repeat

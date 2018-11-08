@@ -313,10 +313,35 @@ namespace Microsoft.Atlas.CommandLine.Commands
 
             if (context.Operation.@foreach == null)
             {
-                await ExecuteOperation(context);
+                await ExecuteOperationInner(context);
             }
+            else
+            {
+                var foreachContexts = new List<ExecutionContext>();
+                var foreachValuesInList = ProcessValuesForeachIn(operation.@foreach.values, context.Values);
 
-            ProcessValues(operation.@foreach.values, context.Values);
+                foreach (var foreachValuesIn in foreachValuesInList)
+                {
+                    var foreachContext = context.CreateChildContext(operation, MergeUtils.Merge(foreachValuesIn, context.Values));
+                    foreachContexts.Add(foreachContext);
+                    await ExecuteOperationInner(foreachContext);
+                }
+
+                var valuesOut = default(object);
+                if (operation.@foreach.output != null)
+                {
+                    valuesOut = ProcessValuesForeachOut(operation.@foreach.output, foreachContexts.Select(foreachContext => foreachContext.Values).ToList());
+                }
+                else
+                {
+                    foreach (var foreachValuesOut in foreachContexts.Select(foreachContext => foreachContext.ValuesOut))
+                    {
+                        valuesOut = MergeUtils.Merge(foreachValuesOut, valuesOut);
+                    }
+                }
+
+                context.AddValuesOut(valuesOut);
+            }
         }
 
         private async Task ExecuteOperationInner(ExecutionContext context)
@@ -631,20 +656,65 @@ namespace Microsoft.Atlas.CommandLine.Commands
 
         private object ProcessValues(object source, object context)
         {
+            return ProcessValuesRecursive(source, new[] { context }, promoteArrays: false);
+        }
+
+        private IList<object> ProcessValuesForeachIn(object source, object context)
+        {
+            var result = ProcessValuesRecursive(source, new[] { context }, promoteArrays: true);
+            if (result is IList<object> resultList)
+            {
+                return resultList;
+            }
+
+            throw new ApplicationException("Foreach values contained no arrays");
+        }
+
+        private object ProcessValuesForeachOut(object source, IList<object> contexts)
+        {
+            return ProcessValuesRecursive(source, contexts, promoteArrays: false);
+        }
+
+        private object ProcessValuesRecursive(object source, IList<object> contexts, bool promoteArrays)
+        {
             if (source is IDictionary<object, object> sourceDictionary)
             {
+                var arrayIsPromoting = false;
+                var arrayLength = 0;
+
                 var output = new Dictionary<object, object>();
                 foreach (var kv in sourceDictionary)
                 {
-                    var isQuery = IsQuery(kv);
-                    if (isQuery)
+                    var result = ProcessValuesRecursive(kv.Value, contexts, promoteArrays: promoteArrays);
+                    output[kv.Key] = result;
+
+                    if (promoteArrays && result is IList<object> resultArray)
                     {
-                        output[kv.Key.ToString().TrimEnd('?')] = ProcessQueries(kv.Value, context);
+                        if (!arrayIsPromoting)
+                        {
+                            arrayIsPromoting = true;
+                            arrayLength = resultArray.Count();
+                        }
+                        else
+                        {
+                            if (arrayLength != resultArray.Count())
+                            {
+                                throw new ApplicationException("Foreach arrays must all be same size");
+                            }
+                        }
                     }
-                    else
+                }
+
+                if (arrayIsPromoting)
+                {
+                    var arrayOutput = new List<object>();
+                    for (var index = 0; index < arrayLength; ++index)
                     {
-                        output[kv.Key] = ProcessValues(kv.Value, context);
+                        var arrayItem = output.ToDictionary(kv => kv.Key, kv => kv.Value is IList<object> valueArray ? valueArray[index] : kv.Value);
+                        arrayOutput.Add(arrayItem);
                     }
+
+                    return arrayOutput;
                 }
 
                 return output;
@@ -652,49 +722,33 @@ namespace Microsoft.Atlas.CommandLine.Commands
 
             if (source is IList<object> sourceList)
             {
-                return sourceList.Select(value => ProcessValues(value, context)).ToList();
+                return sourceList.Select(value => ProcessValuesRecursive(value, contexts, promoteArrays: promoteArrays)).ToList();
             }
 
             if (source is string sourceString)
             {
                 if (sourceString.StartsWith('(') && sourceString.EndsWith(')'))
                 {
-                    return ProcessQueries(sourceString.Substring(1, sourceString.Length - 2), context);
+                    var expression = sourceString.Substring(1, sourceString.Length - 2);
+                    var mergedResult = default(object);
+                    foreach (var context in contexts)
+                    {
+                        var result = _jmesPathQuery.Search(sourceString, context);
+                        if (result is IList<object> resultList && mergedResult is IList<object> mergedList)
+                        {
+                            mergedResult = mergedList.Concat(resultList).ToList();
+                        }
+                        else
+                        {
+                            mergedResult = MergeUtils.Merge(result, mergedResult);
+                        }
+                    }
+
+                    return mergedResult;
                 }
             }
 
             return source;
-        }
-
-        private object ProcessQueries(object source, object context)
-        {
-            if (source is IDictionary<object, object> sourceDictionary)
-            {
-                var output = new Dictionary<object, object>();
-                foreach (var kv in sourceDictionary)
-                {
-                    output[kv.Key] = ProcessQueries(kv.Value, context);
-                }
-
-                return output;
-            }
-
-            if (source is IList<object> sourceList)
-            {
-                return sourceList.Select(value => ProcessQueries(value, context)).ToList();
-            }
-
-            if (source is string sourceString)
-            {
-                return _jmesPathQuery.Search(sourceString, context);
-            }
-
-            throw new ApplicationException($"Unexpected value type {source.GetType().FullName} {source}");
-        }
-
-        private bool IsQuery(KeyValuePair<object, object> kv)
-        {
-            return kv.Key?.ToString()?.EndsWith('?') ?? false;
         }
 
         private string ConvertToString(object source)
