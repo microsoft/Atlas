@@ -4,49 +4,52 @@ operations:
 - message: REST APIs can be called
 
 - message: Listing Microsoft Azure tenants, see https://docs.microsoft.com/en-us/rest/api/resources/subscriptions/list
-  values:
-    tenant: {{azure.tenant}}
-  request: azure-tenants-list.yaml
+  request: apis/azure/SubscriptionClient/Tenants/List.yaml
   output:
-    tenants: (result.body.value[].{ tenantId:tenantId })
+    tenantIds: ( result.body.value[].tenantId )
 
-- message: (['Looking at tenant ', current.tenantId])
+- condition: ( length(tenantIds) != `0` )  
   values:
-    results: []
-    current: (tenants[0])
-    remaining: (tenants[1:])
-  output:
-    results: ([results, current][])
-    current: (remaining[0])
-    remaining: (remaining[1:])
-  repeat:
-    condition: current != null
+    tenants: []
 
   operations:
-  - message: Getting Microsoft Graph user info, see https://docs.microsoft.com/en-us/rest/api/graphrbac/objects/getcurrentuser
-    values:
-      tenant: (current.tenantId)
-    request: graph-me-get.yaml
-    output:
-      current:
-        user: (result.body.{ "odata.type":"odata.type", objectId:objectId, displayName:displayName, userPrincipalName:userPrincipalName, otherMails:otherMails })
+  - message: (['Looking at tenant ', tenantIds[0]])
+    values: # These values apply to all three of the operations
+      azure:
+        tenant: ( tenantIds[0] )
+      request:
+        parameters:
+          tenantID: ( tenantIds[0] )
 
-  - message: Listing Active Directory domains, see https://docs.microsoft.com/en-us/rest/api/graphrbac/domains/list
-    values:
-      tenant: (current.tenantId)
-    request: graph-domains-list.yaml
-    output:
-      current:
-        domains: (result.body.value[].name)
+    operations:
+    - message: Getting Microsoft Graph user info, see https://docs.microsoft.com/en-us/rest/api/graphrbac/objects/getcurrentuser
+      request: apis/graph/GraphRbacManagementClient/SignedInUser/Get.yaml
+      output:
+        current:
+          tenantId: ( tenantIds[0] )
+          user: ( result.body.{ "odata.type":"odata.type", objectId:objectId, displayName:displayName, userPrincipalName:userPrincipalName, otherMails:otherMails } )
 
-  - message: Listing Microsoft Azure subscriptions, see https://docs.microsoft.com/en-us/rest/api/resources/subscriptions/list
-    values:
-      tenant: (current.tenantId)
-    request: azure-subscriptions-list.yaml
-    output:
-      current:
-        subscriptions: (result.body.value[].{ subscriptionId:subscriptionId, displayName:displayName })
+    - message: Listing Active Directory domains, see https://docs.microsoft.com/en-us/rest/api/graphrbac/domains/list
+      request: apis/graph/GraphRbacManagementClient/Domain/Domains_List.yaml
+      output:
+        current:
+          domains: ( result.body.value[].name )
 
-output: 
-  details: (results)
-  subscriptions: (results[].subscriptions[].[displayName, ' (', subscriptionId, ')'].join('',@))
+    - message: Listing Microsoft Azure subscriptions, see https://docs.microsoft.com/en-us/rest/api/resources/subscriptions/list
+      request: apis/azure/SubscriptionClient/Subscriptions/List.yaml
+      output:
+        current:
+          subscriptions: ( result.body.value[].{ subscriptionId:subscriptionId, displayName:displayName } )
+
+  output:
+    tenants: ( [tenants, current] [] )
+    tenantIds: ( tenantIds[1:] )
+  repeat:
+    condition: ( length(tenantIds) != `0` )
+        
+- message: Arranging selection of azure.tenant and azure.subscription
+  template: selection.yaml
+  write: selection.yaml
+  output:
+    selection: ( result )
+  

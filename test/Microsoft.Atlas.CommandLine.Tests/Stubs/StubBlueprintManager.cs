@@ -2,6 +2,7 @@
 // Licensed under the MIT license.
 
 using System.Collections.Generic;
+using System.Threading.Tasks;
 using Microsoft.Atlas.CommandLine.Blueprints;
 
 namespace Microsoft.Atlas.CommandLine.Tests.Stubs
@@ -10,6 +11,6 @@ namespace Microsoft.Atlas.CommandLine.Tests.Stubs
     {
         public IDictionary<string, StubBlueprintPackage> Blueprints { get; set; } = new Dictionary<string, StubBlueprintPackage>();
 
-        IBlueprintPackage IBlueprintManager.GetBlueprintPackage(string blueprint) => Blueprints.TryGetValue(blueprint, out var value) ? value : null;
+        async Task<IBlueprintPackage> IBlueprintManager.GetBlueprintPackage(string blueprint) => Blueprints.TryGetValue(blueprint, out var value) ? value : null;
     }
 }

@@ -9,7 +9,8 @@
     <UseSharedCompilation>false</UseSharedCompilation>
     <ApplicationIcon>..\..\docs\atlas.ico</ApplicationIcon>
     <PackAsTool>true</PackAsTool>
-    <PackageId>dotnet-atlas</PackageId>
+    <PackageId>atlas-cli</PackageId>
+    <LangVersion>7.1</LangVersion>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
@@ -24,6 +25,7 @@
     <PackageReference Include="BouncyCastle" Version="1.8.2" />
     <PackageReference Include="Handlebars.Net" Version="1.9.5" />
     <PackageReference Include="JmesPath.Net" Version="1.0.101" />
+    <PackageReference Include="Markdig" Version="0.15.4" />
     <PackageReference Include="Microsoft.AspNetCore.Http.Abstractions" Version="2.1.1" />
     <PackageReference Include="Microsoft.AspNetCore.Http.Extensions" Version="2.1.1" />
     <PackageReference Include="Microsoft.Extensions.CommandLineUtils" Version="1.1.1" />

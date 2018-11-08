@@ -1,10 +1,10 @@
 {
     "win10-x64": {
         "version": "{{ latest.version }}",
-        "path": "( ['https://', deployment.outputs.hostName.value, '.azureedge.net/{{ storage.container.downloads }}/atlas-{{ latest.version }}-win10-x64.zip'].join('', @) )"
+        "path": "( ['https://', deployment.get.properties.outputs.hostName.value, '.azureedge.net/{{ storage.container.downloads }}/atlas-{{ latest.version }}-win10-x64.zip'].join('', @) )"
     },
     "linux-x64": {
         "version": "{{ latest.version }}",
-        "path": "( ['https://', deployment.outputs.hostName.value, '.azureedge.net/{{ storage.container.downloads }}/atlas-{{ latest.version }}-linux-x64.tar.gz'].join('', @) )"
+        "path": "( ['https://', deployment.get.properties.outputs.hostName.value, '.azureedge.net/{{ storage.container.downloads }}/atlas-{{ latest.version }}-linux-x64.tar.gz'].join('', @) )"
     }
 }

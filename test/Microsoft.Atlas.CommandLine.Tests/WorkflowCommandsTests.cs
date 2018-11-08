@@ -297,5 +297,82 @@ Responses:
 
             Assert.IsTrue(error.Message.Contains("interactive"), "Exception message includes 'interactive'");
         }
+
+        [TestMethod]
+        public async Task WorkflowCanRunWithOnlyHttpsWorkflowYamlFile()
+        {
+            var stubRequests = Yaml<StubHttpClientHandlerFactory>(@"
+Responses:
+    https://localhost/just/workflow.yaml: 
+        GET:
+            status: 200
+            body: |
+                operations:
+                - message: Just a workflow file
+");
+
+            InitializeServices(stubRequests);
+
+            Services.App.Execute("deploy", "https://localhost/just/workflow.yaml");
+
+            Console.AssertContainsInOrder("Just a workflow file");
+        }
+
+        [TestMethod]
+        public async Task WorkflowCanContainReadmeWithNoYaml()
+        {
+            var stubRequests = Yaml<StubHttpClientHandlerFactory>(@"
+Responses:
+    https://localhost/minimal/workflow.yaml: 
+        GET:
+            status: 200
+            body: |
+                operations:
+                - message: Just a workflow file
+    https://localhost/minimal/readme.md: 
+        GET:
+            status: 200
+            body: |
+                # Minimal
+
+                and has no yaml code blocks
+
+
+");
+
+            InitializeServices(stubRequests);
+
+            Services.App.Execute("deploy", "https://localhost/minimal/workflow.yaml");
+
+            Console.AssertContainsInOrder("Just a workflow file");
+        }
+
+        [TestMethod]
+        public async Task WorkflowCanContainMinimalReadmeInfo()
+        {
+            var stubRequests = Yaml<StubHttpClientHandlerFactory>(@"
+Responses:
+    https://localhost/minimal/workflow.yaml: 
+        GET:
+            status: 200
+            body: |
+                operations:
+                - message: Just a workflow file
+    https://localhost/minimal/readme.md: 
+        GET:
+            status: 200
+            body: |
+                ``` yaml
+                info:
+                  title: minimal
+                ```
+");
+
+            InitializeServices(stubRequests);
+
+            Services.App.Execute("deploy", "https://localhost/minimal/workflow.yaml");
+
+            Console.AssertContainsInOrder("Just a workflow file");
+        }
     }
 }

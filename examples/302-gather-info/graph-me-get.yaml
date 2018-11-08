@@ -1,9 +1,0 @@
-# https://docs.microsoft.com/en-us/rest/api/graphrbac/objects/getcurrentuser
-
-method: GET
-url: https://graph.windows.net/{{tenant}}/me?api-version=1.6
-auth:
-  tenant: {{tenant}}
-  resource: https://graph.windows.net/
-  client: 04b07795-8ddb-461a-bbee-02f9e1bf7b46 # Azure CLI
-  

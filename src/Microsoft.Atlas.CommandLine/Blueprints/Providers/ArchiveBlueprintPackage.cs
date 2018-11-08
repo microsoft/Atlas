@@ -2,6 +2,7 @@
 // Licensed under the MIT license.
 
 using System;
+using System.Collections.Generic;
 using System.IO;
 
 namespace Microsoft.Atlas.CommandLine.Blueprints.Providers
@@ -16,6 +17,11 @@ namespace Microsoft.Atlas.CommandLine.Blueprints.Providers
         }
 
         public bool Exists(string path)
+        {
+            throw new NotImplementedException();
+        }
+
+        public IEnumerable<string> GetGeneratedPaths()
         {
             throw new NotImplementedException();
         }

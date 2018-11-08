@@ -1,6 +1,7 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license.
 
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -109,7 +110,30 @@ namespace Microsoft.Atlas.CommandLine.JsonClient
             // using (var reader = new StringReader(responseBody))
             using (var reader = new StreamReader(await response.Content.ReadAsStreamAsync()))
             {
-                jsonResponse.body = _deserializer.Deserialize<TResponse>(reader);
+                try
+                {
+                    jsonResponse.body = _deserializer.Deserialize<TResponse>(reader);
+                }
+                catch (YamlDotNet.Core.SyntaxErrorException)
+                {
+                    var failed = true;
+                    try
+                    {
+                        var responseBody = await response.Content.ReadAsStringAsync();
+                        var temporary = Newtonsoft.Json.JsonConvert.DeserializeObject(responseBody);
+                        var json = Newtonsoft.Json.JsonConvert.SerializeObject(temporary);
+                        jsonResponse.body = _deserializer.Deserialize<TResponse>(json);
+                        failed = false;
+                    }
+                    catch
+                    {
+                    }
+
+                    if (failed)
+                    {
+                        throw;
+                    }
+                }
             }
 
             // Information is added to secret tracker as soon as possible

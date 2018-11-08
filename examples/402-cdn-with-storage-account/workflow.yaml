@@ -1,12 +1,12 @@
 
-values: {{{ json }}}
-
 # Declaring secret {{ secret vsts.token }}
 
 operations:
 - message: Validating inputs
 - {condition: (!azure.tenant),       output: { missing: {azure: {tenant: or --set azure.tenant=AAD_TENANT_ID }}}}
 - {condition: (!azure.subscription), output: { missing: {azure: {subscription: or --set azure.subscription=AZURE_SUBSCRIPTION_ID }}}}
+- {condition: (!latest.version),     output: { missing: {latest: {version: or --set latest.version=SEMVER_VERSION }}}}
+- {condition: (!latest.drop),        output: { missing: {latest: {version: or --set latest.drop=BUILD_ARTIFACTS_DIRECTORY }}}}
 
 - message: Input validation failed
   condition: (missing != null)
@@ -20,48 +20,77 @@ operations:
       as command line options.
     details: (missing)
 
+- output:
+    request:
+      auth:
+        tenant: ( azure.tenant )
+      parameters:
+        subscriptionId: ( azure.subscription )
+        resourceGroupName: ( azure.resourceGroupName )
+        deploymentName: cdn-and-storage-{{ guid (datetime add="PT0S") }}
+    resourceGroup:
+      put:
+        location: ( azure.location )
+    deployment:
+      put:
+        properties:
+          mode: Incremental
+          template: {{> azuredeploy.json }}
+          parameters: 
+            location:
+              value: {{ azure.location }}
+  
 - message: Preparing resource group
-  request: apis/azure/resourcegroups/apply.yaml
+  values:
+    request:
+      body: ( resourceGroup.put )
+  request: apis/azure/ResourceManagementClient/ResourceGroups/CreateOrUpdate.yaml
+  output:
+    resourceGroup:
+      get: ( result.body )
 
 - message: Deploying cdn and storage account
-  values:
-    deployment:
-      name: cdn-and-storage-{{ guid (datetime add="PT0S") }}
-      properties:
-        mode: Incremental
-        template: {{> azuredeploy.json }}
-        parameters: 
-          location:
-            value: {{ azure.location }}
   operations:
   - message: Creating deployment
-    request: apis/azure/deployments/apply.yaml
-
-  - message: Waiting for deployment to complete...
-    request: apis/azure/deployments/get.yaml
+    values:
+      request:
+        body: ( deployment.put )
+    request: apis/azure/ResourceManagementClient/Deployments/CreateOrUpdate.yaml
     output:
-      deploymentStatus: (result.body)
+      deployment:
+        get: ( result.body )
+  
+  - message: Waiting for deployment to complete...
+    request: apis/azure/ResourceManagementClient/Deployments/Get.yaml
+    output:
+      deployment:
+        get: ( result.body )
     repeat:
-      condition: deploymentStatus.properties.provisioningState == 'Accepted' || deploymentStatus.properties.provisioningState == 'Running'
+      condition: deployment.get.properties.provisioningState == 'Accepted' || deployment.get.properties.provisioningState == 'Running'
       delay: PT5S
       timeout: PT4M
 
   - message: Deployment failed
-    condition: deploymentStatus.properties.provisioningState != 'Succeeded'
+    condition: deployment.get.properties.provisioningState != 'Succeeded'
     throw: 
-      message: (['Deployment provisioning state is "', deploymentStatus.properties.provisioningState, '". ', deploymentStatus.properties.error.message])
-      details: (deploymentStatus.properties.error)
+      message: (['Deployment provisioning state is "', deployment.get.properties.provisioningState, '". ', deployment.get.properties.error.message])
+      details: (deployment.get.properties.error)
 
   output:
-    deployment: (deploymentStatus.properties.{state:provisioningState, error:error, outputs:outputs})
+    deployment:
+      get: ( deployment.get )
     storage:
-      account: (deploymentStatus.properties.outputs.storageAccountName.value)
+      account: (deployment.get.properties.outputs.storageAccountName.value)
 
 - message: Getting storage keys
-  request: apis/azure/storage/listkeys.yaml
+  values:
+    request:
+      parameters:
+        accountName: ( storage.account )
+  request: apis/azure/StorageManagementClient/StorageAccounts/ListKeys.yaml
   output: 
     storage:
-      key: (result.body.keys[0].value)
+      key: ( result.body.keys[0].value )
 
 - message: Writing sleet.json
   template: sleet.json

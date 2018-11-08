@@ -1,5 +1,9 @@
 
-values: {{{ json }}}
+values: 
+  request:
+    parameters:
+      organization: ( devops.organization )
+      project: ( devops.project )
 
 operations:
 
@@ -10,20 +14,20 @@ operations:
       queues: (result.body.value)
 
 - message: Listing policy types
-  request: apis/devops/policy-type-list.yaml
+  request: apis/devops/Policy/Types/List.yaml
   output:
     devops:
       policy:
         types: (result.body.value)
 
 - message: Listing policy configurations
-  request: apis/devops/policy-configuration-list.yaml
+  request: apis/devops/Policy/Configurations/List.yaml
   output:
     devops:
       policies: (result.body.value)
 
 - message: Listing groups
-  request: apis/devops/graph-group-list.yaml
+  request: apis/devops/Graph/Groups/List.yaml
   output:
     devops:
       graph:
@@ -33,10 +37,13 @@ operations:
 - message: Processing repository {{ name }}
   values:
     repository: ( devops.repository.{{ @key }} )
+    request:
+      parameters:
+        repositoryId: {{ name }}
 
   operations:
   - message: Finding existing git repository
-    request: apis/devops/git-repository-get.yaml
+    request: apis/devops/Git/Repositories/GetRepository.yaml
     output:
       properties: (result.body)
 
@@ -57,15 +64,24 @@ operations:
 
   operations:
   - message: Finding existing build definition
-    request: apis/devops/build-definition-query.yaml
+    values:
+      request:
+        parameters:
+          name: "{{ name }}"
+          path: "{{ path }}"
+    request: apis/devops/Build/Definitions/List.yaml
     output:
       build:
         id: "( result.body.value[?name=='{{ name }}' && path=='{{ path }}'] | [0].id )"
         revision: "( result.body.value[?name=='{{ name }}' && path=='{{ path }}'] | [0].revision )"
-
+        
   - message: Getting build definition details
+    values:
+      request:
+        parameters:
+          definitionId: ( build.id )
     condition: (build.id != null)
-    request: apis/devops/build-definition-get.yaml
+    request: apis/devops/Build/Definitions/Get.yaml
     output:
       existing: (result.body)
 
@@ -90,12 +106,22 @@ operations:
 
   operations:
   - message: Finding existing release definition
-    request: apis/devops/release-definition-query.yaml
+    values:
+      request:
+        parameters:
+          searchText: "{{ name }}"
+          path: "{{ path }}"
+          isExactNameMatch: true
+    request: apis/devops/Release/Definitions/List.yaml
     output: "( result.body.value[?name=='{{ name }}' && path=='{{ path }}'] | [0].{release:{id:id, revision:revision}} )"
 
   - message: Getting release definition details
     condition: (release.id != null)
-    request: apis/devops/release-definition-get.yaml
+    values:
+      request:
+        parameters:
+          definitionId: ( release. id )
+    request: apis/devops/Release/Definitions/Get.yaml
     output:
       existing: (result.body)
 
@@ -128,10 +154,22 @@ operations:
   - message: Saving branch policies
     condition: (length(foreach || `[]`) != `0` )
     operations:
-    - message: (['Saving "', policy.type.displayName, '" on branch ', policy.settings.scope[0].refName])
+    - message: (['Updating "', foreach[0].type.displayName, '" on branch ', foreach[0].settings.scope[0].refName])
+      condition: ( foreach[0].id != null )
       values:
-        policy: ( foreach[0] )
-      request: apis/devops/policy-configuration-save.yaml
+        request:
+          parameters:
+            configurationId: ( foreach[0].id )
+          body: ( foreach[0] )
+      request: apis/devops/Policy/Configurations/Update.yaml
+      output:
+        policy: ( result.body.to_object( [[ to_string(id), {properties:@} ]] ) )
+    - message: (['Creating "', foreach[0].type.displayName, '" on branch ', foreach[0].settings.scope[0].refName])
+      condition: ( foreach[0].id == null )
+      values:
+        request:
+          body: ( foreach[0] )
+      request: apis/devops/Policy/Configurations/Create.yaml
       output:
         policy: ( result.body.to_object( [[ to_string(id), {properties:@} ]] ) )
     output:

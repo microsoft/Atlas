@@ -1,9 +1,0 @@
-# https://docs.microsoft.com/en-us/rest/api/resources/subscriptions/list
-
-method: GET
-url: https://management.azure.com/subscriptions?api-version=2016-06-01
-auth:
-  tenant: {{tenant}}
-  resource: https://management.azure.com/
-  client: 04b07795-8ddb-461a-bbee-02f9e1bf7b46 # Azure CLI
-  
