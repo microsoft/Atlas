@@ -23,6 +23,11 @@
       "commandLineArgs": "deploy sandbox k8s/lodejard-atlas-dev01",
       "workingDirectory": "..\\..\\..\\AtlasSandbox"
     },
+    "deploy 105-partials": {
+      "commandName": "Project",
+      "commandLineArgs": "deploy 105-partials",
+      "workingDirectory": "..\\..\\examples"
+    },
     "deploy 106-looping": {
       "commandName": "Project",
       "commandLineArgs": "deploy 106-looping",

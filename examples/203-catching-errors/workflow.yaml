@@ -30,34 +30,29 @@ operations:
 
 - message: otherwise your workflow will continue to execute when anything unexpected happens
 
-- message: ([ 'Fetching ', foreach[0] ])
-  values:
-    downloads: []
-    foreach: 
-    - examples/107-outputs/workflow.yaml
-    - No-Such-File.txt
-    - examples/108-looping/workflow.yaml
-    - README.md
+- foreach:
+    values:
+      path:
+      - examples/107-outputs/workflow.yaml
+      - No-Such-File.txt
+      - examples/108-looping/workflow.yaml
+      - README.md
+    output:
+      downloads: ([download])
   operations:
-  - values:
-      path: (foreach[0])
+  - message: ([ 'Fetching ', path ])
     request: fetch-github-file.yaml
     output:
-      append: 
+      download: 
         path: (path)
         contentlength: ( to_number( result.headers."Content-Length"[0] ) )
     catch:
       condition: result.status == `404` || contains(['SyntaxErrorException', 'YamlException'], error.type.name)
       output:
-        append: 
+        download: 
           path: (path)
           exception: (error.type.name)
           message: (error.message)
-  output:
-    downloads: ([downloads, append] [])
-    foreach: (foreach[1:])
-  repeat:
-    condition: (foreach[0] != null)
 
 - message: (['Number of downloads - ', length(downloads[].contentlength) ])
 - message: (['Total content length - ', sum(downloads[].contentlength) ])

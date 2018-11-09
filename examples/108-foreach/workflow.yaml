@@ -1,0 +1,22 @@
+
+operations:
+
+- message: This is an example of looping through items in an array 
+
+- message: Any jmespath expression that results in an array can be iterated over
+
+- foreach:
+    values:
+      item: ( items[] )
+    output:
+      items: ( [item] )
+ 
+  operations:
+  - message: Nested operations are a typical way of working with a loop
+ 
+  - message: ( ['Current item.url is ', item.url])
+ 
+  - message: Adding item.length property
+    output:
+      item:
+        length: ( length(item.url) )
