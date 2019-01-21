@@ -42,7 +42,7 @@ swagger:
     target: apis/graph
     source: https://github.com/Azure/azure-rest-api-specs/tree/master/specification/graphrbac/data-plane/
     inputs: 
-    - stable/1.6/graphrbac.json
+    - Microsoft.GraphRbac/stable/1.6/graphrbac.json
     extra:
       auth:
         tenant: '{{ azure.tenant }}'
