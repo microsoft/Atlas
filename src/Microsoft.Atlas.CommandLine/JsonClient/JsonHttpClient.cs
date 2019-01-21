@@ -127,6 +127,9 @@ namespace Microsoft.Atlas.CommandLine.JsonClient
                     }
                     catch
                     {
+                        var responseBody = await response.Content.ReadAsStringAsync();
+                        jsonResponse.body = responseBody;
+                        failed = false;
                     }
 
                     if (failed)

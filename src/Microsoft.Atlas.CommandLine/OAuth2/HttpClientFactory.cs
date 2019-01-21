@@ -8,8 +8,10 @@ using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Security.Cryptography;
 using System.Text;
+using System.Text.Encodings.Web;
 using System.Threading;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.WebUtilities;
 using Microsoft.Atlas.CommandLine.Accounts;
 using Microsoft.Atlas.CommandLine.ConsoleOutput;
 using Microsoft.Extensions.Logging;
@@ -80,7 +82,7 @@ namespace Microsoft.Atlas.CommandLine.OAuth2
             return new HttpClient(handler);
         }
 
-        private static async Task<HttpResponseMessage> SharedKeyAuthentication(HttpRequestMessage request, CancellationToken cancellationToken, Func<HttpRequestMessage, CancellationToken, Task<HttpResponseMessage>> next)
+        private async Task<HttpResponseMessage> SharedKeyAuthentication(HttpRequestMessage request, CancellationToken cancellationToken, Func<HttpRequestMessage, CancellationToken, Task<HttpResponseMessage>> next)
         {
             var authorization = request.Headers.Authorization;
             if (authorization != null && string.Equals(authorization.Scheme, "SharedKey"))
@@ -96,15 +98,28 @@ namespace Microsoft.Atlas.CommandLine.OAuth2
                     .Select(header => $"{header.Item1}:{header.Item2}\n")
                     .Aggregate(string.Empty, (a, b) => a + b);
 
-                var canonicalizedResource = $"/{account}{request.RequestUri.AbsolutePath}";
+                var queryParameters = QueryHelpers
+                    .ParseNullableQuery(request.RequestUri.Query)
+                    ?.Select((System.Collections.Generic.KeyValuePair<string, Extensions.Primitives.StringValues> item) =>
+                    {
+                        var name = UrlEncoder.Default.Encode(item.Key.ToLower());
+                        var value = string.Join(",", item.Value.Select(UrlEncoder.Default.Encode));
+                        return new { name, value };
+                    })
+                    ?.OrderBy(item => item.name)
+                    ?.Select(item => $"\n{item.name}:{item.value}")
+                    ?.Aggregate(string.Empty, (a, b) => a + b)
+                    ?? string.Empty;
+
+                var canonicalizedResource = $"/{account}{request.RequestUri.AbsolutePath}{queryParameters}";
 
                 var signatureString =
                     $"{request.Method}\n" +
-                    $"{request.Content.Headers.ContentEncoding}\n" +
-                    $"{request.Content.Headers.ContentLanguage}\n" +
-                    $"{request.Content.Headers.ContentLength}\n" +
-                    $"{request.Content.Headers.ContentMD5}\n" +
-                    $"{request.Content.Headers.ContentType}\n" +
+                    $"{request.Content?.Headers?.ContentEncoding}\n" +
+                    $"{request.Content?.Headers?.ContentLanguage}\n" +
+                    $"{request.Content?.Headers?.ContentLength}\n" +
+                    $"{request.Content?.Headers?.ContentMD5}\n" +
+                    $"{request.Content?.Headers?.ContentType}\n" +
                     $"{request.Headers.Date}\n" +
                     $"{request.Headers.IfModifiedSince}\n" +
                     $"{request.Headers.IfMatch}\n" +
@@ -113,6 +128,8 @@ namespace Microsoft.Atlas.CommandLine.OAuth2
                     $"{request.Headers.Range}\n" +
                     $"{canonicalizedHeaders}" +
                     $"{canonicalizedResource}";
+
+                _console.WriteLine($"SignatureString {signatureString}");
 
                 var hmac = new HMACSHA256(key);
                 var signature = hmac.ComputeHash(Encoding.ASCII.GetBytes(signatureString));
