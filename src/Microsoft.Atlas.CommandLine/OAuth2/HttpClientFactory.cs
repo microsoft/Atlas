@@ -129,8 +129,6 @@ namespace Microsoft.Atlas.CommandLine.OAuth2
                     $"{canonicalizedHeaders}" +
                     $"{canonicalizedResource}";
 
-                _console.WriteLine($"SignatureString {signatureString}");
-
                 var hmac = new HMACSHA256(key);
                 var signature = hmac.ComputeHash(Encoding.ASCII.GetBytes(signatureString));
 
