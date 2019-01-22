@@ -57,7 +57,7 @@ namespace Microsoft.Atlas.CommandLine.JsonClient
                     var memoryStream = new MemoryStream();
                     using (var writer = new StreamWriter(memoryStream, new UTF8Encoding(encoderShouldEmitUTF8Identifier: false), bufferSize: 1024, leaveOpen: true))
                     {
-                        _serializer.Serialize(writer, jsonRequest.body);
+                        writer.Write(Newtonsoft.Json.JsonConvert.SerializeObject(jsonRequest.body));
                     }
 
                     memoryStream.Position = 0;
