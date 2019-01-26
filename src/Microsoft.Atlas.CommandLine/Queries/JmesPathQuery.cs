@@ -24,6 +24,8 @@ namespace Microsoft.Atlas.CommandLine.Queries
                 .Register<ZipFunction>()
                 .Register<DistinctByFunction>()
                 .Register<DistinctFunction>()
+                .Register<Base64DecodeFunction>()
+                .Register<Base64EncodeFunction>()
                 .Register<BitsFunction>();
             _serializers = serializers;
         }
