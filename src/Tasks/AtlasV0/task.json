@@ -47,11 +47,10 @@
       "defaultValue": "deploy",
       "required": true,
       "options": {
-        "account add": "account add",
-        "account clear": "account clear",
-        "account show": "account show",
+        "account": "account",
         "deploy": "deploy",
-        "generate": "generate"
+        "generate": "generate",
+        "help": "help"
       },
       "helpMarkDown": "Select an Atlas command",
       "groupName": "commands",
