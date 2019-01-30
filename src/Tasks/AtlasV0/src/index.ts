@@ -21,6 +21,16 @@ async function run() {
             ]);
 
             await accountAdd.exec();
+
+            var accountAdd2 = tl.tool(atlasPath).arg([ 
+                'account', 'add',
+                '--name', parameters.azureSubscriptionEndpoint.connectedService + '-2',
+                '--authority', parameters.azureSubscriptionEndpoint.environmentAuthorityUrl + parameters.azureSubscriptionEndpoint.tenantId,
+                '--appid', parameters.azureSubscriptionEndpoint.servicePrincipalId,
+                '--secret', parameters.azureSubscriptionEndpoint.servicePrincipalKey
+            ]);
+
+            await accountAdd2.exec();
         }
         
         var atlas = tl.tool(atlasPath)
