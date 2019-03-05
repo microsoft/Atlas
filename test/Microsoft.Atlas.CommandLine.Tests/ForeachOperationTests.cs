@@ -70,7 +70,6 @@ namespace Microsoft.Atlas.CommandLine.Tests
                 "y.z is f");
         }
 
-
         [TestMethod]
         public void ForeachHashObject()
         {
@@ -142,6 +141,7 @@ namespace Microsoft.Atlas.CommandLine.Tests
 
             Console.AssertContainsInOrder("a+b+c");
         }
+
         public class ServiceContext : ServiceContextBase
         {
             public CommandLineApplicationServices App { get; set; }
