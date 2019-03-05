@@ -244,8 +244,10 @@ Responses:
             var put = stubHttpClients.AssertRequest("PUT", "https://example.com/somethings/uno?two=dos");
             var body = await put.Content.ReadAsStringAsync();
 
-            Assert.IsTrue(body.Contains("\"four\": \"quatro\""), "Unable to find expected text in " + body);
-            Assert.IsTrue(body.Contains("\"five\": 5"), "Unable to find expected text in " + body);
+            var expectedFourQuatroText = "\"four\":\"quatro\"";
+            Assert.IsTrue(body.Contains(expectedFourQuatroText), $"Unable to find expected text '{expectedFourQuatroText}' in " + body);
+            var expectedFive5Text = "\"five\":5";
+            Assert.IsTrue(body.Contains(expectedFive5Text), $"Unable to find expected text '{expectedFive5Text}' in " + body);
         }
 
         [TestMethod]
