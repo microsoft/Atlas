@@ -1,6 +1,8 @@
 steps:
 
 - script: |
+    set -e # script should fail with first non-zero exit code
+
     test_container_name=test-$(Build.BuildId)
     publish_container_name=publish-$(Build.BuildId)
 
