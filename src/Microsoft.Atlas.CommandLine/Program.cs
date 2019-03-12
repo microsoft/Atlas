@@ -10,6 +10,7 @@ using Microsoft.Atlas.CommandLine.Blueprints;
 using Microsoft.Atlas.CommandLine.Blueprints.Providers;
 using Microsoft.Atlas.CommandLine.Commands;
 using Microsoft.Atlas.CommandLine.ConsoleOutput;
+using Microsoft.Atlas.CommandLine.Execution;
 using Microsoft.Atlas.CommandLine.JsonClient;
 using Microsoft.Atlas.CommandLine.OAuth2;
 using Microsoft.Atlas.CommandLine.Queries;
@@ -100,6 +101,9 @@ namespace Microsoft.Atlas.CommandLine
 
                 .AddSingleton<CommandLineApplicationServices>()
                 .AddTransient<IConsole, ConsoleService>()
+
+                .AddTransient<IWorkflowEngine, WorkflowEngine>()
+                .AddTransient<IValuesEngine, ValuesEngine>()
 
                 .AddTransient<WorkflowCommands>()
                 .AddTransient<AccountCommands>()
