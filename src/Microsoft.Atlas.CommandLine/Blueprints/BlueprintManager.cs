@@ -64,6 +64,14 @@ namespace Microsoft.Atlas.CommandLine.Blueprints
                 }
             }
 
+            foreach (var swaggerInfo in blueprintInfo.workflows.Values)
+            {
+                foreach (var decoratorProvider in _decoratorProviders)
+                {
+                    blueprintPackage = await decoratorProvider.CreateDecorator(swaggerInfo, blueprintPackage);
+                }
+            }
+
             return blueprintPackage;
         }
 

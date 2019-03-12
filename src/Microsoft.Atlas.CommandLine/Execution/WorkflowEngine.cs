@@ -256,6 +256,12 @@ namespace Microsoft.Atlas.CommandLine.Execution
                                 }
                             }
 
+                            if (!string.IsNullOrEmpty(operation.workflow))
+                            {
+                                var workflow = _valuesEngine.EvaluateToString(operation.workflow, context.Values);
+
+                            }
+
                             // Third special type of operation - nested operations
                             if (operation.operations != null)
                             {

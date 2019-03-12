@@ -37,6 +37,7 @@ namespace Microsoft.Atlas.CommandLine.Models.Workflow
 
             public string request { get; set; }
             public string template { get; set; }
+            public string workflow { get; set; }
             public string write { get; set; }
             public IList<Operation> operations { get; set; }
         }
