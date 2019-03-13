@@ -5,6 +5,6 @@ namespace Microsoft.Atlas.CommandLine.Blueprints
 {
     public interface IBlueprintPackageProvider
     {
-        IBlueprintPackage TryGetBlueprintPackage(IBlueprintPackage package, string blueprint);
+        IBlueprintPackage TryGetBlueprintPackage(string blueprint);
     }
 }

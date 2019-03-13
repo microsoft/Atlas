@@ -22,6 +22,7 @@ namespace Microsoft.Atlas.CommandLine.Commands
 {
     public partial class WorkflowCommands
     {
+        private readonly IWorkflowLoader _workflowLoader;
         private readonly IWorkflowEngine _workflowEngine;
         private readonly IValuesEngine _valuesEngine;
         private readonly ITemplateEngineFactory _templateEngineFactory;
@@ -32,6 +33,7 @@ namespace Microsoft.Atlas.CommandLine.Commands
         private readonly IConsole _console;
 
         public WorkflowCommands(
+            IWorkflowLoader workflowLoader,
             IWorkflowEngine workflowEngine,
             IValuesEngine valuesEngine,
             ITemplateEngineFactory templateEngineFactory,
@@ -41,6 +43,7 @@ namespace Microsoft.Atlas.CommandLine.Commands
             IBlueprintManager blueprintManager,
             IConsole console)
         {
+            _workflowLoader = workflowLoader;
             _workflowEngine = workflowEngine;
             _valuesEngine = valuesEngine;
             _templateEngineFactory = templateEngineFactory;
@@ -126,11 +129,6 @@ namespace Microsoft.Atlas.CommandLine.Commands
                 throw new ApplicationException($"Unable to locate blueprint {Blueprint.Required()}");
             }
 
-            var templateEngine = _templateEngineFactory.Create(new TemplateEngineOptions
-            {
-                FileSystem = new BlueprintPackageFileSystem(blueprint)
-            });
-
             var eachValues = new List<object>();
 
             if (blueprint.Exists("values.yaml"))
@@ -201,62 +199,20 @@ namespace Microsoft.Atlas.CommandLine.Commands
                 values = (IDictionary<object, object>)MergeUtils.Merge(addValues, values) ?? values;
             }
 
-            object model;
-
-            var modelTemplate = "model.yaml";
-            var modelExists = blueprint.Exists(modelTemplate);
-            if (modelExists)
-            {
-                model = templateEngine.Render<object>(modelTemplate, values);
-            }
-            else
-            {
-                model = values;
-            }
-
-            var workflowTemplate = "workflow.yaml";
-            var workflowContents = new StringBuilder();
-            using (var workflowWriter = new StringWriter(workflowContents))
-            {
-                templateEngine.Render(workflowTemplate, model, workflowWriter);
-            }
-
-            // NOTE: the workflow is rendered BEFORE writing these output files because it may contain
-            // calls to the "secret" helper which will redact tokens that might have been provided in values
-
-            // write values to output folder
-            GenerateOutput("values.yaml", writer => _serializers.YamlSerializer.Serialize(writer, values));
-
-            if (modelExists)
-            {
-                // write normalized values to output folder
-                GenerateOutput(modelTemplate, writer => templateEngine.Render(modelTemplate, values, writer));
-            }
-
-            // write workflow to output folder
-            GenerateOutput("workflow.yaml", writer => writer.Write(workflowContents.ToString()));
-
-            var workflow = _serializers.YamlDeserializer.Deserialize<WorkflowModel>(new StringReader(workflowContents.ToString()));
-
-            foreach (var generatedFile in blueprint.GetGeneratedPaths())
-            {
-                using (var generatedContent = blueprint.OpenText(generatedFile))
-                {
-                    GenerateOutput($"generated/{generatedFile}", writer => writer.Write(generatedContent.ReadToEnd()));
-                }
-            }
+            var(templateEngine, workflow, model) = _workflowLoader.Load(blueprint, values, GenerateOutput);
 
             if (generateOnly == false)
             {
                 var patternMatcher = _patternMatcherFactory.Create(Target.Values.Any() ? Target.Values : new List<string>() { "/**" });
 
                 var context = new ExecutionContext.Builder()
+                    .UseBlueprintPackage(blueprint)
                     .UseTemplateEngine(templateEngine)
                     .UsePatternMatcher(patternMatcher)
                     .SetOutputDirectory(OutputDirectory.Required())
                     .SetNonInteractive(NonInteractive?.HasValue() ?? false)
                     .SetDryRun(DryRun?.HasValue() ?? false)
-                    .SetValues(values)
+                    .SetValues(model)
                     .Build();
 
                 context.AddValuesIn(_valuesEngine.ProcessValues(workflow.values, context.Values) ?? context.Values);

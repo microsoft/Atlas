@@ -8,6 +8,7 @@ using System.Linq;
 using System.Net.Http;
 using System.Threading.Tasks;
 using System.Xml;
+using Microsoft.Atlas.CommandLine.Blueprints;
 using Microsoft.Atlas.CommandLine.Blueprints.Providers;
 using Microsoft.Atlas.CommandLine.ConsoleOutput;
 using Microsoft.Atlas.CommandLine.JsonClient;
@@ -25,6 +26,8 @@ namespace Microsoft.Atlas.CommandLine.Execution
         private readonly ISecretTracker _secretTracker;
         private readonly IConsole _console;
         private readonly IJsonHttpClientFactory _clientFactory;
+        private readonly IBlueprintManager _blueprintManager;
+        private readonly IWorkflowLoader _workflowLoader;
         private int _operationCount;
 
         public WorkflowEngine(
@@ -32,13 +35,17 @@ namespace Microsoft.Atlas.CommandLine.Execution
             IYamlSerializers serializers,
             ISecretTracker secretTracker,
             IConsole console,
-            IJsonHttpClientFactory clientFactory)
+            IJsonHttpClientFactory clientFactory,
+            IBlueprintManager blueprintManager,
+            IWorkflowLoader workflowLoader)
         {
             _valuesEngine = valuesEngine;
             _serializers = serializers;
             _secretTracker = secretTracker;
             _console = console;
             _clientFactory = clientFactory;
+            _blueprintManager = blueprintManager;
+            _workflowLoader = workflowLoader;
         }
 
         public async Task<object> ExecuteOperations(OperationContext parentContext, IList<WorkflowModel.Operation> operations)
@@ -116,6 +123,7 @@ namespace Microsoft.Atlas.CommandLine.Execution
             {
                 var message = _valuesEngine.EvaluateToString(operation.message, context.Values);
                 var write = _valuesEngine.EvaluateToString(operation.write, context.Values);
+                var workflow = _valuesEngine.EvaluateToString(operation.workflow, context.Values);
 
                 if (!string.IsNullOrEmpty(message))
                 {
@@ -123,7 +131,7 @@ namespace Microsoft.Atlas.CommandLine.Execution
                     _console.WriteLine($"{new string(' ', context.Indent * 2)}- {message.Color(ConsoleColor.Cyan)}");
                 }
 
-                var debugPath = Path.Combine(context.ExecutionContext.OutputDirectory, "logs", $"{++_operationCount:000}-{new string('-', context.Indent * 2)}{new string((message ?? write ?? operation.request ?? operation.template ?? string.Empty).Select(ch => char.IsLetterOrDigit(ch) ? ch : '-').ToArray())}.yaml");
+                var debugPath = Path.Combine(context.ExecutionContext.OutputDirectory, "logs", $"{++_operationCount:000}-{new string('-', context.Indent * 2)}{new string((message ?? write ?? operation.request ?? operation.template ?? workflow ?? string.Empty).Select(ch => char.IsLetterOrDigit(ch) ? ch : '-').ToArray())}.yaml");
                 Directory.CreateDirectory(Path.GetDirectoryName(debugPath));
                 using (var writer = _secretTracker.FilterTextWriter(File.CreateText(debugPath)))
                 {
@@ -139,6 +147,7 @@ namespace Microsoft.Atlas.CommandLine.Execution
                                 { "repeat", operation.repeat },
                                 { "request", operation.request },
                                 { "template", operation.template },
+                                { "workflow", workflow },
                                 { "write", write },
                             }
                         },
@@ -256,10 +265,26 @@ namespace Microsoft.Atlas.CommandLine.Execution
                                 }
                             }
 
-                            if (!string.IsNullOrEmpty(operation.workflow))
+                            if (!string.IsNullOrEmpty(workflow))
                             {
-                                var workflow = _valuesEngine.EvaluateToString(operation.workflow, context.Values);
+                                var subBlueprint = await _blueprintManager.GetBlueprintPackageDependency(context.ExecutionContext.BlueprintPackage, workflow);
+                                if (subBlueprint == null)
+                                {
+                                    throw new OperationException($"Unable to load sub-workflow {workflow}");
+                                }
 
+                                var(subTemplateEngine, subWorkflow, subModel) = _workflowLoader.Load(subBlueprint, context.ValuesIn, GenerateOutput);
+
+                                var subContext = new ExecutionContext.Builder()
+                                    .CopyFrom(context)
+                                    .UseBlueprintPackage(subBlueprint)
+                                    .UseTemplateEngine(subTemplateEngine)
+                                    .SetValues(subModel)
+                                    .Build();
+
+                                var nestedResult = await ExecuteOperations(subContext, subWorkflow.operations);
+
+                                outputContext = MergeUtils.Merge(new Dictionary<object, object> { { "result", nestedResult } }, outputContext);
                             }
 
                             // Third special type of operation - nested operations
@@ -334,6 +359,13 @@ namespace Microsoft.Atlas.CommandLine.Execution
                     }
                 }
             }
+        }
+
+        private void GenerateOutput(string arg1, Action<TextWriter> arg2)
+        {
+            // TODO: proper rendered file output location for sub-workflow
+            // _console.WriteLine(arg1);
+            // arg2(_console.Out);
         }
 
         private object ProcessValues(object source, object context)

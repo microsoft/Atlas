@@ -14,27 +14,78 @@ namespace Microsoft.Atlas.CommandLine.Blueprints
     public class BlueprintManager : IBlueprintManager
     {
         private readonly IEnumerable<IBlueprintPackageProvider> _packageProviders;
+        private readonly IEnumerable<IDependencyBlueprintPackageProvider> _dependencyPackageProviders;
         private readonly IEnumerable<IBlueprintDecoratorProvider> _decoratorProviders;
         private readonly IYamlSerializers _yamlSerializers;
 
         public BlueprintManager(
             IEnumerable<IBlueprintPackageProvider> packageProviders,
-            IEnumerable<IBlueprintDecoratorProvider> fileGeneratorProviders,
+            IEnumerable<IDependencyBlueprintPackageProvider> dependencyPackageProviders,
+            IEnumerable<IBlueprintDecoratorProvider> decoratorProviders,
             IYamlSerializers yamlSerializers)
         {
             _packageProviders = packageProviders;
-            _decoratorProviders = fileGeneratorProviders;
+            _dependencyPackageProviders = dependencyPackageProviders;
+            _decoratorProviders = decoratorProviders;
             _yamlSerializers = yamlSerializers;
         }
 
         public async Task<IBlueprintPackage> GetBlueprintPackage(string blueprint)
         {
-            var blueprintPackageCore = GetBlueprintPackageCore(blueprint);
+            var blueprintPackageCore = GetBlueprintPackageCore(null, blueprint);
             if (blueprintPackageCore == null)
             {
                 return null;
             }
 
+            var blueprintPackage = await DecorateBlueprintPackage(blueprintPackageCore);
+
+            return blueprintPackage;
+        }
+
+        public async Task<IBlueprintPackage> GetBlueprintPackageDependency(IBlueprintPackage parent, string blueprint)
+        {
+            var blueprintPackageCore = GetBlueprintPackageCore(parent, blueprint);
+            if (blueprintPackageCore == null)
+            {
+                return null;
+            }
+
+            var blueprintPackage = await DecorateBlueprintPackage(blueprintPackageCore);
+
+            return blueprintPackage;
+        }
+
+        private IBlueprintPackage GetBlueprintPackageCore(IBlueprintPackage parent, string blueprint)
+        {
+            if (parent == null)
+            {
+                foreach (var provider in _packageProviders)
+                {
+                    var blueprintPackage = provider.TryGetBlueprintPackage(blueprint);
+                    if (blueprintPackage != null)
+                    {
+                        return blueprintPackage;
+                    }
+                }
+            }
+            else
+            {
+                foreach (var provider in _dependencyPackageProviders)
+                {
+                    var blueprintPackage = provider.TryGetBlueprintPackage(parent, blueprint);
+                    if (blueprintPackage != null)
+                    {
+                        return blueprintPackage;
+                    }
+                }
+            }
+
+            return null;
+        }
+
+        private async Task<IBlueprintPackage> DecorateBlueprintPackage(IBlueprintPackage blueprintPackageCore)
+        {
             var blueprintInfo = new WorkflowInfoDocument();
 
             if (blueprintPackageCore.Exists("readme.md"))
@@ -64,29 +115,15 @@ namespace Microsoft.Atlas.CommandLine.Blueprints
                 }
             }
 
-            foreach (var swaggerInfo in blueprintInfo.workflows.Values)
+            foreach (var dependencyInfo in blueprintInfo.workflows.Values)
             {
                 foreach (var decoratorProvider in _decoratorProviders)
                 {
-                    blueprintPackage = await decoratorProvider.CreateDecorator(swaggerInfo, blueprintPackage);
+                    blueprintPackage = await decoratorProvider.CreateDecorator(dependencyInfo, blueprintPackage);
                 }
             }
 
             return blueprintPackage;
-        }
-
-        private IBlueprintPackage GetBlueprintPackageCore(string blueprint)
-        {
-            foreach (var provider in _packageProviders)
-            {
-                var blueprintPackage = provider.TryGetBlueprintPackage(blueprint);
-                if (blueprintPackage != null)
-                {
-                    return blueprintPackage;
-                }
-            }
-
-            return null;
         }
     }
 }

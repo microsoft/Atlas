@@ -26,7 +26,7 @@ namespace Microsoft.Atlas.CommandLine.Tests.Stubs
         {
             _factory.Requests.Add(request);
 
-            if (_factory.Responses.TryGetValue(request.RequestUri.ToString(), out var address))
+            if (_factory.AllResponses.TryGetValue(StubFileSystem.Normalize(request.RequestUri.ToString()), out var address))
             {
                 // Find method, or fall back to get if method is head
                 if (address.TryGetValue(request.Method, out var response) ||
@@ -73,7 +73,7 @@ namespace Microsoft.Atlas.CommandLine.Tests.Stubs
             }
 
             // provide simple 404 response if the request is to an implied server
-            if (_factory.Responses.Any(kv => kv.Key.StartsWith($"{request.RequestUri.Scheme}://{request.RequestUri.Host}")))
+            if (_factory.AllResponses.Any(kv => kv.Key.StartsWith($"{request.RequestUri.Scheme}://{request.RequestUri.Host}")))
             {
                 return new HttpResponseMessage
                 {

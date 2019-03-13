@@ -1,4 +1,4 @@
-﻿// Copyright (c) Microsoft Corporation. All rights reserved.
+// Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license.
 
 using System;
@@ -10,10 +10,10 @@ namespace Microsoft.Atlas.CommandLine.Execution
 {
     public class OperationContext
     {
-        public OperationContext(ExecutionContext executionContext, object values)
+        public OperationContext(ExecutionContext executionContext, object values, int indent = 0)
         {
             ExecutionContext = executionContext;
-            Indent = 0;
+            Indent = indent;
             Path = "/";
             Values = values;
             OperationStartedUtc = DateTimeOffset.UtcNow;

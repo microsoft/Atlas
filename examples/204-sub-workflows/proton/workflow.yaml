@@ -1,0 +1,17 @@
+
+operations:
+- message: creating neutron
+- workflow: workflows/quark
+  values:
+    flavor: up
+    color: red
+- workflow: workflows/quark
+  values:
+    flavor: down
+    color: green
+- workflow: workflows/quark
+  values:
+    flavor: down
+    color: blue
+            
+  
