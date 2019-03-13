@@ -1,4 +1,3 @@
-
 operations:
 - message: creating proton
 - workflow: workflows/quark
@@ -13,5 +12,3 @@ operations:
   values:
     flavor: down
     color: blue
-            
-  
