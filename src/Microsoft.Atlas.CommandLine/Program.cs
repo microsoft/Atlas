@@ -109,7 +109,7 @@ namespace Microsoft.Atlas.CommandLine
 
                 .AddSingleton<CommandLineApplicationServices>()
                 .AddTransient<IConsole, ConsoleService>()
-                .AddTransient(typeof(IFactory<>),typeof(Factory<>))
+                .AddTransient(typeof(IFactory<>), typeof(Factory<>))
 
                 .AddTransient<IWorkflowLoader, WorkflowLoader>()
                 .AddTransient<IWorkflowEngine, WorkflowEngine>()

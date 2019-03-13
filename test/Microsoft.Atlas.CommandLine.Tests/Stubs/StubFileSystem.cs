@@ -9,9 +9,10 @@ using Microsoft.Atlas.CommandLine.Abstractions;
 
 namespace Microsoft.Atlas.CommandLine.Tests.Stubs
 {
-
     public class StubFileSystem : IFileSystem
     {
+        public IDictionary<string, string> Files { get; set; } = new Dictionary<string, string>();
+
         public static string Normalize(string path)
         {
             var parts = path.Replace("://", ":::").Replace('\\', '/').Split('/');
@@ -45,10 +46,9 @@ namespace Microsoft.Atlas.CommandLine.Tests.Stubs
             {
                 Console.WriteLine($"{path} -> {normalized}");
             }
+
             return normalized;
         }
-
-        public IDictionary<string, string> Files { get; set; } = new Dictionary<string, string>();
 
         bool IFileSystem.DirectoryExists(string path)
         {

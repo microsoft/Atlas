@@ -1,19 +1,12 @@
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT license.
+
 using System;
 using System.Threading.Tasks;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace Microsoft.Atlas.CommandLine.Factories
 {
-    public interface IFactory<TService>
-    {
-        Task<TService> Create<TArguments>(TArguments arguments);
-    }
-
-    public interface IFactoryInstance<TArguments>
-    {
-        Task Initialize(TArguments arguments);
-    }
-
     public class Factory<TService> : IFactory<TService>
     {
         private readonly IServiceProvider _serviceProvider;

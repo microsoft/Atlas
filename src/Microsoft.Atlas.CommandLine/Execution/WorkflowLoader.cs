@@ -1,3 +1,6 @@
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT license.
+
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -17,7 +20,7 @@ namespace Microsoft.Atlas.CommandLine.Execution
 
         public WorkflowLoader(
             ITemplateEngineFactory templateEngineFactory,
-            IYamlSerializers serializers    )
+            IYamlSerializers serializers)
         {
             _templateEngineFactory = templateEngineFactory;
             _serializers = serializers;

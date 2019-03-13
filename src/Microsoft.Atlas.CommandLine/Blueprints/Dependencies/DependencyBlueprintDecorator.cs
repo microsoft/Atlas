@@ -1,3 +1,6 @@
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT license.
+
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -77,6 +80,7 @@ namespace Microsoft.Atlas.CommandLine.Blueprints.Dependencies
                     return true;
                 }
             }
+
             result = default(TResult);
             return false;
         }
