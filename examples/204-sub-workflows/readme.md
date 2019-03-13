@@ -3,9 +3,7 @@
 
 Demonstrates now a workflow can execute nested workflows
 
-Also demonstrates now a readme can declare references to non-nested workflows.
-
-And demonstrates how workflows can be from an absolute source instead of a relative one.
+Also show now a `readme.md` like this one can declare references to non-nested workflows.
 
 ``` yaml
 workflows:
@@ -14,7 +12,7 @@ workflows:
     inputs: [101-messages]
 
   # or you can include packages from an absolute path or remote location 
-  library:
+  github-examples:
     source: https://github.com/Microsoft/Atlas/tree/master/examples/
     inputs: [102-yaml, 301-rest]
 ```
