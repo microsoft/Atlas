@@ -1,6 +1,6 @@
 
 operations:
-- message: creating neutron
+- message: creating proton
 - workflow: workflows/quark
   values:
     flavor: up
