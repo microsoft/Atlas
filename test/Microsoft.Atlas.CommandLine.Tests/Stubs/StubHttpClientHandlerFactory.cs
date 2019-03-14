@@ -11,7 +11,19 @@ namespace Microsoft.Atlas.CommandLine.Tests.Stubs
 {
     public class StubHttpClientHandlerFactory : IHttpClientHandlerFactory
     {
-        public IDictionary<string, IDictionary<HttpMethod, JsonResponse>> Responses { get; set; }
+        public IDictionary<string, string> Files { get; set; } = new Dictionary<string, string>();
+
+        public IDictionary<string, IDictionary<HttpMethod, JsonResponse>> Responses { get; set; } = new Dictionary<string, IDictionary<HttpMethod, JsonResponse>>();
+
+        public IDictionary<string, IDictionary<HttpMethod, JsonResponse>> AllResponses => Files
+            .ToDictionary(
+                kv => kv.Key,
+                kv => (IDictionary<HttpMethod, JsonResponse>)new Dictionary<HttpMethod, JsonResponse>
+                {
+                    { HttpMethod.Get, new JsonResponse { status = 200, body = kv.Value } }
+                })
+            .Concat(Responses)
+            .ToDictionary(kv => kv.Key, kv => kv.Value);
 
         public List<HttpRequestMessage> Requests { get; } = new List<HttpRequestMessage>();
 

@@ -16,6 +16,8 @@ namespace Microsoft.Atlas.CommandLine.Blueprints.Providers
             _archivePath = archivePath;
         }
 
+        public string Location => throw new NotImplementedException();
+
         public bool Exists(string path)
         {
             throw new NotImplementedException();

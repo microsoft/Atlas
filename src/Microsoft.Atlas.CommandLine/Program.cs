@@ -5,11 +5,15 @@ using System;
 using System.Linq;
 using System.Reflection;
 using System.Runtime.InteropServices;
+using Microsoft.Atlas.CommandLine.Abstractions;
 using Microsoft.Atlas.CommandLine.Accounts;
 using Microsoft.Atlas.CommandLine.Blueprints;
+using Microsoft.Atlas.CommandLine.Blueprints.Dependencies;
 using Microsoft.Atlas.CommandLine.Blueprints.Providers;
 using Microsoft.Atlas.CommandLine.Commands;
 using Microsoft.Atlas.CommandLine.ConsoleOutput;
+using Microsoft.Atlas.CommandLine.Execution;
+using Microsoft.Atlas.CommandLine.Factories;
 using Microsoft.Atlas.CommandLine.JsonClient;
 using Microsoft.Atlas.CommandLine.OAuth2;
 using Microsoft.Atlas.CommandLine.Queries;
@@ -72,6 +76,8 @@ namespace Microsoft.Atlas.CommandLine
         public static IServiceCollection AddServices(IServiceCollection services)
         {
             return services
+                .AddTransient<IFileSystem, FileSystem>()
+
                 .AddSingleton<IYamlSerializers, YamlSerializers>()
                 .AddSingleton<IJmesPathQuery, JmesPathQuery>()
                 .AddSingleton<ISecretTracker, SecretTracker>()
@@ -89,7 +95,10 @@ namespace Microsoft.Atlas.CommandLine
                 .AddTransient<IBlueprintPackageProvider, HttpsFilesBlueprintPackageProvider>()
                 .AddTransient<IBlueprintPackageProvider, DirectoryBlueprintPackageProvider>()
                 .AddTransient<IBlueprintPackageProvider, ArchiveBlueprintPackageProvider>()
+                .AddTransient<IDependencyBlueprintPackageProvider, DependencyBlueprintPackageProvider>()
+                .AddTransient<DependencyBlueprintDecorator>()
                 .AddTransient<IBlueprintDecoratorProvider, SwaggerBlueprintDecoratorProvider>()
+                .AddTransient<IBlueprintDecoratorProvider, DependencyBlueprintDecoratorProvider>()
 
                 .AddTransient<IRequestGenerator, RequestGenerator>()
 
@@ -100,6 +109,11 @@ namespace Microsoft.Atlas.CommandLine
 
                 .AddSingleton<CommandLineApplicationServices>()
                 .AddTransient<IConsole, ConsoleService>()
+                .AddTransient(typeof(IFactory<>), typeof(Factory<>))
+
+                .AddTransient<IWorkflowLoader, WorkflowLoader>()
+                .AddTransient<IWorkflowEngine, WorkflowEngine>()
+                .AddTransient<IValuesEngine, ValuesEngine>()
 
                 .AddTransient<WorkflowCommands>()
                 .AddTransient<AccountCommands>()

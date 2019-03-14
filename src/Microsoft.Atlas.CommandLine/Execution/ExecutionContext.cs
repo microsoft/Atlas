@@ -2,62 +2,96 @@
 // Licensed under the MIT license.
 
 using System;
+using Microsoft.Atlas.CommandLine.Blueprints;
 using Microsoft.Atlas.CommandLine.Targets;
 using Microsoft.Atlas.CommandLine.Templates;
-using static Microsoft.Atlas.CommandLine.Models.Workflow.WorkflowModel;
 
 namespace Microsoft.Atlas.CommandLine.Execution
 {
     public class ExecutionContext
     {
-        public ExecutionContext(ITemplateEngine templateEngine, IPatternMatcher patternMatcher, object values)
-        {
-            TemplateEngine = templateEngine;
-            PatternMatcher = patternMatcher;
-            Indent = 0;
-            Path = "/";
-            Values = values;
-            StartedUtc = DateTimeOffset.UtcNow;
-        }
+        public IBlueprintPackage BlueprintPackage { get; private set; }
 
         public ITemplateEngine TemplateEngine { get; private set; }
 
         public IPatternMatcher PatternMatcher { get; private set; }
 
-        public DateTimeOffset StartedUtc { get; private set; }
+        public DateTimeOffset ExecutionStartedUtc { get; private set; } = DateTimeOffset.UtcNow;
 
-        public int Indent { get; private set; }
+        public string OutputDirectory { get; private set; }
 
-        public string Path { get; private set; }
+        public bool IsDryRun { get; private set; }
 
-        public Operation Operation { get; private set; }
+        public bool IsInteractive { get; private set; }
 
-        public object Values { get; private set; }
-
-        public object ValuesIn { get; private set; }
-
-        public object ValuesOut { get; private set; }
-
-        public ExecutionContext CreateChildContext(Operation operation, object values)
+        public class Builder
         {
-            return new ExecutionContext(TemplateEngine, PatternMatcher, values)
+            private readonly ExecutionContext _context = new ExecutionContext();
+            private object _values;
+            private int _indent;
+
+            public OperationContext Build() => new OperationContext(_context, _values, _indent);
+
+            public Builder CopyFrom(OperationContext context)
             {
-                Indent = Indent + 1,
-                Path = string.IsNullOrWhiteSpace(operation.target) ? Path : (Path + operation.target + "/"),
-                Operation = operation,
-            };
-        }
+                _context.BlueprintPackage = context.ExecutionContext.BlueprintPackage;
+                _context.TemplateEngine = context.ExecutionContext.TemplateEngine;
+                _context.PatternMatcher = context.ExecutionContext.PatternMatcher;
+                _context.OutputDirectory = context.ExecutionContext.OutputDirectory;
+                _context.IsDryRun = context.ExecutionContext.IsDryRun;
+                _context.IsInteractive = context.ExecutionContext.IsInteractive;
+                _values = context.Values;
+                _indent = context.Indent;
+                return this;
+            }
 
-        public void AddValuesIn(object valuesIn)
-        {
-            ValuesIn = valuesIn;
-            Values = MergeUtils.Merge(ValuesIn, Values);
-        }
+            public Builder UseTemplateEngine(ITemplateEngine templateEngine)
+            {
+                _context.TemplateEngine = templateEngine;
+                return this;
+            }
 
-        public void AddValuesOut(object valuesOut)
-        {
-            ValuesOut = valuesOut;
-            Values = MergeUtils.Merge(ValuesOut, Values);
+            public Builder UsePatternMatcher(IPatternMatcher patternMatcher)
+            {
+                _context.PatternMatcher = patternMatcher;
+                return this;
+            }
+
+            public Builder SetOutputDirectory(string outputDirectory)
+            {
+                _context.OutputDirectory = outputDirectory;
+                return this;
+            }
+
+            public Builder SetDryRun(bool isDryRun)
+            {
+                _context.IsDryRun = isDryRun;
+                return this;
+            }
+
+            public Builder SetNonInteractive(bool isNonInteractive)
+            {
+                _context.IsInteractive = !isNonInteractive;
+                return this;
+            }
+
+            public Builder SetValues(object values)
+            {
+                _values = values;
+                return this;
+            }
+
+            public Builder SetIndent(int indent)
+            {
+                _indent = indent;
+                return this;
+            }
+
+            public Builder UseBlueprintPackage(IBlueprintPackage blueprint)
+            {
+                _context.BlueprintPackage = blueprint;
+                return this;
+            }
         }
     }
 }

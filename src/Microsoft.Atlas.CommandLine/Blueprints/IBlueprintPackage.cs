@@ -8,6 +8,8 @@ namespace Microsoft.Atlas.CommandLine.Blueprints
 {
     public interface IBlueprintPackage
     {
+        string Location { get; }
+
         bool Exists(string path);
 
         TextReader OpenText(string path);

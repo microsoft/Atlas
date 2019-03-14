@@ -1,0 +1,27 @@
+operations:
+- message: creating helium atom
+  operations:
+  - workflow: proton
+  - workflow: proton
+  - workflow: neutron
+  - workflow: neutron
+  - workflow: lepton
+    values:
+      flavor: electron
+  - workflow: lepton
+    values:
+      flavor: electron
+
+- message: calling messages workflow
+  workflow: workflows/101-messages
+
+- message: calling yaml workflow
+  workflow: workflows/102-yaml
+
+- message: calling rest workflow
+  workflow: workflows/301-rest
+  values:
+    azure:
+      tenant: common
+  output:
+    subscriptions: ( to_object(result.subscriptions[].[subscriptionId, displayName]) )

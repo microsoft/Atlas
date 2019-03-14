@@ -20,6 +20,8 @@ namespace Microsoft.Atlas.CommandLine.Blueprints.Decorators
 
         public IBlueprintPackage InnerPackage => _package;
 
+        public string Location => InnerPackage.Location;
+
         public virtual bool Exists(string path)
         {
             return GeneratedFiles.ContainsKey(path) || InnerPackage.Exists(path);

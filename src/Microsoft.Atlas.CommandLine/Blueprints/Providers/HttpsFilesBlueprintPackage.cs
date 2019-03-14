@@ -23,6 +23,8 @@ namespace Microsoft.Atlas.CommandLine.Blueprints.Providers
             _httpClient = _httpClientFactory.Create(auth: null);
         }
 
+        public string Location => _blueprintUri.ToString();
+
         public bool Exists(string path)
         {
             var request = new HttpRequestMessage(HttpMethod.Head, _blueprintUri.Append(path).ToString());

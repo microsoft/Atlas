@@ -12,6 +12,8 @@ namespace Microsoft.Atlas.CommandLine.Tests.Stubs
     {
         public IDictionary<string, string> Files { get; set; } = new Dictionary<string, string>();
 
+        public string Location { get; set; }
+
         TextReader IBlueprintPackage.OpenText(string path) => Files.TryGetValue(path, out var text) ? new StringReader(text) : null;
 
         bool IBlueprintPackage.Exists(string path) => Files.ContainsKey(path);

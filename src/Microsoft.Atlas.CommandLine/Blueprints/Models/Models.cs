@@ -16,6 +16,8 @@ namespace Microsoft.Atlas.CommandLine.Blueprints.Models
         public Swagger.Models.Info info { get; set; }
 
         public Dictionary<string, SwaggerReference> swagger { get; set; } = new Dictionary<string, SwaggerReference>();
+
+        public Dictionary<string, DependencyReference> workflows { get; set; } = new Dictionary<string, DependencyReference>();
     }
 
     public class SwaggerReference
@@ -24,5 +26,12 @@ namespace Microsoft.Atlas.CommandLine.Blueprints.Models
         public string source { get; set; }
         public List<string> inputs { get; set; } = new List<string>();
         public object extra { get; set; }
+    }
+
+    public class DependencyReference
+    {
+        public string target { get; set; }
+        public string source { get; set; }
+        public List<string> inputs { get; set; } = new List<string>();
     }
 }

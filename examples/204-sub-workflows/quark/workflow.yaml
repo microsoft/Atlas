@@ -1,0 +1,2 @@
+operations:
+- message: creating {{ color }} {{ flavor }} quark
