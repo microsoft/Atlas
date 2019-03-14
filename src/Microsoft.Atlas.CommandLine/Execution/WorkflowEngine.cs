@@ -284,6 +284,11 @@ namespace Microsoft.Atlas.CommandLine.Execution
 
                                 var nestedResult = await ExecuteOperations(subContext, subWorkflow.operations);
 
+                                if (subWorkflow.output != null)
+                                {
+                                    nestedResult = _valuesEngine.ProcessValues(subWorkflow.output, nestedResult);
+                                }
+
                                 outputContext = MergeUtils.Merge(new Dictionary<object, object> { { "result", nestedResult } }, outputContext);
                             }
 

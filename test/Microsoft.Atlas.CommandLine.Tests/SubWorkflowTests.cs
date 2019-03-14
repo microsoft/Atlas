@@ -135,5 +135,95 @@ Files:
 
             Console.AssertContainsInOrder("Before", "During", "After");
         }
+
+        [TestMethod]
+        public async Task OnlyWorkflowOperationValuesPassThrough()
+        {
+            var stubs = Yaml<StubHttpClientHandlerFactory>(@"
+Files:
+  https://localhost/the-test/workflow.yaml: |
+    operations:
+    - workflow: ../step1
+      values: { x: ( xValue ) }
+  https://localhost/step1/workflow.yaml: |
+    operations:
+    - message: (['x=<', x, '>'])
+    - message: (['y=<', y, '>'])
+    - message: (['xValue=<', xValue, '>'])
+    - message: (['yValue=<', yValue, '>'])
+");
+
+            InitializeServices(stubs);
+
+            var result = Services.App.Execute(
+                "deploy",
+                "https://localhost/the-test",
+                "--set",
+                "xValue=alpha",
+                "--set",
+                "yValue=beta",
+                "--set",
+                "x=gamma",
+                "--set",
+                "y=delta");
+
+            Assert.AreEqual(0, result);
+
+            Console.AssertContainsInOrder("x=<alpha>", "y=<>", "xValue=<>", "yValue=<>");
+        }
+
+        [TestMethod]
+        public async Task OnlyWorkflowOperationOutputPassBack()
+        {
+            var stubs = Yaml<StubHttpClientHandlerFactory>(@"
+Files:
+  https://localhost/the-test/workflow.yaml: |
+    operations:
+    - workflow: ../step1
+      output: { xOut: ( result.x ) }
+    - message: ([ 'everything is ', to_string(@) ])
+  https://localhost/step1/workflow.yaml: |
+    operations:
+    - output:
+        x: alpha
+        y: beta
+");
+
+            InitializeServices(stubs);
+
+            var result = Services.App.Execute("deploy", "https://localhost/the-test");
+
+            Assert.AreEqual(0, result);
+
+            Console.AssertContainsInOrder(@"everything is {""xOut"":""alpha""}");
+        }
+
+        [TestMethod]
+        public async Task WorkflowOutputWorksSameAsOperationOutput()
+        {
+            var stubs = Yaml<StubHttpClientHandlerFactory>(@"
+Files:
+  https://localhost/the-test/workflow.yaml: |
+    operations:
+    - workflow: ../step1
+      output: { xOut: ( result.x ) }
+    - message: ([ 'everything is ', to_string(@) ])
+  https://localhost/step1/workflow.yaml: |
+    operations:
+    - output:
+        xOperation: alpha
+        yOperation: beta
+    output:
+      x: ( xOperation )
+");
+
+            InitializeServices(stubs);
+
+            var result = Services.App.Execute("deploy", "https://localhost/the-test");
+
+            Assert.AreEqual(0, result);
+
+            Console.AssertContainsInOrder(@"everything is {""xOut"":""alpha""}");
+        }
     }
 }
