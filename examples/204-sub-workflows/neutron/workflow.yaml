@@ -1,14 +1,14 @@
 operations:
 - message: creating neutron
-- workflow: workflows/quark
+- workflow: ../quark
   values:
     flavor: up
     color: red
-- workflow: workflows/quark
+- workflow: ../quark
   values:
     flavor: up
     color: green
-- workflow: workflows/quark
+- workflow: ../quark
   values:
     flavor: down
     color: blue
