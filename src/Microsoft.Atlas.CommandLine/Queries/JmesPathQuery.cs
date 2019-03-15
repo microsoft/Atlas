@@ -50,7 +50,7 @@ namespace Microsoft.Atlas.CommandLine.Queries
                     return _serializers.YamlDeserializer.Deserialize<object>(jsonText);
                 }
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 throw new QueryException(ex.Message + Environment.NewLine + expression) { Expression = expression };
             }
