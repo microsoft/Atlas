@@ -225,5 +225,122 @@ Files:
 
             Console.AssertContainsInOrder(@"everything is {""xOut"":""alpha""}");
         }
+
+        [TestMethod]
+        public async Task WorkflowValuesYamlFileIsInEffect()
+        {
+            var stubs = Yaml<StubHttpClientHandlerFactory>(@"
+Files:
+  https://localhost/the-test/workflow.yaml: |
+    operations:
+    - workflow: step1
+      output: (result)
+    - condition: (x != 'one')
+      throw: 
+        message: (['Expected x == one, actual <', x||'null', '>'])
+  https://localhost/the-test/step1/values.yaml: |
+    xValue: one
+  https://localhost/the-test/step1/workflow.yaml: |
+    operations:
+    - output: {x: (xValue)}
+");
+
+            InitializeServices(stubs);
+
+            var result = Services.App.Execute("deploy", "https://localhost/the-test");
+
+            Assert.AreEqual(0, result);
+        }
+
+        [TestMethod]
+        public async Task WorkflowValuesPropertyIsInEffect()
+        {
+            var stubs = Yaml<StubHttpClientHandlerFactory>(@"
+Files:
+  https://localhost/the-test/workflow.yaml: |
+    operations:
+    - workflow: step1
+      output: (result)
+    - condition: (y != 'two')
+      throw: 
+        message: (['Expected y == two, actual <', y||'null', '>'])
+  https://localhost/the-test/step1/workflow.yaml: |
+    values:
+      yValue: two
+    operations:
+    - output: {y: (yValue)}
+");
+
+            InitializeServices(stubs);
+
+            var result = Services.App.Execute("deploy", "https://localhost/the-test");
+
+            Assert.AreEqual(0, result);
+        }
+
+        [TestMethod]
+        public async Task WorkflowModelsYamlIsInEffect()
+        {
+            var stubs = Yaml<StubHttpClientHandlerFactory>(@"
+Files:
+  https://localhost/the-test/workflow.yaml: |
+    operations:
+    - workflow: step1
+      values:
+        zValueInput: three
+      output: (result)
+    - condition: (z != 'three')
+      throw: 
+        message: (['Expected z == three, actual <', z||'null', '>'])
+  https://localhost/the-test/step1/model.yaml: |
+    zValue: {{ zValueInput }}
+  https://localhost/the-test/step1/workflow.yaml: |
+    operations:
+    - output: {z: (zValue)}
+");
+
+            InitializeServices(stubs);
+
+            var result = Services.App.Execute("deploy", "https://localhost/the-test");
+
+            Assert.AreEqual(0, result);
+        }
+
+        [TestMethod]
+        public async Task HandlebarRenderingInModelAndWorkflowCanUseValues()
+        {
+            var stubs = Yaml<StubHttpClientHandlerFactory>(@"
+Files:
+  https://localhost/the-test/workflow.yaml: |
+    operations:
+    - workflow: step1
+      values:
+        x1: one
+  https://localhost/the-test/step1/values.yaml: |
+    x2: two
+  https://localhost/the-test/step1/model.yaml: |
+    x3: three
+    x1x2: m<{{x1}}{{x2}}{{x3}}{{x4}}>
+  https://localhost/the-test/step1/workflow.yaml: |
+    values:
+      x4: four
+      x1x2x3: w<{{x1}}{{x2}}{{x3}}{{x4}}>
+    operations:
+    - foreach:
+        values: 
+          variable: (['x1', 'x2', 'x3', 'x4', 'x1x2', 'x1x2x3'])
+          actual: ([x1, x2, x3, x4, x1x2, x1x2x3])
+          expected: (['one', 'two', 'three', 'four', 'm<onetwo>', 'w<onetwothree>'])
+      condition: ( actual != expected )
+      throw:
+        message: (['expected ', variable, '==<', expected || 'null', '> but actual <', actual || 'null', '>'])
+");
+
+            InitializeServices(stubs);
+
+            var result = Services.App.Execute("deploy", "https://localhost/the-test");
+
+            Assert.AreEqual(0, result);
+        }
     }
 }

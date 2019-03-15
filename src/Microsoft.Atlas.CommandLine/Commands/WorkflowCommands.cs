@@ -130,17 +130,7 @@ namespace Microsoft.Atlas.CommandLine.Commands
             }
 
             var eachValues = new List<object>();
-
-            if (blueprint.Exists("values.yaml"))
-            {
-                using (var reader = blueprint.OpenText("values.yaml"))
-                {
-                    eachValues.Add(_serializers.YamlDeserializer.Deserialize(reader));
-                }
-            }
-
             var defaultValuesFiles =
-                File.Exists("atlas-values.yaml") ? new[] { "atlas-values.yaml" } :
                 File.Exists("values.yaml") ? new[] { "values.yaml" } :
                 new string[0];
 
@@ -199,7 +189,7 @@ namespace Microsoft.Atlas.CommandLine.Commands
                 values = (IDictionary<object, object>)MergeUtils.Merge(addValues, values) ?? values;
             }
 
-            var(templateEngine, workflow, model) = _workflowLoader.Load(blueprint, values, GenerateOutput);
+            var(templateEngine, workflow, effectiveValues) = _workflowLoader.Load(blueprint, values, GenerateOutput);
 
             if (generateOnly == false)
             {
@@ -212,7 +202,7 @@ namespace Microsoft.Atlas.CommandLine.Commands
                     .SetOutputDirectory(OutputDirectory.Required())
                     .SetNonInteractive(NonInteractive?.HasValue() ?? false)
                     .SetDryRun(DryRun?.HasValue() ?? false)
-                    .SetValues(model)
+                    .SetValues(effectiveValues)
                     .Build();
 
                 context.AddValuesIn(_valuesEngine.ProcessValues(workflow.values, context.Values) ?? context.Values);

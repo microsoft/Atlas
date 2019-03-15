@@ -11,6 +11,6 @@ namespace Microsoft.Atlas.CommandLine.Execution
 {
     public interface IWorkflowLoader
     {
-        (ITemplateEngine templateEngine, WorkflowModel workflow, object model) Load(IBlueprintPackage blueprint, object values, Action<string, Action<TextWriter>> generateOutput);
+        (ITemplateEngine templateEngine, WorkflowModel workflow, object effectiveValues) Load(IBlueprintPackage blueprint, object values, Action<string, Action<TextWriter>> generateOutput);
     }
 }

@@ -1,6 +1,7 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license.
 
+using System;
 using System.IO;
 using DevLab.JmesPath;
 using DevLab.JmesPath.Functions;
@@ -32,19 +33,26 @@ namespace Microsoft.Atlas.CommandLine.Queries
 
         public object Search(string expression, object json)
         {
-            var jtokenEmitter = new JTokenEmitter();
-            _serializers.ValueSerialier.SerializeValue(jtokenEmitter, json, json?.GetType() ?? typeof(object));
-            var transformOutput = _jmespath.Transform(jtokenEmitter.Root, expression);
-
-            using (var stringWriter = new StringWriter())
+            try
             {
-                using (var jsonWriter = new JsonTextWriter(stringWriter) { CloseOutput = false })
-                {
-                    transformOutput.WriteTo(jsonWriter);
-                }
+                var jtokenEmitter = new JTokenEmitter();
+                _serializers.ValueSerialier.SerializeValue(jtokenEmitter, json, json?.GetType() ?? typeof(object));
+                var transformOutput = _jmespath.Transform(jtokenEmitter.Root, expression);
 
-                var jsonText = stringWriter.GetStringBuilder().ToString();
-                return _serializers.YamlDeserializer.Deserialize<object>(jsonText);
+                using (var stringWriter = new StringWriter())
+                {
+                    using (var jsonWriter = new JsonTextWriter(stringWriter) { CloseOutput = false })
+                    {
+                        transformOutput.WriteTo(jsonWriter);
+                    }
+
+                    var jsonText = stringWriter.GetStringBuilder().ToString();
+                    return _serializers.YamlDeserializer.Deserialize<object>(jsonText);
+                }
+            }
+            catch (Exception ex)
+            {
+                throw new QueryException(ex.Message + Environment.NewLine + expression) { Expression = expression };
             }
         }
     }

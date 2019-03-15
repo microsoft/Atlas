@@ -273,14 +273,19 @@ namespace Microsoft.Atlas.CommandLine.Execution
                                     throw new OperationException($"Unable to load sub-workflow {workflow}");
                                 }
 
-                                var(subTemplateEngine, subWorkflow, subModel) = _workflowLoader.Load(subBlueprint, context.ValuesIn, GenerateOutput);
+                                var(subTemplateEngine, subWorkflow, subValues) = _workflowLoader.Load(subBlueprint, context.ValuesIn, GenerateOutput);
 
                                 var subContext = new ExecutionContext.Builder()
                                     .CopyFrom(context)
                                     .UseBlueprintPackage(subBlueprint)
                                     .UseTemplateEngine(subTemplateEngine)
-                                    .SetValues(subModel)
+                                    .SetValues(subValues)
                                     .Build();
+
+                                if (subWorkflow.values != null)
+                                {
+                                    subContext.AddValuesIn(_valuesEngine.ProcessValues(subWorkflow.values, subContext.Values));
+                                }
 
                                 var nestedResult = await ExecuteOperations(subContext, subWorkflow.operations);
 
