@@ -9,7 +9,7 @@ Waits until the deployment has succeeded or fails.
 info:
   title: azure-deployment
   version: 0.1
-  description: Demonstrates making a REST call
+  description: Deploys an ARM template to Azure
   contact:
     name: Microsoft
     url: https://github.com/Microsoft/Atlas/issues/new
