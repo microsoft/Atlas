@@ -1,0 +1,38 @@
+azure:
+  # tenant: 00000000-0000-0000-0000-000000000000 # Azure AD tenantId
+  # subscription: 00000000-0000-0000-0000-000000000000 # Azure subscriptionId
+  # resourceGroup: YOUR-RESOURCE-GROUP # Resource group name to create or update
+  location: westus2 # Azure location for resource group
+
+# The name of the deployment, provide a unique value to preserve deployment history
+# deploymentName: 
+
+# timeout after 45 minutes by default
+# an exception is thrown at that point though the deployment may eventually succeed
+timeout: PT45M 
+
+# polling frequency every 10 seconds until complete by default
+polling: PT10S
+
+# See https://docs.microsoft.com/en-us/rest/api/resources/deployments/createorupdate#deploymentproperties
+deployment:  
+  # May be 'Incremental' or 'Complete'. 
+  # 'Complete' will delete anything in the resource group which is not found in the deployment template
+  mode: Incremental
+  
+  # May be 'none' 'requestContent' 'responseContent' or 'requestContent,responseContent'
+  # See documentation for security implications changing this default
+  debugSetting:
+    detailLevel: none
+
+  # All ( deployment.parameters.* ) properties are used to provide template parameter values
+  # parameters: {} 
+
+  # template body is passed in as the ( deployment.template ) json object.
+  # template: 
+  #   $schema: https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#
+  #   contentVersion: 1.0.0.0
+  #   parameters: []
+  #   variables: {}
+  #   resources: []
+  #   outputs: {}
