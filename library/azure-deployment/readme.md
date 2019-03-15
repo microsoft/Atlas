@@ -18,9 +18,26 @@ info:
     url: https://github.com/Microsoft/Atlas/blob/master/LICENSE
 ```
 
-## Usage
+## Examples
 
-### Example usage as a subworkflow
+### Example 1: Invoking as a sub-workflow
+
+**readme.md**
+````
+# My Workflow
+
+I am importing the following sub-workflows from github.
+
+It is a good idea to replace 'master' with a sha.
+
+``` yaml
+workflows:
+  github-atlas-library:
+    source: https://github.com/Microsoft/Atlas/tree/master/library
+    inputs: 
+    - azure-deployment
+```
+````
 
 **values.yaml**
 ```
@@ -55,7 +72,7 @@ operations:
     my-outputs: ( result.properties.outputs ) # any arm "outputs" stored here
 ```
 
-### Example as a direct deployment
+### Example 2: Executing as a standalone workflow
 
 **my-values.yaml**
 ```
@@ -119,7 +136,9 @@ Deploying with debug details:
 atlas deploy -f my-values.yaml --set deployment.debugSetting.detailLevel=requestContent,responseContent https://github.com/Microsoft/Atlas/tree/master/library/azure-deployment
 ```
 
-#  
+## Dependencies
+
+This workflow calls the following REST APIs
 
 ``` yaml
 swagger:
