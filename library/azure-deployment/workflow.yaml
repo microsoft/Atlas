@@ -1,0 +1,56 @@
+values:
+  request:
+    parameters:
+      subscriptionId: "{{ azure.subscription }}"
+      resourceGroupName: "{{ azure.resourceGroup }}"
+      deploymentName: {{# if deploymentName }}{{ deploymentName }}{{ else }}atlas-deployment-{{ guid (datetime add="PT0S") }}{{/ if }}
+
+operations:
+- message: Deploying ARM template
+  operations:
+  # ensure resource group
+  - request: apis/azure/ResourceManagementClient/ResourceGroups/CreateOrUpdate.yaml
+    values:
+      request:
+        body:
+          location: "{{ azure.location }}"
+
+  # start deployment
+  - request: apis/azure/ResourceManagementClient/Deployments/CreateOrUpdate.yaml
+    values:
+      request:
+        body: 
+          properties: ( deployment )
+
+  # wait until complete
+  - request: apis/azure/ResourceManagementClient/Deployments/Get.yaml
+    output:
+      body: ( result.body )
+    repeat:
+      condition: ( contains(['Accepted', 'Running'], body.properties.provisioningState) )
+      delay: {{ polling }}
+      timeout: {{ timeout }}
+
+  - condition: ( body.properties.provisioningState != 'Succeeded' )
+    throw:
+      message: ( body.properties.error.message || 'ARM template failed' )
+      details:
+        provisioningState: ( body.properties.provisioningState )
+        error: ( body.properties.error )
+
+  catch:
+    condition: ( error.response.body.error != null )
+    output:
+      throw:
+        message: "( join(': ', [to_string(error.message), to_string(error.response.body.error.message)]) )"
+        details:
+          status: ( error.response.status )
+          error: ( error.response.body.error )
+          request: ( error.request )
+
+- condition: ( throw != null )
+  throw:
+    message: ( throw.message )
+    details: ( throw.details )
+
+output: ( body )
