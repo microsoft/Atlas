@@ -26,35 +26,44 @@ namespace Microsoft.Atlas.CommandLine.Execution
             _serializers = serializers;
         }
 
-        public (ITemplateEngine templateEngine, WorkflowModel workflow, object model) Load(IBlueprintPackage blueprint, object values, Action<string, Action<TextWriter>> generateOutput)
+        public (ITemplateEngine templateEngine, WorkflowModel workflow, object effectiveValues) Load(IBlueprintPackage blueprint, object values, Action<string, Action<TextWriter>> generateOutput)
         {
             var templateEngine = _templateEngineFactory.Create(new TemplateEngineOptions
             {
                 FileSystem = new BlueprintPackageFileSystem(blueprint)
             });
 
-            object model;
-
-            var modelTemplate = "model.yaml";
-            var modelExists = blueprint.Exists(modelTemplate);
-            if (modelExists)
+            var providedValues = values;
+            if (blueprint.Exists("values.yaml"))
             {
-                model = templateEngine.Render<object>(modelTemplate, values);
-                if (values != null)
+                using (var reader = blueprint.OpenText("values.yaml"))
                 {
-                    model = MergeUtils.Merge(model, values);
+                    var defaultValues = _serializers.YamlDeserializer.Deserialize(reader);
+                    if (values == null)
+                    {
+                        values = defaultValues;
+                    }
+                    else
+                    {
+                        values = MergeUtils.Merge(values, defaultValues);
+                    }
                 }
             }
-            else
+
+            var premodelValues = values;
+            if (blueprint.Exists("model.yaml"))
             {
-                model = values;
+                var model = templateEngine.Render<object>("model.yaml", values);
+                if (model != null)
+                {
+                    values = MergeUtils.Merge(model, values);
+                }
             }
 
-            var workflowTemplate = "workflow.yaml";
             var workflowContents = new StringBuilder();
             using (var workflowWriter = new StringWriter(workflowContents))
             {
-                templateEngine.Render(workflowTemplate, model, workflowWriter);
+                templateEngine.Render("workflow.yaml", values, workflowWriter);
             }
 
             // NOTE: the workflow is rendered BEFORE writing these output files because it may contain
@@ -62,12 +71,6 @@ namespace Microsoft.Atlas.CommandLine.Execution
 
             // write values to output folder
             generateOutput("values.yaml", writer => _serializers.YamlSerializer.Serialize(writer, values));
-
-            if (modelExists)
-            {
-                // write normalized values to output folder
-                generateOutput("model.yaml", writer => templateEngine.Render(modelTemplate, model, writer));
-            }
 
             // write workflow to output folder
             generateOutput("workflow.yaml", writer => writer.Write(workflowContents.ToString()));
@@ -82,7 +85,7 @@ namespace Microsoft.Atlas.CommandLine.Execution
                 }
             }
 
-            return (templateEngine, workflow, model);
+            return (templateEngine, workflow, values);
         }
     }
 }

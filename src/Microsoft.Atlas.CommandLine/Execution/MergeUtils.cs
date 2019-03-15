@@ -1,4 +1,4 @@
-﻿// Copyright (c) Microsoft Corporation. All rights reserved.
+// Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license.
 
 using System.Collections.Generic;
@@ -8,19 +8,19 @@ namespace Microsoft.Atlas.CommandLine.Execution
 {
     public static class MergeUtils
     {
-        public static object Merge(object values1, object values2)
+        public static object Merge(object overlayValues, object underlayValues)
         {
-            var values1Properties = values1 as IDictionary<object, object>;
-            var values2Properties = values2 as IDictionary<object, object>;
+            var overlayProperties = overlayValues as IDictionary<object, object>;
+            var underlayProperties = underlayValues as IDictionary<object, object>;
 
-            if (values1Properties != null && values2Properties != null)
+            if (overlayProperties != null && underlayProperties != null)
             {
                 var result = new Dictionary<object, object>();
-                foreach (var key in values2Properties.Keys.Concat(values1Properties.Keys.Except(values2Properties.Keys)))
+                foreach (var key in underlayProperties.Keys.Concat(overlayProperties.Keys.Except(underlayProperties.Keys)))
                 {
-                    if (values1Properties.TryGetValue(key, out var childValue1))
+                    if (overlayProperties.TryGetValue(key, out var childValue1))
                     {
-                        if (values2Properties.TryGetValue(key, out var childValue2))
+                        if (underlayProperties.TryGetValue(key, out var childValue2))
                         {
                             result.Add(key, Merge(childValue1, childValue2));
                         }
@@ -31,7 +31,7 @@ namespace Microsoft.Atlas.CommandLine.Execution
                     }
                     else
                     {
-                        if (values2Properties.TryGetValue(key, out var childValue2))
+                        if (underlayProperties.TryGetValue(key, out var childValue2))
                         {
                             result.Add(key, childValue2);
                         }
@@ -46,7 +46,7 @@ namespace Microsoft.Atlas.CommandLine.Execution
                 return result;
             }
 
-            return values1;
+            return overlayValues;
         }
     }
 }
