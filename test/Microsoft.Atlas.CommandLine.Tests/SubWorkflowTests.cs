@@ -306,7 +306,6 @@ Files:
             Assert.AreEqual(0, result);
         }
 
-
         [TestMethod]
         public async Task HandlebarRenderingInModelAndWorkflowCanUseValues()
         {
