@@ -43,11 +43,11 @@ namespace Microsoft.Atlas.CommandLine.Serialization
             JTokenTranserializer = JTokenTranserializerImpl;
         }
 
-        public Deserializer YamlDeserializer { get; }
+        public IDeserializer YamlDeserializer { get; }
 
-        public Serializer YamlSerializer { get; }
+        public ISerializer YamlSerializer { get; }
 
-        public Serializer JsonSerializer { get; }
+        public ISerializer JsonSerializer { get; }
 
         public IValueSerializer ValueSerialier { get; }
 

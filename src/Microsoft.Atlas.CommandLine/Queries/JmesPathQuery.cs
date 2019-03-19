@@ -35,20 +35,10 @@ namespace Microsoft.Atlas.CommandLine.Queries
         {
             try
             {
-                var jtokenEmitter = new JTokenEmitter();
-                _serializers.ValueSerialier.SerializeValue(jtokenEmitter, json, json?.GetType() ?? typeof(object));
-                var transformOutput = _jmespath.Transform(jtokenEmitter.Root, expression);
-
-                using (var stringWriter = new StringWriter())
-                {
-                    using (var jsonWriter = new JsonTextWriter(stringWriter) { CloseOutput = false })
-                    {
-                        transformOutput.WriteTo(jsonWriter);
-                    }
-
-                    var jsonText = stringWriter.GetStringBuilder().ToString();
-                    return _serializers.YamlDeserializer.Deserialize<object>(jsonText);
-                }
+                var jsonInput = _serializers.JsonSerializer.Serialize(json);
+                var jsonOutput = _jmespath.Transform(jsonInput, expression);
+                var result = _serializers.YamlDeserializer.Deserialize<object>(jsonOutput);
+                return result;
             }
             catch (Exception ex)
             {

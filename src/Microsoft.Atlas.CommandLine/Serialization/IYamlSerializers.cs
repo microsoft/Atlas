@@ -1,4 +1,4 @@
-﻿// Copyright (c) Microsoft Corporation. All rights reserved.
+// Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license.
 
 using System;
@@ -9,11 +9,11 @@ namespace Microsoft.Atlas.CommandLine.Serialization
 {
     public interface IYamlSerializers
     {
-        Deserializer YamlDeserializer { get; }
+        IDeserializer YamlDeserializer { get; }
 
-        Serializer YamlSerializer { get; }
+        ISerializer YamlSerializer { get; }
 
-        Serializer JsonSerializer { get; }
+        ISerializer JsonSerializer { get; }
 
         IValueSerializer ValueSerialier { get; }
 
