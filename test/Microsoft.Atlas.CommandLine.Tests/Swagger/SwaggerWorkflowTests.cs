@@ -388,6 +388,70 @@ Responses:
             stubHttpClients.AssertRequest("GET", "https://example.com/path");
         }
 
+        [TestMethod]
+        public async Task ExtraCanBeStringLiteral()
+        {
+            var stubHttpClients = Yaml<StubHttpClientHandlerFactory>(@"
+Responses:
+  https://example.net/the-test/readme.md:
+    GET:
+      status: 200
+      body: |
+        ``` yaml
+        info:
+          title: TheTest
+        swagger:
+          foo:
+            target: apis/tests
+            source: https://example.org/specs/
+            inputs:
+            - testing/swagger.json
+            extra: |
+              headers:
+                x-sum: {{{ query ""sum([`2`, `5`])"" }}}
+        ```
+  https://example.net/the-test/workflow.yaml:
+    GET:
+      status: 200
+      body:
+        operations:
+        - request: apis/tests/TestingClient/One/Two.yaml
+  https://example.org/specs/testing/swagger.json:
+    GET:
+      status: 200
+      body:
+        swagger: 2.0
+        info:
+          title: Testing Client
+          version: 5.0-preview.2
+        host: example.com
+        paths:
+          /path:
+            get:
+              tags:
+              - One
+              operationId: One_Two
+  https://example.com/path:
+    GET:
+      status: 200
+      body:
+      - request has arrived
+");
+
+            InitializeServices(stubHttpClients);
+
+            var result = Services.App.Execute("deploy", "https://example.net/the-test");
+
+            System.Console.Error.WriteLine(Console.ErrorStringWriter.ToString());
+            System.Console.Out.WriteLine(Console.OutStringWriter.ToString());
+
+            Assert.AreEqual(0, result);
+
+            var request = stubHttpClients.AssertRequest("GET", "https://example.com/path");
+            var xSumValue = request.Headers.GetValues("x-sum").Single();
+            Assert.AreEqual("7", xSumValue);
+        }
+
         public class ServiceContext : ServiceContextBase
         {
             public CommandLineApplicationServices App { get; set; }

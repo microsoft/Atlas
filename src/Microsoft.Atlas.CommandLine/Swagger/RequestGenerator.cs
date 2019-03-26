@@ -82,7 +82,14 @@ namespace Microsoft.Atlas.CommandLine.Swagger
 
                 if (context.SwaggerReference.extra != null)
                 {
-                    writer.WriteLine(_yamlSerializers.YamlSerializer.Serialize(context.SwaggerReference.extra));
+                    if (context.SwaggerReference.extra is string extraString)
+                    {
+                        writer.WriteLine(extraString);
+                    }
+                    else
+                    {
+                        writer.WriteLine(_yamlSerializers.YamlSerializer.Serialize(context.SwaggerReference.extra));
+                    }
                 }
 
                 var bodyParameter = parameters.SingleOrDefault(parameter => parameter.@in == "body");
