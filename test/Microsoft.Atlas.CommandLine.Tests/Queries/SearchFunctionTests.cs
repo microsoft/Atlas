@@ -22,7 +22,7 @@ data:
 - name: three
   value: 3");
 
-            var result = Query.Search(@"search(`""data[?name=='three']|[0].value""`, @) ", context);
+            var result = Query.Search(@"search('data[?name==\'three\']|[0].value', @) ", context);
 
             Assert.AreEqual(3, result);
         }
@@ -40,7 +40,7 @@ data:
 - name: three
   value: 3");
 
-            var result = Query.Search(@"search(join('', [`""data[?name=='""`, find, `""'] | [0].value""`]), @) ", context);
+            var result = Query.Search(@"search(concat('data[?name==\'', find, '\'] | [0].value'), @) ", context);
 
             Assert.AreEqual(2, result);
         }
@@ -56,7 +56,7 @@ data:
   three: 3
 ");
 
-            var result = Query.Search(@"search(join('', ['data.""', find, '""']), @) ", context);
+            var result = Query.Search(@"search(concat('data.""', find, '""'), @) ", context);
 
             Assert.AreEqual(1, result);
         }
