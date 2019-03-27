@@ -18,15 +18,15 @@ namespace Microsoft.Atlas.CommandLine.JsonClient
     public class JsonHttpClient : IJsonHttpClient
     {
         private readonly HttpClient _httpClient;
-        private readonly Serializer _serializer;
-        private readonly Deserializer _deserializer;
+        private readonly ISerializer _serializer;
+        private readonly IDeserializer _deserializer;
         private readonly IJmesPathQuery _jmesPath;
         private readonly ISecretTracker _secretTracker;
 
         public JsonHttpClient(
             HttpClient httpClient,
-            Serializer serializer,
-            Deserializer deserializer,
+            ISerializer serializer,
+            IDeserializer deserializer,
             IJmesPathQuery jmesPath,
             ISecretTracker secretTracker)
         {

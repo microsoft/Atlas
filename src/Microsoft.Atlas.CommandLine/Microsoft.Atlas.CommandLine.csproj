@@ -22,9 +22,9 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="BouncyCastle" Version="1.8.2" />
+    <PackageReference Include="BouncyCastle" Version="1.8.4" />
     <PackageReference Include="Handlebars.Net" Version="1.9.5" />
-    <PackageReference Include="JmesPath.Net" Version="1.0.101" />
+    <PackageReference Include="JmesPath.Net" Version="1.0.109" />
     <PackageReference Include="Markdig" Version="0.15.4" />
     <PackageReference Include="Microsoft.AspNetCore.Http.Abstractions" Version="2.1.1" />
     <PackageReference Include="Microsoft.AspNetCore.Http.Extensions" Version="2.1.1" />
@@ -36,7 +36,7 @@
     <PackageReference Include="Microsoft.IdentityModel.Clients.ActiveDirectory" Version="3.19.8" />
     <PackageReference Include="StyleCop.Analyzers" Version="1.0.2" />
     <PackageReference Include="System.Security.Cryptography.ProtectedData" Version="4.5.0" />
-    <PackageReference Include="YamlDotNet" Version="5.0.1" />
+    <PackageReference Include="YamlDotNet" Version="6.0.0" />
     <PackageReference Include="Packaging.Targets" Version="0.1.45" PrivateAssets="all" />
     <DotNetCliToolReference Include="dotnet-tarball" Version="0.1.45" />
     <DotNetCliToolReference Include="dotnet-zip" Version="0.1.45" />
