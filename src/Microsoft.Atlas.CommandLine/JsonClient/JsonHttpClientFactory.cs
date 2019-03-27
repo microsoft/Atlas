@@ -31,8 +31,7 @@ namespace Microsoft.Atlas.CommandLine.JsonClient
         {
             return new JsonHttpClient(
                 _httpClientFactory.Create(auth),
-                _serializers.JsonSerializer,
-                _serializers.YamlDeserializer,
+                _serializers,
                 _jmesPathQuery,
                 _secretTracker);
         }

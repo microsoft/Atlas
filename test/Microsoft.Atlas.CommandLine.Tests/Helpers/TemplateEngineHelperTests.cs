@@ -168,7 +168,7 @@ six
 
             var output = Render(templateEngine, "test", values);
 
-            Assert.AreEqual(@"data: {""list"": [5, ""alpha""]}", output);
+            Assert.AreEqual(@"data: {""list"":[5,""alpha""]}", output);
         }
 
         [TestMethod]
@@ -217,7 +217,7 @@ six
 
             var output = Render(templateEngine, "test", values);
 
-            Assert.AreEqual(@"data: [2, ""alpha""]", output);
+            Assert.AreEqual(@"data: [2,""alpha""]", output);
         }
 
         [TestMethod]

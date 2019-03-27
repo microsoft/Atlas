@@ -214,7 +214,24 @@ eta:
 
             Assert.AreEqual("data: !!binary AAECA/7/", yaml.Replace("\r", string.Empty).Replace("\n", string.Empty));
 
-            Assert.AreEqual(@"{""data"": !!binary AAECA/7/}", json.Replace("\r", string.Empty).Replace("\n", string.Empty));
+            Assert.AreEqual(@"{""data"":""AAECA/7/""}", json.Replace("\r", string.Empty).Replace("\n", string.Empty));
+        }
+
+        [TestMethod]
+        public void StrangeDateFormatCanBeDeserialized()
+        {
+            var services = Program.AddServices(new ServiceCollection()).BuildServiceProvider();
+
+            var serializers = services.GetRequiredService<IYamlSerializers>();
+
+            var json = @"{ ""x"": ""\/Date(1366340594875)\/"" }";
+
+            // A json deserializer is not directly available from the YamlSerializers interface
+            var data = Newtonsoft.Json.JsonConvert.DeserializeObject<IDictionary<string, object>>(json);
+
+            Assert.AreEqual(1, data.Count);
+
+            Assert.AreEqual(new DateTime(1970, 1, 1).AddMilliseconds(1366340594875), data["x"]);
         }
 
         private void AssertAreEqual(object expected, object actual)

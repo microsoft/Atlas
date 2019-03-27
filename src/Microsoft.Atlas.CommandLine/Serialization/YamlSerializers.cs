@@ -28,11 +28,12 @@ namespace Microsoft.Atlas.CommandLine.Serialization
                 .WithTypeConverter(new ByteArrayConverter())
                 .Build();
 
-            JsonSerializer = new SerializerBuilder()
-                .DisableAliases()
-                .JsonCompatible()
-                .WithTypeConverter(new ByteArrayConverter())
-                .Build();
+            // JsonSerializer = new SerializerBuilder()
+            //    .DisableAliases()
+            //    .JsonCompatible()
+            //    .WithTypeConverter(new ByteArrayConverter())
+            //    .Build();
+            JsonSerializer = new NewtonsoftJsonSerializer();
 
             ValueSerialier = new SerializerBuilder()
                 .DisableAliases()
