@@ -11,6 +11,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Microsoft.Atlas.CommandLine.Queries;
 using Microsoft.Atlas.CommandLine.Secrets;
+using Microsoft.Atlas.CommandLine.Serialization;
 using YamlDotNet.Serialization;
 
 namespace Microsoft.Atlas.CommandLine.JsonClient
@@ -18,21 +19,17 @@ namespace Microsoft.Atlas.CommandLine.JsonClient
     public class JsonHttpClient : IJsonHttpClient
     {
         private readonly HttpClient _httpClient;
-        private readonly ISerializer _serializer;
-        private readonly IDeserializer _deserializer;
+        private readonly IYamlSerializers _serializers;
         private readonly IJmesPathQuery _jmesPath;
         private readonly ISecretTracker _secretTracker;
 
         public JsonHttpClient(
             HttpClient httpClient,
-            ISerializer serializer,
-            IDeserializer deserializer,
+            IYamlSerializers serializers,
             IJmesPathQuery jmesPath,
             ISecretTracker secretTracker)
         {
             _httpClient = httpClient;
-            _serializer = serializer;
-            _deserializer = deserializer;
             _jmesPath = jmesPath;
             _secretTracker = secretTracker;
         }
@@ -44,20 +41,20 @@ namespace Microsoft.Atlas.CommandLine.JsonClient
             var request = new HttpRequestMessage(jsonRequest.method, jsonRequest.url);
             if (jsonRequest.body != null)
             {
-                if (jsonRequest.body is string)
+                if (jsonRequest.body is string textBody)
                 {
-                    request.Content = new StringContent((string)jsonRequest.body);
+                    request.Content = new StringContent(textBody);
                 }
-                else if (jsonRequest.body is byte[])
+                else if (jsonRequest.body is byte[] binaryBody)
                 {
-                    request.Content = new ByteArrayContent((byte[])jsonRequest.body);
+                    request.Content = new ByteArrayContent(binaryBody);
                 }
                 else
                 {
                     var memoryStream = new MemoryStream();
                     using (var writer = new StreamWriter(memoryStream, new UTF8Encoding(encoderShouldEmitUTF8Identifier: false), bufferSize: 1024, leaveOpen: true))
                     {
-                        writer.Write(Newtonsoft.Json.JsonConvert.SerializeObject(jsonRequest.body));
+                        _serializers.JsonSerializer.Serialize(writer, jsonRequest.body);
                     }
 
                     memoryStream.Position = 0;
@@ -112,17 +109,19 @@ namespace Microsoft.Atlas.CommandLine.JsonClient
             {
                 try
                 {
-                    jsonResponse.body = _deserializer.Deserialize<TResponse>(reader);
+                    jsonResponse.body = _serializers.YamlDeserializer.Deserialize<TResponse>(reader);
                 }
                 catch (YamlDotNet.Core.SyntaxErrorException)
                 {
                     var failed = true;
                     try
                     {
+                        // There is one known case where Newtonsoft supports a value yamldotnet does not.
+                        // Specifically when it looks like /Date(1366340594875)/
                         var responseBody = await response.Content.ReadAsStringAsync();
                         var temporary = Newtonsoft.Json.JsonConvert.DeserializeObject(responseBody);
                         var json = Newtonsoft.Json.JsonConvert.SerializeObject(temporary);
-                        jsonResponse.body = _deserializer.Deserialize<TResponse>(json);
+                        jsonResponse.body = _serializers.YamlDeserializer.Deserialize<TResponse>(json);
                         failed = false;
                     }
                     catch
