@@ -30,6 +30,7 @@ namespace Microsoft.Atlas.CommandLine.JsonClient
             ISecretTracker secretTracker)
         {
             _httpClient = httpClient;
+            _serializers = serializers;
             _jmesPath = jmesPath;
             _secretTracker = secretTracker;
         }
