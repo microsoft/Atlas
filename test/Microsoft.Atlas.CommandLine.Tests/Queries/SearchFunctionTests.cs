@@ -77,7 +77,6 @@ data:
             Assert.AreEqual(null, result);
         }
 
-
         [TestMethod]
         public void SearchResultCanBeAnObject()
         {

@@ -61,7 +61,6 @@ data:
             Assert.AreEqual(1, result);
         }
 
-
         [TestMethod]
         public void ConcatCanBeEmpty()
         {

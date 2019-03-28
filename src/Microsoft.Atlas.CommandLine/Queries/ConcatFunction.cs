@@ -34,7 +34,7 @@ namespace Microsoft.Atlas.CommandLine.Queries
             }
         }
 
-        private static string FormatAllowedDataTypes(string[] types)
+        public string FormatAllowedDataTypes(string[] types)
         {
             if (types.Length == 1)
             {
