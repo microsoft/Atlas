@@ -27,7 +27,9 @@ namespace Microsoft.Atlas.CommandLine.Queries
                 .Register<DistinctFunction>()
                 .Register<Base64DecodeFunction>()
                 .Register<Base64EncodeFunction>()
-                .Register<BitsFunction>();
+                .Register<BitsFunction>()
+                .Register<ConcatFunction>()
+                .Register("search", new SearchFunction(this));
             _serializers = serializers;
         }
 
@@ -39,6 +41,18 @@ namespace Microsoft.Atlas.CommandLine.Queries
                 var jsonOutput = _jmespath.Transform(jsonInput, expression);
                 var result = _serializers.YamlDeserializer.Deserialize<object>(jsonOutput);
                 return result;
+            }
+            catch (Exception ex)
+            {
+                throw new QueryException(ex.Message + Environment.NewLine + expression, ex) { Expression = expression };
+            }
+        }
+
+        public string SearchJsonText(string expression, string jsonText)
+        {
+            try
+            {
+                return _jmespath.Transform(jsonText, expression);
             }
             catch (Exception ex)
             {
