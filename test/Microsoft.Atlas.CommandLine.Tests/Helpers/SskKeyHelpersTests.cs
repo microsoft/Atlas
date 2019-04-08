@@ -13,7 +13,7 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 namespace Microsoft.Atlas.CommandLine.Tests.Helpers
 {
     [TestClass]
-    public class SskKeyHelpersTests : ServiceContextTestsBase<TemplateEngineTests.ServiceContext>
+    public class SskKeyHelpersTests : ServiceContextTestsBase<SskKeyHelpersTests.ServiceContext>
     {
 #pragma warning disable SA1201 // Elements must appear in the correct order
         public class ServiceContext : ServiceContextBase

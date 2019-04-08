@@ -12,7 +12,7 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 namespace Microsoft.Atlas.CommandLine.Tests
 {
     [TestClass]
-    public class SubWorkflowTests : ServiceContextTestsBase<WorkflowCommandsTests.ServiceContext>
+    public class SubWorkflowTests : ServiceContextTestsBase<SubWorkflowTests.ServiceContext>
     {
 #pragma warning disable SA1201 // Elements must appear in the correct order
         public class ServiceContext : ServiceContextBase
