@@ -12,7 +12,7 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 namespace Microsoft.Atlas.CommandLine.Tests
 {
     [TestClass]
-    public class CatchOperationTests : ServiceContextTestsBase<RequestOperationTests.ServiceContext>
+    public class CatchOperationTests : ServiceContextTestsBase<CatchOperationTests.ServiceContext>
     {
         [TestMethod]
         public void ThrowOperationCanBeCaught()

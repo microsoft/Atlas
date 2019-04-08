@@ -12,7 +12,7 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 namespace Microsoft.Atlas.CommandLine.Tests
 {
     [TestClass]
-    public class ForeachOperationTests : ServiceContextTestsBase<RequestOperationTests.ServiceContext>
+    public class ForeachOperationTests : ServiceContextTestsBase<ForeachOperationTests.ServiceContext>
     {
         [TestMethod]
         public void ForeachValuesAreIterated()
