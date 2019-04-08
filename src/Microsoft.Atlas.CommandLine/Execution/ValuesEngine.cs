@@ -4,6 +4,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using Microsoft.Atlas.CommandLine.Queries;
 using Microsoft.Atlas.CommandLine.Serialization;
@@ -65,12 +66,8 @@ namespace Microsoft.Atlas.CommandLine.Execution
                 var arrayIsPromoting = false;
                 var arrayLength = 0;
 
-                var output = new Dictionary<object, object>();
-                foreach (var kv in sourceDictionary)
+                void CheckArrayIsPromoting(object result)
                 {
-                    var result = ProcessValuesRecursive(kv.Value, contexts, promoteArrays: promoteArrays);
-                    output[kv.Key] = result;
-
                     if (promoteArrays && result is IList<object> resultArray)
                     {
                         if (!arrayIsPromoting)
@@ -85,6 +82,36 @@ namespace Microsoft.Atlas.CommandLine.Execution
                                 throw new ApplicationException("Foreach arrays must all be same size");
                             }
                         }
+                    }
+                }
+
+                var output = new Dictionary<object, object>();
+                foreach (var kv in sourceDictionary)
+                {
+                    var propertyName = Convert.ToString(kv.Key, CultureInfo.InvariantCulture);
+                    if (propertyName.StartsWith('(') && propertyName.EndsWith(')'))
+                    {
+                        var propertyGroupings = contexts
+                            .Select(eachContext =>
+                            {
+                                var eachPropertyName = _jmesPathQuery.Search(propertyName, eachContext);
+                                return (eachPropertyName, eachContext);
+                            })
+                            .ToList()
+                            .GroupBy(x => x.eachPropertyName, x => x.eachContext);
+
+                        foreach (var propertyGrouping in propertyGroupings)
+                        {
+                            var result = ProcessValuesRecursive(kv.Value, propertyGrouping.ToList(), promoteArrays: promoteArrays);
+                            output[propertyGrouping.Key] = result;
+                            CheckArrayIsPromoting(result);
+                        }
+                    }
+                    else
+                    {
+                        var result = ProcessValuesRecursive(kv.Value, contexts, promoteArrays: promoteArrays);
+                        output[propertyName] = result;
+                        CheckArrayIsPromoting(result);
                     }
                 }
 
@@ -112,7 +139,6 @@ namespace Microsoft.Atlas.CommandLine.Execution
             {
                 if (sourceString.StartsWith('(') && sourceString.EndsWith(')'))
                 {
-                    var expression = sourceString.Substring(1, sourceString.Length - 2);
                     var mergedResult = default(object);
                     foreach (var context in contexts)
                     {
