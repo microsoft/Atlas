@@ -342,5 +342,110 @@ Files:
 
             Assert.AreEqual(0, result);
         }
+
+
+        [TestMethod]
+        public async Task FileSystemTransitiveRelativeReferenceImportsFiles()
+        {
+            var stubs = Yaml<StubFileSystem>(@"
+Files:
+  the-test/readme.md: |
+    ``` yaml
+    info:
+        title: TheTest
+    workflows:
+      local:
+        inputs:
+        - step1
+    ```
+  the-test/workflow.yaml: |
+    operations:
+    - message: BeginTheTest
+    - workflow: workflows/step1
+    - message: EndTheTest
+  step1/readme.md: |
+    ``` yaml
+    info:
+        title: Step1
+    workflows:
+      local:
+        inputs:
+        - step2
+    ```
+  step1/workflow.yaml: |
+    operations:
+    - message: BeginStep1
+    - workflow: workflows/step2
+    - message: EndStep1
+  step2/readme.md: |
+    ``` yaml
+    info:
+        title: Step2
+    ```
+  step2/workflow.yaml: |
+    operations:
+    - message: DuringStep2
+");
+
+            InitializeServices(stubs);
+
+            var result = Services.App.Execute("deploy", "the-test");
+
+            Assert.AreEqual(0, result);
+
+            Console.AssertContainsInOrder("BeginTheTest", "BeginStep1", "DuringStep2", "EndStep1", "EndTheTest");
+        }
+
+        [TestMethod]
+        public async Task WebServerTransitiveRelativeReferenceImportsFiles()
+        {
+            var stubs = Yaml<StubHttpClientHandlerFactory>(@"
+Files:
+  https://localhost/the-test/readme.md: |
+    ``` yaml
+    info:
+        title: TheTest
+    workflows:
+      local:
+        inputs:
+        - step1
+    ```
+  https://localhost/the-test/workflow.yaml: |
+    operations:
+    - message: BeginTheTest
+    - workflow: workflows/step1
+    - message: EndTheTest
+  https://localhost/step1/readme.md: |
+    ``` yaml
+    info:
+        title: Step1
+    workflows:
+      local:
+        inputs:
+        - step2
+    ```
+  https://localhost/step1/workflow.yaml: |
+    operations:
+    - message: BeginStep1
+    - workflow: workflows/step2
+    - message: EndStep1
+  https://localhost/step2/readme.md: |
+    ``` yaml
+    info:
+        title: Step2
+    ```
+  https://localhost/step2/workflow.yaml: |
+    operations:
+    - message: DuringStep2
+");
+
+            InitializeServices(stubs);
+
+            var result = Services.App.Execute("deploy", "https://localhost/the-test");
+
+            Assert.AreEqual(0, result);
+
+            Console.AssertContainsInOrder("BeginTheTest", "BeginStep1", "DuringStep2", "EndStep1", "EndTheTest");
+        }
     }
 }

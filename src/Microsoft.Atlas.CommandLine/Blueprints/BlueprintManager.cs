@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Markdig.Syntax;
+using Microsoft.Atlas.CommandLine.Blueprints.Decorators;
 using Microsoft.Atlas.CommandLine.Blueprints.Models;
 using Microsoft.Atlas.CommandLine.Serialization;
 
@@ -35,7 +36,7 @@ namespace Microsoft.Atlas.CommandLine.Blueprints
             var blueprintPackageCore = GetBlueprintPackageCore(null, blueprint);
             if (blueprintPackageCore == null)
             {
-                return null;
+                throw new Exception($"Unable to find blueprint {blueprint}");
             }
 
             var blueprintPackage = await DecorateBlueprintPackage(blueprintPackageCore);
@@ -48,7 +49,7 @@ namespace Microsoft.Atlas.CommandLine.Blueprints
             var blueprintPackageCore = GetBlueprintPackageCore(parent, blueprint);
             if (blueprintPackageCore == null)
             {
-                return null;
+                throw new Exception($"Unable to find blueprint {blueprint}");
             }
 
             var blueprintPackage = await DecorateBlueprintPackage(blueprintPackageCore);
@@ -88,7 +89,9 @@ namespace Microsoft.Atlas.CommandLine.Blueprints
         {
             var blueprintInfo = new WorkflowInfoDocument();
 
-            if (blueprintPackageCore.Exists("readme.md"))
+            var blueprintPackage = blueprintPackageCore;
+
+            if (blueprintPackage.Exists("readme.md"))
             {
                 var readmeText = blueprintPackageCore.OpenText("readme.md").ReadToEnd();
                 var readmeDoc = Markdig.Markdown.Parse(readmeText);
@@ -103,9 +106,9 @@ namespace Microsoft.Atlas.CommandLine.Blueprints
 
                     blueprintInfo = _yamlSerializers.YamlDeserializer.Deserialize<WorkflowInfoDocument>(yamlText);
                 }
-            }
 
-            var blueprintPackage = blueprintPackageCore;
+                blueprintPackage = new GeneratedReadmeBlueprintDecorator(blueprintPackage, "");
+            }
 
             foreach (var swaggerInfo in blueprintInfo.swagger.Values)
             {
