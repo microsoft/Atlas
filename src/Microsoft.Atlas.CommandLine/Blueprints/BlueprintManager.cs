@@ -107,7 +107,7 @@ namespace Microsoft.Atlas.CommandLine.Blueprints
                     blueprintInfo = _yamlSerializers.YamlDeserializer.Deserialize<WorkflowInfoDocument>(yamlText);
                 }
 
-                blueprintPackage = new GeneratedReadmeBlueprintDecorator(blueprintPackage, "");
+                blueprintPackage = new GeneratedReadmeBlueprintDecorator(blueprintPackage, string.Empty);
             }
 
             foreach (var swaggerInfo in blueprintInfo.swagger.Values)

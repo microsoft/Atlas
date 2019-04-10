@@ -1,3 +1,6 @@
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT license.
+
 namespace Microsoft.Atlas.CommandLine.Blueprints.Decorators
 {
     public class GeneratedReadmeBlueprintDecorator : GeneratedFileBlueprintDecorator
