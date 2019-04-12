@@ -101,8 +101,8 @@ Responses:
             System.Console.Error.WriteLine(Console.ErrorStringWriter.ToString());
             System.Console.Out.WriteLine(Console.OutStringWriter.ToString());
 
-            Assert.AreEqual(1, generated.Count());
-            Assert.AreEqual(expectedPath, generated[0]);
+            Assert.AreEqual(2, generated.Count());
+            Assert.IsTrue(generated.Contains(expectedPath));
         }
 
         [TestMethod]
