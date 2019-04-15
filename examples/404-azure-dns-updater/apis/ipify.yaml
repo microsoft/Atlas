@@ -1,0 +1,2 @@
+method: GET
+url: https://api.ipify.org?format=json

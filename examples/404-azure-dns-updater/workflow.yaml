@@ -1,0 +1,39 @@
+operations:
+- request: apis/ipify.yaml
+  message: Getting current IP address
+  output:
+    currentIp: ( result.body.ip )
+
+- message: "( ['Current IP Address: ', currentIp] )"
+
+- output:
+    parameters:
+      subscriptionId: "{{ azure.subscription }}"
+      resourceGroupName: "{{ azure.resourceGroup }}"
+      zoneName: "{{ dns.zoneName }}"
+      recordType: "{{ dns.recordType }}"
+      relativeRecordSetName: "{{ dns.relativeRecordSetName }}"
+
+- request: apis/azure/DnsManagementClient/RecordSets/Get.yaml
+  message: Requesting Azure's currently configured IP address
+  values:
+    request:
+      parameters: ( parameters )
+  output:
+    recordSet: ( result.body )
+    currentAzureIpAddress: ( result.body.properties.ARecords[0].ipv4Address )
+
+- message: "( ['Azure Reported IP Address: ', currentAzureIpAddress] )"
+
+- request: apis/azure/DnsManagementClient/RecordSets/Update.yaml
+  condition: currentAzureIpAddress != currentIp
+  message: "( ['Updating IP address in Azure to ', currentIp] )"
+  values:
+    request:
+      parameters: ( parameters )
+      body:
+        properties:
+          ARecords:
+          - ipv4Address: "( currentIp )"
+  output:
+    recordSet: ( result.body )

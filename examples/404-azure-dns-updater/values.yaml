@@ -1,0 +1,12 @@
+azure:
+  tenant: [Azure Tenant ID]
+  subscription: [Azure Subscription ID]
+  resourceGroup: [Name of the Resource Group containing DNS]
+  location: [Resource Group Location]
+
+dns:
+  zoneName: [DNS Zone name]
+  ttl: 3600
+  recordType: A
+  relativeRecordSetName: "@"
+
