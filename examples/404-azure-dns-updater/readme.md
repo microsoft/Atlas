@@ -20,12 +20,6 @@ dns:
   ttl: 3600
 ```
 
-To run the workflow
-```
-atlas deploy dnsZones
-```
-
-References
 ``` yaml
 workflows:
   github-atlas-library:
