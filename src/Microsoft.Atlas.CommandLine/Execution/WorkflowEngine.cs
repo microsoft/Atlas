@@ -244,13 +244,21 @@ namespace Microsoft.Atlas.CommandLine.Execution
                             {
                                 if (!string.IsNullOrEmpty(write))
                                 {
-                                    var targetPath = Path.Combine(context.ExecutionContext.OutputDirectory, write);
-
-                                    Directory.CreateDirectory(Path.GetDirectoryName(targetPath));
-
-                                    using (var targetWriter = File.CreateText(targetPath))
+                                    if (string.Equals(write, "stdout"))
                                     {
-                                        if (!string.IsNullOrWhiteSpace(operation.template))
+                                        context.TemplateEngine.Render(operation.template, context.Values, Console.Out);
+                                    }
+                                    else if (string.Equals(write, "stderr"))
+                                    {
+                                        context.TemplateEngine.Render(operation.template, context.Values, Console.Error);
+                                    }
+                                    else
+                                    {
+                                        var targetPath = Path.Combine(context.ExecutionContext.OutputDirectory, write);
+
+                                        Directory.CreateDirectory(Path.GetDirectoryName(targetPath));
+
+                                        using (var targetWriter = File.CreateText(targetPath))
                                         {
                                             context.TemplateEngine.Render(operation.template, context.Values, targetWriter);
                                         }

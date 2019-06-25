@@ -1,0 +1,27 @@
+
+operations:
+- message: stdout and stderr are special file names for template write
+
+- message: template to console stdout
+  values:
+    characters:
+      cheshireCat:
+        url: https://en.wikipedia.org/wiki/Cheshire_Cat
+        description: >-
+          The Cheshire Cat (/ˈtʃɛʃər/ or /ˈtʃɛʃɪər/) is a fictional cat
+          popularised by Lewis Carroll in Alice's Adventures in Wonderland
+          and known for its distinctive mischievous grin.
+  template: characters.html
+  write: stdout
+
+- message: template to console stderr
+  values:
+    characters:
+      cheshireCat:
+        url: https://en.wikipedia.org/wiki/Cheshire_Cat
+        description: >-
+          The Cheshire Cat (/ˈtʃɛʃər/ or /ˈtʃɛʃɪər/) is a fictional cat
+          popularised by Lewis Carroll in Alice's Adventures in Wonderland
+          and known for its distinctive mischievous grin.
+  template: characters.html
+  write: stderr
