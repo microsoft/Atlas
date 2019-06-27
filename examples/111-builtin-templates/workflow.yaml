@@ -1,0 +1,43 @@
+values:
+  items:
+    - name: Cheshire Cat
+      url: https://en.wikipedia.org/wiki/Cheshire_Cat
+      description: >-
+        The Cheshire Cat (/ˈtʃɛʃər/ or /ˈtʃɛʃɪər/) is a fictional cat
+        popularised by Lewis Carroll in Alice's Adventures in Wonderland
+        and known for its distinctive mischievous grin.
+    - name: Bill the Lizard
+      url: https://en.wikipedia.org/wiki/Bill_the_Lizard
+      description: >-
+        Introduced in chapter four, Bill is perceived by Alice to be
+        someone who does all of the hard work for The White Rabbit and
+        the denizens of the community.
+
+operations:
+- message: text, yaml, and json are built-in template names
+
+- message: writing example.txt
+  template: text
+  values: 
+    content: |
+      This is text
+
+      a newlines should be preserved
+      when this gets output
+  write: example.txt
+
+- message: writing example.yaml
+  template: yaml
+  values:
+    content: 
+      title: This is yaml
+      characters: ( items )
+  write: example.yaml
+
+- message: writing example.json
+  template: json
+  values:
+    content: 
+      title: This is json
+      characters: ( items )
+  write: example.json

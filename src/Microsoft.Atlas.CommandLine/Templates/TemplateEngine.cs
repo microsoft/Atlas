@@ -26,9 +26,17 @@ namespace Microsoft.Atlas.CommandLine.Templates
         {
             Services = services;
             Options = options;
+
+            var builtInTemplates = new Dictionary<string, string>
+            {
+                { "text", "{{{ content }}}" },
+                { "json", "{{{ json content }}}" },
+                { "yaml", "{{{ yaml content indent=0 }}}" },
+            };
+
             var config = new HandlebarsConfiguration()
             {
-                FileSystem = new ProbingFileSystem(options.FileSystem),
+                FileSystem = new ProbingFileSystem(new BuiltInTemplatesFileSystem(options.FileSystem, builtInTemplates)),
                 Helpers =
                 {
                     { "query", QueryHelper },
