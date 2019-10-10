@@ -11,6 +11,7 @@
     <PackAsTool>true</PackAsTool>
     <PackageId>atlas-cli</PackageId>
     <LangVersion>7.1</LangVersion>
+    <PackageLicenseFile>LICENSE</PackageLicenseFile>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
