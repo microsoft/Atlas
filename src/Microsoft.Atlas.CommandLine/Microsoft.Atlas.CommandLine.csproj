@@ -11,6 +11,8 @@
     <PackAsTool>true</PackAsTool>
     <PackageId>atlas-cli</PackageId>
     <LangVersion>7.1</LangVersion>
+    <PackageIcon>atlas.ico</PackageIcon>
+
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
@@ -43,7 +45,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <None Include="..\..\docs\atlas.ico" />
+    <None Include="..\..\docs\atlas.ico" Pack="true" PackagePath="\" />
     <None Include="..\..\LICENSE" Pack="true" PackagePath="." />
     <None Include="..\..\ThirdPartyNotice.txt" Pack="true" PackagePath="." />
   </ItemGroup>
