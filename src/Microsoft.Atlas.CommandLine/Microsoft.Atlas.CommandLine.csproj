@@ -1,4 +1,4 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <OutputType>Exe</OutputType>
@@ -22,7 +22,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="BouncyCastle" Version="1.8.4" />
+    <PackageReference Include="BouncyCastle" Version="1.8.9" />
     <PackageReference Include="Handlebars.Net" Version="1.9.5" />
     <PackageReference Include="JmesPath.Net" Version="1.0.109" />
     <PackageReference Include="Markdig" Version="0.15.4" />
