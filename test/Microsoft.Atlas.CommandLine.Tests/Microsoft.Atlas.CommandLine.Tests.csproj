@@ -1,17 +1,17 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFramework>netcoreapp2.1</TargetFramework>
+    <TargetFramework>net6.0</TargetFramework>
     <IsPackable>false</IsPackable>
     <LangVersion>7.1</LangVersion>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
-    <DocumentationFile>bin\Release\netcoreapp2.1\Microsoft.Atlas.CommandLine.Tests.xml</DocumentationFile>
+    <DocumentationFile>bin\Release\$(TargetFramework)\Microsoft.Atlas.CommandLine.Tests.xml</DocumentationFile>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
-    <DocumentationFile>bin\Debug\netcoreapp2.1\Microsoft.Atlas.CommandLine.Tests.xml</DocumentationFile>
+    <DocumentationFile>bin\Debug\$(TargetFramework)\Microsoft.Atlas.CommandLine.Tests.xml</DocumentationFile>
   </PropertyGroup>
 
   <ItemGroup>
