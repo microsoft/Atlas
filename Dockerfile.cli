@@ -1,4 +1,4 @@
-FROM microsoft/dotnet:2.1-sdk AS restore
+FROM mcr.microsoft.com/dotnet/sdk AS restore
 WORKDIR /app
 COPY *.sln ./
 COPY .editorconfig ./
